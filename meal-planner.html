@@ -799,7 +799,8 @@ const PANTRY_SECTIONS = [
     { id:"p-amylu",    name:"Amylu Chicken Sausage", sub:"Costco freezer" },
     { id:"p-wellshire",name:"Wellshire Turkey Bacon", sub:"Fridge" },
     { id:"p-jennio",   name:"Jennie-O Ground Turkey", sub:"Fridge/freezer" },
-    { id:"p-eggs",     name:"Eggs + Egg Whites", sub:"Costco carton" },
+    { id:"p-eggs",     name:"Eggs", sub:"Dozen" },
+    { id:"p-eggwhites", name:"Liquid Egg Whites", sub:"Costco carton" },
   ]},
   { section: "🥛 Dairy", items: [
     { id:"p-fage",     name:"Fage 0% Greek Yogurt", sub:"32oz tub" },
@@ -909,6 +910,7 @@ let state = {
   alexaMergedList: [],
   alexaSyncTime: null,
   ratings: {},  // recipeId -> { stars, chips[], note, date }
+  activeRecipes: {},  // recipeId -> false means inactive (default all active)
 };
 
 let supabase = null;
@@ -958,6 +960,7 @@ async function loadFromSupabase() {
         if (plan.alexaOnlyItems) state.alexaOnlyItems = plan.alexaOnlyItems;
         if (plan.alexaSyncTime) state.alexaSyncTime = plan.alexaSyncTime;
         if (plan.ratings) state.ratings = plan.ratings;
+        if (plan.activeRecipes) state.activeRecipes = plan.activeRecipes;
       setSyncStatus("saved");
     }
   } catch(e) { console.error("Load error:", e); setSyncStatus("offline"); }
@@ -967,7 +970,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -999,6 +1002,7 @@ function loadFromLocal() {
     if (saved.alexaOnlyItems) state.alexaOnlyItems = saved.alexaOnlyItems;
     if (saved.alexaSyncTime) state.alexaSyncTime = saved.alexaSyncTime;
     if (saved.ratings) state.ratings = saved.ratings;
+    if (saved.activeRecipes) state.activeRecipes = saved.activeRecipes;
   } catch(e) {}
 }
 
@@ -1471,8 +1475,9 @@ function confirmImport(section, encoded) {
 
 function renderItemCard(item, section) {
   const swapBadge = hasSwaps(item) ? `<span class="tag tag-green">✅ swaps</span>` : "";
+  const active = isActive(item.id);
   return `
-    <div class="card" onclick="viewRecipe('${section}','${item.id}')" style="cursor:pointer">
+    <div class="card" onclick="viewRecipe('${section}','${item.id}')" style="cursor:pointer;opacity:${active?1:0.45}">
       <div class="card-row">
         <div class="card-emoji">${item.emoji}</div>
         <div class="card-body">
@@ -1481,6 +1486,7 @@ function renderItemCard(item, section) {
           <div class="tags">${tags(item)}${swapBadge}</div>
         </div>
         <div class="card-actions" onclick="event.stopPropagation()">
+          <button onclick="toggleRecipeActive('${item.id}',event)" style="padding:6px 12px;border-radius:8px;border:none;background:${active?"var(--green)":"rgba(255,255,255,0.08)"};color:${active?"#0a0f1a":"var(--muted)"};font-size:13px;font-weight:700;cursor:pointer">${active?"✓ On":"Off"}</button>
           <button class="btn-edit" onclick="editItem('${section}','${item.id}')">Edit</button>
           <button class="btn-del" onclick="deleteItem('${section}','${item.id}')">✕</button>
         </div>
@@ -1493,7 +1499,7 @@ function renderDinnerCard(dinner, i, total) {
   const vegBadge  = dinner.hiddenVeg ? `<div style="color:var(--purple);font-size:11px;margin-top:2px">🥦 ${esc(dinner.hiddenVeg)}</div>` : "";
   const leftover  = dinner.leftoverNote ? `<div style="color:var(--amber);font-size:11px;margin-top:3px;line-height:1.4">${esc(dinner.leftoverNote)}</div>` : "";
   return `
-    <div class="dinner-card" data-id="${dinner.id}">
+    <div class="dinner-card" data-id="${dinner.id}" style="opacity:${isActive(dinner.id)?1:0.45}">
       <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer" onclick="viewRecipe('dinner','${dinner.id}')">
         <span style="font-size:30px;flex-shrink:0">${dinner.emoji}</span>
         <div style="flex:1;min-width:0">
@@ -1503,6 +1509,7 @@ function renderDinnerCard(dinner, i, total) {
           ${leftover}${swapBadge}${vegBadge}
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">
+          <button onclick="toggleRecipeActive('${dinner.id}',event)" style="padding:6px 12px;border-radius:8px;border:none;background:${isActive(dinner.id)?"var(--green)":"rgba(255,255,255,0.08)"};color:${isActive(dinner.id)?"#0a0f1a":"var(--muted)"};font-size:13px;font-weight:700;cursor:pointer">${isActive(dinner.id)?"✓ On":"Off"}</button>
           <button style="padding:6px 12px;border-radius:8px;border:1px solid var(--indigo);background:transparent;color:var(--indigo);font-size:13px;cursor:pointer" onclick="editItem('dinner','${dinner.id}')">Edit</button>
           <button style="padding:6px 12px;border-radius:8px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:13px;cursor:pointer" onclick="deleteItem('dinner','${dinner.id}')">✕</button>
         </div>
@@ -1618,7 +1625,7 @@ function buildSmartGroceryList() {
     ...state.breakfasts,
     ...state.lunches,
     ...state.desserts,
-  ];
+  ].filter(r => isActive(r.id));
   const CAT_RULES = [
     { cat:"🥩 Protein & Meat",    re:/chicken|turkey(?! bacon)|salmon|fish|beef|steak|pork|shrimp|ground|deli|rotisserie|amylu|jennie|wellshire/i },
     { cat:"🥓 Deli & Sausage",    re:/turkey bacon|sausage|bacon|deli/i },
@@ -2241,6 +2248,19 @@ const RATING_CHIPS = [
   "Keeper recipe ⭐",
 ];
 
+
+function isActive(id) {
+  // Default is active — only false if explicitly set to false
+  return state.activeRecipes[id] !== false;
+}
+
+function toggleRecipeActive(id, event) {
+  event.stopPropagation();
+  state.activeRecipes[id] = !isActive(id);
+  scheduleSave();
+  renderTab(currentTab);
+}
+
 function buildRatingHtml(id, section) {
   const r = (state.ratings||{})[id] || {};
   const stars = r.stars || 0;
@@ -2563,7 +2583,7 @@ async function exportToPaprika() {
     ...state.breakfasts,
     ...state.lunches,
     ...state.desserts,
-  ];
+  ].filter(r => isActive(r.id));
   const paprikaRecipes = allRecipes.map(r => {
     const ingredients = (r.ingredients || [])
       .filter(i => !i.startsWith("---"))
