@@ -3347,9 +3347,11 @@ async function init() {
     }
   } catch(e) {}
   loadFromLocal();
-  state.breakfasts = state.breakfasts.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
-  state.lunches    = state.lunches.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
-  state.dinners    = state.dinners.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
+  const safeInit = (arr) => (arr||[]).filter(r => r && r.id).map(r => ({...r, ingredients: applySwaps(r.ingredients||[]), instructions: r.instructions||[], tips: r.tips||""}));
+  state.breakfasts = safeInit(state.breakfasts);
+  state.lunches    = safeInit(state.lunches);
+  state.dinners    = safeInit(state.dinners);
+  state.desserts   = safeInit(state.desserts);
 
   var planEl = document.getElementById("page-plan");
   if (planEl) planEl.innerHTML = '<div style="padding:20px;color:#10b981">Loading...</div>';
