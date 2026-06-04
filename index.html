@@ -20,6 +20,7 @@
     <button class="tab-btn" onclick="showTab('swaps')">🔄</button>
     <button class="tab-btn" onclick="showTab('kids')">👧</button>
     <button class="tab-btn" onclick="showTab('pantry')">🧄</button>
+    <button class="tab-btn" onclick="showTab('sauces')">🫙</button>
     <button class="tab-btn" onclick="showTab('settings')">⚙️</button>
     <button class="tab-btn" onclick="showTab('cook')" style="background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:700">👨‍🍳 Cook</button>
   </div>
@@ -32,6 +33,7 @@
 <div id="page-kids" class="page"></div>
 <div id="page-settings" class="page"></div>
 <div id="page-pantry" class="page"></div>
+<div id="page-sauces" class="page"></div>
 <div id="page-cook" class="page" style="padding:0;"></div>
 
 <!-- MODAL -->
@@ -71,19 +73,27 @@ const DEFAULT_BREAKFASTS = [
       "1 small zucchini, grated and squeezed very dry in a paper towel",
       "½ cup reduced-fat shredded cheddar",
       "¼ cup Fairlife 2% milk",
-      "Kinder's The Blend or salt, pepper, garlic powder"
+      "Kinder's The Blend, Dan-O's Original, or Tony Chachere's Creole (one shake replaces salt + pepper + garlic)",
+      "🫙 Serve with: Lemon Herb Drizzle or Spicy Yum Yum Sauce from Sauces tab"
     ],
     hiddenVeg:"Grated zucchini + finely chopped spinach — both invisible once baked",
     instructions:[
-      "Preheat oven to 375°F. Grease a 12-cup muffin tin well (or use silicone pan).",
-      "Grate zucchini, wrap in a paper towel and squeeze out all moisture — this step matters.",
-      "Whisk eggs, egg whites, milk and seasoning together.",
-      "Divide sausage, spinach and zucchini evenly among cups.",
-      "Pour egg mixture over top. Sprinkle cheese.",
+      "── MISE EN PLACE (do all this before turning on the oven) ──",
+      "Preheat oven to 375°F.",
+      "Grate the zucchini. Wrap in a paper towel and squeeze out ALL moisture — soggy muffins happen when you skip this.",
+      "Finely chop 1 cup baby spinach → set aside.",
+      "Cook sausage in a skillet over medium heat, crumbling into small pieces until no pink. Set aside to cool slightly.",
+      "Grease all 12 muffin cups generously — sides too.",
+      "── MIX AND BAKE ──",
+      "Whisk together 10 eggs + ½ cup liquid egg whites in a large bowl.",
+      "Add ¼ cup Fairlife milk, seasoning (Kinder's or Dan-O's). Whisk again.",
+      "Stir in squeezed zucchini, chopped spinach, sausage crumbles, and ½ cup shredded cheddar.",
+      "Pour evenly into the 12 muffin cups — about ¾ full each.",
+      "Optional: sprinkle Pizza Party! seasoning or Everything But the Bagel on top.",
       "Bake 20-22 min until set and lightly golden.",
       "Cool completely, then store in an airtight container in the fridge.",
     ],
-    tips:"Silicone muffin pan makes removal and cleanup effortless. Make Sunday night — takes 30 min total."
+    tips:"SEASON WELL: Taste the egg mixture before pouring into the tins — it should taste well seasoned. Eggs need more seasoning than you think, especially cold out of the fridge. | SQUEEZE DRY: Skipping the zucchini squeeze is the #1 mistake — even a little extra moisture makes rubbery, wet muffins. Squeeze harder than you think you need to. | MAILLARD / BROWNING: For a slightly golden top, switch the oven to broil for the last 60-90 seconds. Watch closely — they go from golden to burnt fast. | SILICONE PAN: A silicone muffin pan releases these perfectly without any sticking. Worth $10 on Amazon."
   },
   {
     id:"b2", name:"PB Banana Overnight Oats (Kids)", calories:320, protein:12, emoji:"🫙", kidFriendly:true,
@@ -108,7 +118,7 @@ const DEFAULT_BREAKFASTS = [
       "Seal and refrigerate overnight.",
       "Hand to kids in the morning — eat cold or 45 sec microwave."
     ],
-    tips:"Make a batch of spinach puree, freeze in an ice cube tray, and pop cubes into smoothies, oats, and sauces all week. Each cube is roughly 1 tbsp."
+    tips:"TEXTURE: If oats are too thick in the morning, stir in a splash of Fairlife milk to loosen. Too thin means you need more oats next time. | BANANA RIPENESS: The riper the banana the sweeter — overripe bananas (brown spots) mean you can reduce or skip the honey entirely. | SPINACH PUREE HACK: Blend a handful of spinach with 2 tbsp water, freeze in an ice cube tray. Each cube = 1 tbsp. Pop one into oats, smoothies, or sauces all week — completely invisible and tasteless."
   },
 ];
 const DEFAULT_LUNCHES = [
@@ -127,14 +137,23 @@ const DEFAULT_LUNCHES = [
       "1 cucumber, diced",
       "½ cup hummus",
       "Primal Kitchen Greek dressing or lemon + olive oil",
+      "🫙 Try instead: Lemon Herb Drizzle, Greek Yogurt Tzatziki, or Nothing Hidden Ranch from Sauces tab",
     ],
     instructions:[
-      "Pull chicken from Sunday's roast (or grab a rotisserie) and shred into a container.",
-      "Cook farro or quinoa in bulk — keeps 5 days in fridge.",
-      "To assemble: layer greens, grains, chicken, tomatoes and cucumber in a bowl.",
-      "Add hummus on the side. Drizzle dressing. Done."
+      "── MISE EN PLACE ──",
+      "Shred roast chicken from Sunday's Sheet Pan night or pull apart a rotisserie → set aside.",
+      "Grate ½ zucchini on box grater → set aside to stir into warm grains.",
+      "Halve 1 cup cherry tomatoes → set aside.",
+      "Dice 1 cucumber into bite-size pieces → set aside.",
+      "── COOK GRAINS ──",
+      "Cook farro or quinoa per package. While still HOT stir in the grated zucchini — it wilts in and disappears.",
+      "Season grains with salt, pepper and a drizzle of olive oil.",
+      "── ASSEMBLE ──",
+      "Layer greens in each bowl. Add warm grains, shredded chicken, cherry tomatoes, cucumber.",
+      "Add a dollop of hummus. Drizzle with Primal Kitchen Greek dressing — or swap for Nothing Hidden Ranch, Lemon Herb Drizzle, or Tzatziki from the Sauces tab.",
+      "Adults: finish with a pinch of Smoked Chipotle Chili Flakes or Herbes de Provence."
     ],
-    tips:"Keep all components separate in the fridge — assembles in literally 3 minutes each day."
+    tips:"ACID: The Primal Kitchen Greek dressing already has lemon/vinegar — but if it tastes flat, an extra squeeze of fresh lemon right before eating makes a big difference. | SEASON THE GRAINS: Taste your farro or quinoa while warm and make sure it's well seasoned with salt — underseasoned grains make the whole bowl taste bland no matter how good the toppings are. | WARM GRAINS = better zucchini: Stir the grated zucchini into the grains while they're still hot — it wilts perfectly. Cold grains won't wilt it properly. | COMPONENTS SEPARATE: Keep chicken, grains, veg and dressing all in separate containers in the fridge — assembles in 3 min each day."
   },
   {
     id:"l2", name:"Tomato Soup & Turkey Melts", calories:460, protein:34, emoji:"🍅", kidFriendly:true,
@@ -151,13 +170,21 @@ const DEFAULT_LUNCHES = [
       "Land O'Lakes light butter for pan"
     ],
     instructions:[
-      "Heat soup per package. Add splash of Fairlife milk if kids like it creamier.",
-      "Butter one side of each bread slice with light butter.",
-      "Layer turkey and cheese on unbuttered side. Spread pesto or Dijon.",
-      "Grill butter-side-down over medium heat until golden and cheese melts, ~3 min per side.",
-      "Slice diagonally, serve alongside soup."
+      "── MISE EN PLACE ──",
+      "Lay out 8 bread slices. Portion turkey (2 oz per sandwich) and cheese (1 oz per sandwich).",
+      "Have pesto ready. If blending in spinach for kids: blend a small handful into the pesto now.",
+      "── MAKE THE SOUP ──",
+      "Pour tomato soup into a saucepan over medium heat, stirring occasionally. Keep warm on low.",
+      "Optional: stir in a splash of Fairlife milk for a creamier texture the kids love.",
+      "── MAKE THE MELTS ──",
+      "Butter one side of each bread slice with a thin layer of Land O'Lakes light butter.",
+      "On the unbuttered side of 4 slices: spread pesto, then layer turkey and cheese. Top with remaining bread butter-side up.",
+      "Heat a skillet over medium. Add sandwiches butter-side-down.",
+      "Cook 3-4 min until golden. Flip carefully. Cook another 3 min until golden and cheese is melted.",
+      "Slice diagonally. Serve alongside soup.",
+      "🫙 Serve with Nothing Hidden Ranch for dipping — kids love it alongside the tomato soup."
     ],
-    tips:"Rao's and Frik & Frak are both genuinely good straight from the carton — no doctoring needed."
+    tips:"MAILLARD / CRISPY BREAD: Medium heat is key — too high and the bread burns before the cheese melts. Press down lightly with a spatula while grilling for better contact and more even browning. | ACID IN SOUP: Stir a tiny splash of cream or Fairlife milk into the tomato soup to balance the acidity — makes it noticeably smoother and richer. | PESTO TRICK: Spread pesto on the INSIDE of the bread (not the outside) — this keeps it from burning and lets the buttered outside get the golden crust. | CHEESE MELT: If cheese isn't melting, cover the pan with a lid for the last minute — traps steam and melts the cheese perfectly."
   },
 ];
 const DESSERT_LIBRARY = [
@@ -334,7 +361,7 @@ const DEFAULT_DINNERS = [
       "Optional: broil 1-2 min at the end for extra crispy skin — watch closely.",
       "Pull and shred remaining chicken while still warm. Store in an airtight container in the fridge."
     ],
-    tips:"The balsamic vinegar is the secret — it caramelizes beautifully on the veggies and chicken. Don't skip it."
+    tips:"ACID FINISH: Squeeze fresh lemon juice over everything right when it comes out of the oven — before serving. It wakes up all the roasted flavors dramatically. | MAILLARD / CRISPY SKIN: Patting the chicken completely dry is non-negotiable. Moisture is the enemy of browning — any water on the skin steams instead of sears. Dry chicken = golden crispy skin. | SINGLE LAYER: Don't crowd the vegetables on the pan or they'll steam instead of caramelize. Use two pans if needed. | RESTING: The 5 min rest after cooking lets juices redistribute — cutting immediately makes them run out onto the board."
   },
   {
     id:"d2", day:"Tuesday", emoji:"🥬", calories:380, protein:40,
@@ -354,24 +381,36 @@ const DEFAULT_DINNERS = [
       "1 medium carrot, grated (add with onion — melts into the filling)",
       "½ cup mushrooms, very finely diced (adds moisture and umami, invisible in sauce)",
       "¼ cup hoisin sauce",
-      "2 tbsp reduced-sodium soy sauce",
+      "2 tbsp reduced-sodium soy sauce or coconut aminos",
       "1 tbsp rice wine vinegar",
       "1 tsp fresh ginger, grated (or ginger paste)",
       "1 tsp sesame oil",
       "1 can (8oz) water chestnuts, drained and diced",
       "3 green onions, thinly sliced",
-      "Sriracha on the side (skip for kids)"
+      "Sriracha on the side (skip for kids)",
+      "🫙 Drizzle with: Peanut Sauce or Spicy Yum Yum Sauce from Sauces tab"
     ],
     instructions:[
-      "Heat oil in a large cast iron skillet or wok over medium-high heat.",
-      "Add garlic and onion, cook 3-4 min until softened.",
-      "If using raw ground meat: add and cook, breaking up into small crumbles, until cooked through, 5-6 min.",
+      "── MISE EN PLACE (do all this before turning on the stove) ──",
+      "Dice the small onion finely → set aside.",
+      "Mince 3 garlic cloves → set aside.",
+      "Grate 1 medium carrot on a box grater → set aside.",
+      "Finely dice ½ cup mushrooms (if using) → set aside.",
+      "Open and drain water chestnuts, dice into small pieces → set aside.",
+      "Slice 3 green onions thinly → set aside for topping.",
+      "Mix sauce in a small bowl: hoisin + soy sauce + rice wine vinegar + ginger + sesame oil → set aside.",
+      "Separate lettuce leaves onto a plate — ready to fill.",
+      "── NOW COOK ──",
+      "Heat oil in a large skillet over medium-high until shimmering.",
+      "Add onion, cook 3-4 min until softened.",
+      "Add garlic and grated carrot, cook 2 min.",
+      "If using raw ground meat: add and cook breaking into small crumbles until cooked through, 5-6 min.",
       "If using leftover shredded chicken: add and stir to warm, 2 min.",
       "Stir in hoisin sauce, soy sauce, rice wine vinegar, ginger and sesame oil. Cook 1-2 min.",
       "Stir in water chestnuts and green onions.",
       "Spoon into lettuce leaves. Sriracha on the side for adults."
     ],
-    tips:"Use reduced sodium soy sauce — the hoisin already adds a lot of salt. Skip sriracha for the kids entirely."
+    tips:"ACID BALANCE: The rice wine vinegar is your acid here — taste the filling before serving and if it tastes flat, add another small splash of vinegar. It cuts through the richness of the hoisin. | MAILLARD: Same rule as ground turkey in Bolognese — leave it undisturbed 3 min to brown before breaking up. Browned turkey has dramatically more flavor than grey steamed turkey. | SALT CHECK: Hoisin is already salty — taste before adding any extra salt. | SAUCE TRICK: Mix the sauce in a small bowl before it goes in the pan so it coats everything evenly the moment it hits the heat."
   },
   {
     id:"d3", day:"Thursday", emoji:"🍝", calories:490, protein:44,
@@ -391,25 +430,93 @@ const DEFAULT_DINNERS = [
       "3 cloves garlic, minced",
       "1 jar Frik & Frak or Rao's marinara sauce",
       "1 can (14oz) diced tomatoes",
-      "1 tsp Italian seasoning",
+      "1 tsp Italian seasoning (or Burlap & Barrel Herbes de Provence for deeper, more aromatic flavor)",
       "1 tbsp olive oil",
       "Salt & pepper",
       "12 oz Brami protein pasta (cook per package — al dente, rinse after draining)",
-      "Reduced-fat Parmesan to finish"
+      "Reduced-fat Parmesan to finish",
+      "🫙 Swap the red sauce some weeks: Cottage Cheese Alfredo from Sauces tab for a white version"
     ],
     instructions:[
-      "Grate zucchini and carrots on a box grater — takes about 60 seconds. No need to squeeze dry here.",
-      "Heat olive oil in a large skillet or Dutch oven over medium-high. Add onion and cook 3 min.",
-      "Add garlic and mushrooms (if using), cook 1 min.",
-      "Add ground turkey in chunks — leave UNDISTURBED 3-4 min to brown. Then break up.",
-      "Add grated zucchini and carrot. Stir and cook 3-4 min — they'll look like a lot but cook way down.",
-      "Pour in marinara and diced tomatoes. Add Italian seasoning, salt and pepper.",
-      "Simmer 15 min — the veg melts completely into the sauce. Taste and adjust seasoning.",
-      "Meanwhile cook Brami pasta per package. Al dente — rinse after draining to stop cooking.",
-      "Serve pasta topped with sauce. Finish with Parmesan."
+      "── MISE EN PLACE (do all this before turning on the stove) ──",
+      "Grate zucchini on box grater → set aside. Grate both carrots → set aside. Takes about 2 min total.",
+      "Dice the onion into small pieces → set aside.",
+      "Mince 3 garlic cloves (or use a garlic press) → set aside.",
+      "If using mushrooms: finely dice ½ cup → set aside.",
+      "Open the jar of marinara and can of diced tomatoes — have them ready to pour.",
+      "Measure out your Italian seasoning (or Herbes de Provence), salt and pepper → set aside.",
+      "── NOW START COOKING ──",
+      "Heat 1 tbsp olive oil in a large Dutch oven or skillet over medium-high heat.",
+      "Add onion. Cook 3 min, stirring occasionally, until softened.",
+      "Add garlic and mushrooms (if using). Cook 1 min until fragrant.",
+      "Add ground turkey in one layer — leave UNDISTURBED for 3-4 min to get a brown crust. Then break up with a spoon.",
+      "Add grated zucchini and carrot. Stir and cook 3-4 min — it looks like a lot but cooks way down.",
+      "Pour in marinara and diced tomatoes. Add Italian seasoning, salt and pepper. Stir to combine.",
+      "Reduce heat to low. Simmer UNCOVERED 15 min — the veg melts into the sauce. Taste and adjust salt.",
+      "While sauce simmers: bring a pot of well-salted water to boil. Cook Brami pasta al dente per package. Rinse after draining.",
+      "Serve pasta topped with sauce. Finish with a generous grating of Parmesan."
     ],
-    tips:"The grated veg adds moisture to the sauce so it coats pasta beautifully. Double the sauce and freeze half — future Thursday is done in 10 min. Swap to salmon (see 👧 Kids tab for the salmon recipe) on weeks the kids are being more adventurous."
+    tips:"ACID FINISH: Right before serving, squeeze half a lemon or a splash of red wine vinegar into the sauce and stir. It brightens the whole dish and makes it taste restaurant-quality — don't skip this step. | MAILLARD: The undisturbed browning on the turkey is critical — resist stirring for the full 3-4 min to build a crust that adds deep flavor. | PASTA WATER: Salt your pasta water until it tastes like the sea — this is the only chance to season the pasta itself, not just the sauce. Reserve a cup before draining in case the sauce needs loosening. | DOUBLE BATCH: Make double sauce and freeze half — future Thursday dinner in 10 min."
   },
+  ,{
+    id:"dinner4",
+    name:"Italian Steak Skewers with Salsa Verde",
+    emoji:"🥩",
+    day:"Saturday",
+    calories:380,
+    protein:42,
+    activeTime:"25 min",
+    prepTime:"30 min marinade + 25 min cook",
+    hiddenVeg:"Parsley + anchovy in salsa verde — both invisible to kids",
+    leftoverNote:"🔄 Leftover steak bites are incredible cold the next day sliced over a grain bowl with tzatziki.",
+    source:"Inspired by Yeppa & Co., Atlanta — Rimini-style Italian grilled skewers",
+    description:"MK's favorite from Yeppa & Co. on the Beltline — Italian steak skewers with bright salsa verde and charred lemon. Restaurant quality in 25 minutes of active cooking.",
+    ingredients:[
+      "--- THE STEAK ---",
+      "1.5 lbs sirloin or ribeye, cut into 1.5-inch cubes",
+      "2 tbsp refined avocado oil",
+      "3 cloves garlic, minced or grated",
+      "1 tsp fresh rosemary, finely chopped (or ½ tsp dried)",
+      "1 tsp Kinder's Buttery Steakhouse OR Burlap & Barrel Herbes de Provence",
+      "1 tsp salt (Diamond Crystal kosher)",
+      "½ tsp black pepper (or Penzeys Four Peppercorn Blend)",
+      "--- SALSA VERDE ---",
+      "1 cup fresh flat-leaf parsley, packed",
+      "2 tbsp capers, drained",
+      "1 clove garlic",
+      "1 anchovy fillet (optional — adds incredible depth, completely undetectable in the sauce)",
+      "Zest + juice of 1 lemon",
+      "3-4 tbsp good olive oil",
+      "Pinch of red pepper flakes",
+      "Salt to taste",
+      "--- FINISHING ---",
+      "1 lemon, halved (for charring)",
+      "Flaky sea salt for finishing (Burlap & Barrel Herb & Sea Salt if you have it)",
+      "🫙 Serve alongside: Greek Yogurt Tzatziki or Lemon Herb Drizzle from Sauces tab"
+    ],
+    instructions:[
+      "── MISE EN PLACE (30 min before cooking) ──",
+      "Cut steak into 1.5-inch cubes — uniform size is important for even cooking. Pat completely dry with paper towels.",
+      "In a bowl combine avocado oil, minced garlic, rosemary, seasoning, salt and pepper. Add steak cubes and toss to coat.",
+      "Thread onto skewers — leave a small gap between pieces so heat circulates. Set aside to marinate at least 30 min (up to 2 hours in the fridge).",
+      "── MAKE THE SALSA VERDE ──",
+      "Finely chop parsley, capers, garlic and anchovy together by hand — chunky is better than smooth. Alternatively pulse 3-4 times in a food processor, don't over-blend.",
+      "Transfer to a bowl. Add lemon zest, lemon juice and olive oil. Stir to combine.",
+      "Add red pepper flakes and salt to taste. Set aside — flavor improves as it sits.",
+      "── COOK THE SKEWERS ──",
+      "Heat a cast iron skillet or grill pan over HIGH heat until smoking hot — this is critical for the crust.",
+      "Add skewers in a single layer — don't crowd the pan. Cook UNDISTURBED 2 min per side. 2 min side 1, flip, 2 min side 2, flip to remaining sides — total about 8 min for medium.",
+      "While skewers cook: place lemon halves cut-side DOWN in the same hot pan. Let char 2-3 min until deeply caramelized and golden — this concentrates the juice and adds smoky sweetness.",
+      "── FINISH AND SERVE ──",
+      "Rest skewers 3 min — do not skip this step or juices run out when cut.",
+      "ACID FINISH: Squeeze the charred lemon over everything right before serving — this is what makes it taste like the restaurant.",
+      "Finish with flaky sea salt. Spoon salsa verde generously over or alongside the skewers.",
+      "Serve immediately — skewers are best the moment they come off the heat."
+    ],
+    tips:"MAILLARD: The cast iron must be ripping hot before the steak goes in — a drop of water should evaporate instantly. Cold or crowded pan = grey steamed steak instead of a crust. | DRY THE STEAK: Pat completely dry before marinating. Any surface moisture prevents browning. This single step is the difference between restaurant-quality and home-cook results. | ANCHOVY SECRET: Don't skip the anchovy in the salsa verde — it doesn't taste like fish at all, it just adds a deep savory richness that makes everyone ask what's in the sauce. | CHARRED LEMON: The charred lemon is the acid finish — squeezing it over right before serving wakes up every other flavor on the plate. Don't serve without it. | RESTING: 3 min rest is non-negotiable. Cut immediately and you lose half the juices onto the cutting board.",
+    kidNote:"Kids eat the steak — skip the salsa verde for them or offer your Nothing Hidden Ranch as a dipping sauce instead. The steak itself is mild and kid-friendly.",
+    active:true
+  }
 ];
 const DEFAULT_SWAPS = [
   {
@@ -428,10 +535,10 @@ const DEFAULT_SWAPS = [
     id:"s2",
     category:"Pasta",
     original:"Regular pasta",
-    upgrade:"Brami Protein Pasta",
+    upgrade:"Brami Protein Pasta (or Barilla Protein+)",
     benefit:"High protein pasta — significantly more protein than regular pasta",
     protein:"Higher protein per serving than regular pasta",
-    where:"Costco (confirmed) — availability elsewhere unconfirmed",
+    where:"Brami: Costco · Barilla Protein+: Publix, Target, Kroger — widely available",
     applies:["Any pasta dish","Mac and cheese","Pasta salads","Baked pasta"],
     emoji:"🍝",
     note:"Costco is the reliable source. Worth grabbing extra when you're there. Cook al dente — high protein pastas can get mushy if overcooked."
@@ -689,6 +796,90 @@ const DEFAULT_SWAPS = [
     note:"In a cooked sauce you genuinely cannot tell the difference."
   },
   {
+    id:"s25",
+    category:"Salad Dressing",
+    original:"Regular bottled dressing",
+    upgrade:"Bragg Organic Apple Cider Vinaigrette",
+    benefit:"Only 15 calories per serving, oil-free, clean ingredients",
+    protein:"Negligible",
+    where:"Whole Foods · Publix · Amazon",
+    applies:["Salads","Grain bowls","Marinades"],
+    emoji:"🥗",
+    note:"Dietitian top pick for lowest calorie dressing. Bright, zippy flavor. Great on grain bowls and mixed greens."
+  },
+  {
+    id:"s26",
+    category:"Salad Dressing",
+    original:"Creamy Caesar or Ranch dressing",
+    upgrade:"Primal Kitchen Caesar or Ranch",
+    benefit:"Avocado oil base, no seed oils, no added sugar — same richness at fewer calories",
+    protein:"Slight protein boost",
+    where:"Whole Foods · Publix · Target",
+    applies:["Caesar salads","Ranch dipping","Grain bowls","Chicken marinades"],
+    emoji:"🥗",
+    note:"Primal Kitchen Ranch and Caesar are both excellent — taste like the real thing with none of the junk."
+  },
+  {
+    id:"s27",
+    category:"Hot Sauce",
+    original:"Regular hot sauce or sriracha",
+    upgrade:"Cholula Original or Frank's RedHot",
+    benefit:"Essentially zero calories — pure flavor with no caloric cost",
+    protein:"Zero",
+    where:"Any grocery store — Publix, Kroger, Target, Walmart",
+    applies:["Eggs","Tacos","Chicken","Grain bowls","Lettuce cups","Marinades"],
+    emoji:"🌶️",
+    note:"Cholula is mild and versatile — great on eggs and tacos. Frank's RedHot is perfect for buffalo-style chicken. Both zero calories."
+  },
+  {
+    id:"s28",
+    category:"Salsa",
+    original:"Regular jarred salsa",
+    upgrade:"Newman's Own Mild or Trader Joe's Thick & Chunky",
+    benefit:"Only 10-15 calories per serving, low sodium, clean ingredients",
+    protein:"Negligible",
+    where:"Newman's Own: any grocery store · Trader Joe's: Trader Joe's only",
+    applies:["Tacos","Eggs","Chicken topping","Burrito bowls","Dipping"],
+    emoji:"🫙",
+    note:"Newman's Own is the most widely available clean salsa. TJ's Thick & Chunky is excellent if you have a Trader Joe's nearby."
+  },
+  {
+    id:"s29",
+    category:"BBQ Sauce",
+    original:"Regular BBQ sauce (Sweet Baby Ray's original etc.)",
+    upgrade:"G Hughes Sugar-Free OR Sweet Baby Ray's Sugar-Free Sweet & Spicy",
+    benefit:"Zero sugar, ~5 calories per serving vs 70+ in regular BBQ sauce",
+    protein:"Zero",
+    where:"Publix · Kroger · Walmart · Target — both widely available",
+    applies:["Grilled chicken","Pork","Burgers","Dipping","Sheet pan proteins"],
+    emoji:"🍖",
+    note:"G Hughes is the gold standard sugar-free BBQ — multiple flavors all excellent. Sweet Baby Ray's Sugar-Free Sweet & Spicy is Andrew's personal favorite. Both taste like the real thing."
+  },
+  {
+    id:"s30",
+    category:"Soy Sauce",
+    original:"Regular soy sauce",
+    upgrade:"Coconut Aminos",
+    benefit:"Lower sodium than soy sauce, slightly sweet, same umami flavor",
+    protein:"Same",
+    where:"Whole Foods · Publix · most grocery stores",
+    applies:["Stir fry","Lettuce cups","Marinades","Fried rice","Asian dishes"],
+    emoji:"🥢",
+    note:"Use 1:1 swap for soy sauce. Slightly sweeter and less salty — great for the lettuce cup filling and any Asian-style dish."
+  },
+  {
+    id:"s31",
+    category:"Buffalo Sauce",
+    original:"Regular buffalo sauce",
+    upgrade:"Primal Kitchen Buffalo Sauce",
+    benefit:"Clean ingredients, avocado oil base, no artificial dyes",
+    protein:"Negligible",
+    where:"Whole Foods · Publix · Target",
+    applies:["Chicken","Cauliflower","Dipping","Wraps","Sheet pan"],
+    emoji:"🌶️",
+    note:"Great for buffalo chicken bowls or wraps — all the flavor of traditional buffalo sauce with none of the junk ingredients."
+  },
+  {
     id:"s20",
     category:"Ground Turkey vs Chicken",
     original:"Ground chicken",
@@ -702,192 +893,329 @@ const DEFAULT_SWAPS = [
   },
 ];
 const DEFAULT_SPICE_BLENDS = [
+  // ── PRIORITY BUYS ─────────────────────────────────────────────
   {
     id:"sp1",
     name:"Kinder's The Blend",
     emoji:"⭐",
-    rating:"4.8★ — Amazon #1 bestseller in seasoning blends",
-    usedFor:["Chicken (any preparation)","Pork","Salmon","Roasted vegetables","Eggs"],
-    where:"Costco (best price, large bottle) · Amazon · most grocery stores",
-    replaces:"Salt + pepper + garlic powder + onion powder",
-    note:"The most versatile all-purpose blend in the game right now.",
-    timesSaved:"Replaces 4-5 spice measurements per recipe"
+    priority:true,
+    buy:"Any grocery store · Costco (best value)",
+    recipes:["Egg & Turkey Sausage Muffin Cups","Sheet Pan Roast Chicken"],
+    howToUse:"Egg Muffin Cups: season the egg mixture before pouring into tins. Sheet Pan Chicken: coat thighs before roasting instead of measuring salt + pepper + garlic separately.",
+    note:"Your everyday all-purpose. Already in your pantry — use it."
   },
   {
     id:"sp2",
-    name:"Kinder's Buttery Steakhouse",
-    emoji:"🥩",
-    rating:"4.8★ — top-rated steak seasoning",
-    usedFor:["Steaks","Burgers","Pork chops","Roasted potatoes","Ground beef"],
-    where:"Costco · Amazon · most grocery stores",
-    replaces:"Salt + pepper + garlic + onion + butter flavoring",
-    note:"Makes the Friday steak night even easier — just coat and cook.",
-    timesSaved:"Replaces 5+ spice measurements"
+    name:"Dan-O's Original",
+    emoji:"🧂",
+    priority:true,
+    buy:"Amazon · Walmart · Target",
+    recipes:["Egg & Turkey Sausage Muffin Cups","Sheet Pan Roast Chicken","PF Chang's Lettuce Cups","Turkey Bolognese"],
+    howToUse:"Direct swap for Kinder's The Blend on any of these recipes. No salt added so you can season more generously. Use Original for the kids, Spicy for adults.",
+    note:"Best value all-purpose seasoning. Buy the 2-pack (Original + Spicy) on Amazon."
   },
   {
     id:"sp3",
-    name:"Trader Joe's Everything But the Bagel",
-    emoji:"🫙",
-    rating:"4.9★ — cult favorite",
-    usedFor:["Eggs","Avocado toast","Salmon","Chicken","Roasted veggies","Cottage cheese bowls"],
-    where:"Trader Joe's (original) · most grocery stores now carry versions",
-    replaces:"Sesame seeds + poppy seeds + garlic + onion + salt",
-    note:"Insanely versatile finishing seasoning.",
-    timesSaved:"Finishing seasoning — no measuring needed, just sprinkle"
+    name:"Burlap & Barrel Nothing Hidden Ranch",
+    emoji:"🥗",
+    priority:true,
+    buy:"burlapandbarrel.com",
+    recipes:["Squeeze Bottle Ranch Sauce","Turkey Melts (dipping)","Rotisserie Chicken Grain Bowls","Egg & Turkey Sausage Muffin Cups (side dip)"],
+    howToUse:"Squeeze Bottle Ranch: mix 2 tsp with 1 cup Fage 0% + splash Fairlife milk. Turkey Melts: serve alongside tomato soup as dipping sauce. Grain Bowls: drizzle instead of Primal Kitchen dressing.",
+    note:"You're making the ranch sauce recipe weekly — this is the key ingredient. Worth ordering immediately."
   },
   {
     id:"sp4",
-    name:"Primal Palate Adobo Seasoning",
-    emoji:"🌶️",
-    rating:"4.7★",
-    usedFor:["Chicken","Shrimp","Fish tacos","Burrito bowls","Latin-style dishes"],
-    where:"Amazon · Whole Foods · Thrive Market",
-    replaces:"Cumin + garlic + oregano + paprika + onion + salt",
-    note:"Excellent for the shrimp taco and lettuce cup recipes — one shake instead of measuring out 5 spices.",
-    timesSaved:"Replaces 5-6 spice measurements"
+    name:"Burlap & Barrel Pizza Party!",
+    emoji:"🍕",
+    priority:true,
+    buy:"burlapandbarrel.com",
+    recipes:["Egg & Turkey Sausage Muffin Cups","Rotisserie Chicken Grain Bowls","Turkey Melts","Brami pasta (finishing)"],
+    howToUse:"Egg Muffins: sprinkle on top before baking for a cheesy-herby crust. Turkey Melts: season the outside of the bread before grilling. Grain Bowls: finishing sprinkle on top with the Parmesan. Brami pasta: toss in at the end instead of just salt.",
+    note:"Incredibly versatile — you'll reach for this 4-5x a week across multiple recipes."
   },
   {
     id:"sp5",
-    name:"Kinder's Lemon Pepper",
-    emoji:"🍋",
-    rating:"4.8★",
-    usedFor:["Salmon","Shrimp","Chicken","Roasted asparagus","Fish"],
-    where:"Costco · Amazon · most grocery stores",
-    replaces:"Lemon zest + cracked pepper + salt + garlic",
-    note:"Perfect for the sheet pan salmon and any quick fish night.",
-    timesSaved:"Replaces lemon zest + 3 spice measurements"
+    name:"Burlap & Barrel Herbes de Provence (or Penzeys Sunny Paris)",
+    emoji:"🌿",
+    priority:true,
+    buy:"Burlap & Barrel: burlapandbarrel.com · Penzeys Sunny Paris: penzeys.com — both excellent, get whichever ships first",
+    recipes:["Sheet Pan Roast Chicken Thighs","Turkey Bolognese"],
+    howToUse:"Sheet Pan Chicken: replace the dried thyme + rosemary with 1.5 tsp of either blend — one jar instead of two separate herbs. Turkey Bolognese: replace Italian seasoning 1:1. Penzeys Sunny Paris is salt-free which gives you more control over seasoning level.",
+    note:"Both are excellent. Penzeys Sunny Paris is consistently rated slightly better for chicken specifically and is salt-free. Burlap & Barrel is better for the Bolognese. If buying one: Penzeys for chicken-forward weeks, Burlap & Barrel for pasta weeks."
   },
   {
     id:"sp6",
-    name:"McCormick Grill Mates Montreal Chicken",
-    emoji:"🍗",
-    rating:"4.7★ — widely loved, very accessible",
-    usedFor:["Chicken (grilled, baked, pan-seared)","Turkey","Pork"],
-    where:"Any grocery store · Costco · Amazon",
-    replaces:"Garlic + onion + paprika + thyme + pepper + salt",
-    note:"The most available great chicken seasoning — every grocery store carries it.",
-    timesSaved:"Replaces 5-6 spice measurements"
+    name:"Burlap & Barrel Low & Slow Chili Powder",
+    emoji:"🌶️",
+    priority:true,
+    buy:"burlapandbarrel.com",
+    recipes:["PF Chang's Lettuce Cups","Turkey Bolognese","Egg & Turkey Sausage Muffin Cups"],
+    howToUse:"Lettuce Cups: add 1 tsp to the filling with the hoisin for depth and warmth. Bolognese: add 1 tsp with the Italian seasoning. Egg Muffins: a pinch in the egg mixture adds subtle smokiness.",
+    note:"Ground turkey is in 3 of your weekly recipes — this elevates all of them. Their best single-ingredient upgrade."
   },
   {
     id:"sp7",
-    name:"Kinder's Teriyaki Seasoning",
-    emoji:"🍱",
-    rating:"4.7★",
-    usedFor:["Salmon","Chicken thighs","Shrimp","Stir fry","Rice bowls","Fried rice"],
-    where:"Costco · Amazon · most grocery stores",
-    replaces:"Soy sauce + ginger + garlic + sesame + mirin measurements",
-    note:"Simplifies the miso salmon and fried rice nights significantly.",
-    timesSaved:"Replaces 4-5 liquid and dry measurements"
+    name:"Siete Taco Seasoning (primary) / Burlap & Barrel Yo Quiero (upgrade)",
+    emoji:"🌮",
+    priority:true,
+    buy:"Siete: Publix · Whole Foods · Target — available NOW. Burlap & Barrel: burlapandbarrel.com — OUT OF STOCK, email alert set",
+    recipes:["PF Chang's Lettuce Cups","Turkey Bolognese (Mexican variation)"],
+    howToUse:"Lettuce Cups: replace hoisin-based seasoning with 1.5 tsp Siete Taco Seasoning + coconut aminos for a Tex-Mex version. Bolognese: swap Italian seasoning for a Mexican-style meat sauce over Brami pasta. Use Siete now — switch to Burlap & Barrel when it comes back in stock.",
+    note:"Siete is equally rated to Burlap & Barrel, cleaner ingredients than any standard taco seasoning, and available at Publix right now. No waiting for a restock."
   },
   {
     id:"sp8",
-    name:"Burlap & Barrel Turkish Seasoning",
-    emoji:"🥙",
-    rating:"4.8★ — single-origin, highly rated specialty blend",
-    usedFor:["Chicken (Turkish bowls, kebabs)","Lamb","Ground meat","Roasted vegetables"],
-    where:"burlap-barrel.com · Amazon · Whole Foods",
-    replaces:"Cumin + coriander + cinnamon + paprika + allspice",
-    note:"Makes the Turkish Chicken Bowl recipe a one-shake affair instead of measuring 5 spices.",
-    timesSaved:"Replaces 5 spice measurements — including the tricky cinnamon balance"
+    name:"Tony Chachere's Creole Seasoning",
+    emoji:"⭐",
+    priority:true,
+    buy:"Any grocery store — Publix, Kroger, Walmart",
+    recipes:["Sheet Pan Roast Chicken Thighs","Egg & Turkey Sausage Muffin Cups","Rotisserie Chicken Grain Bowls"],
+    howToUse:"Sheet Pan Chicken: coat thighs instead of the individual salt + pepper + paprika. Egg Muffins: season egg mixture for a Southern kick. Grain Bowls: season the shredded chicken before adding to the bowl.",
+    note:"Available at Publix right now. Best value seasoning on this list — $4 and it does everything."
+  },
+  // ── ALREADY OWNED / PANTRY STAPLES ───────────────────────────
+  {
+    id:"sp9",
+    name:"Kinder's Lemon Pepper",
+    emoji:"🍋",
+    priority:false,
+    buy:"Any grocery store",
+    recipes:["Sheet Pan Roast Chicken (variation)","Rotisserie Chicken Grain Bowls"],
+    howToUse:"Sheet Pan Chicken: swap The Blend for Lemon Pepper when you want a brighter flavor. Grain Bowls: season the shredded chicken with a pinch before adding to the bowl.",
+    note:"Already in your pantry. Great for variety on Sheet Pan Chicken nights."
+  },
+  {
+    id:"sp10",
+    name:"Kinder's Buttery Steakhouse",
+    emoji:"🥩",
+    priority:false,
+    buy:"Any grocery store",
+    recipes:["Sheet Pan Roast Chicken (variation)","Any steak or pork night"],
+    howToUse:"Sheet Pan Chicken: use instead of The Blend when you want a richer, butter-forward flavor. Steak nights: coat before searing.",
+    note:"Already in your pantry."
+  },
+  {
+    id:"sp11",
+    name:"Kinder's Teriyaki Seasoning",
+    emoji:"🍯",
+    priority:false,
+    buy:"Any grocery store",
+    recipes:["Sheet Pan Roast Chicken (variation)","Rotisserie Chicken Grain Bowls"],
+    howToUse:"Sheet Pan Chicken: coat thighs with Teriyaki instead of The Blend for an Asian-inspired version. Grain Bowls: season the chicken for a teriyaki bowl variation.",
+    note:"Already in your pantry. Good for variety weeks."
+  },
+  {
+    id:"sp12",
+    name:"Trader Joe's Everything But the Bagel",
+    emoji:"🥯",
+    priority:false,
+    buy:"Trader Joe's",
+    recipes:["Egg & Turkey Sausage Muffin Cups","Rotisserie Chicken Grain Bowls"],
+    howToUse:"Egg Muffins: sprinkle on top before baking for a crunchy everything-bagel crust. Grain Bowls: finishing sprinkle on top with the veggies.",
+    note:"Keep it as a finishing seasoning — a sprinkle at the end, not a primary seasoning."
+  },
+  {
+    id:"sp13",
+    name:"Burlap & Barrel Smoked Chipotle Chili Flakes",
+    emoji:"🌶️",
+    priority:false,
+    buy:"burlapandbarrel.com",
+    recipes:["Turkey Bolognese (adults)","Rotisserie Chicken Grain Bowls (adults)","Cottage Cheese Alfredo sauce"],
+    howToUse:"Bolognese: finish adult portions with a pinch at the table. Grain Bowls: sprinkle on adult bowls after plating. Alfredo Sauce: a pinch in the sauce adds subtle smokiness.",
+    note:"Finishing spice only — a little goes a long way. Buy if you like heat. Skip if you don't use heat much."
+  },
+  {
+    id:"sp14",
+    name:"Penzeys Mural of Flavor",
+    emoji:"🫙",
+    priority:false,
+    buy:"penzeys.com",
+    recipes:["Rotisserie Chicken Grain Bowls","Lemon Herb Drizzle squeeze bottle sauce"],
+    howToUse:"Grain Bowls: season the grains while warm with 1 tsp instead of plain salt. Lemon Herb Drizzle: use instead of dried oregano/thyme in the sauce recipe.",
+    note:"Salt-free — good if watching sodium. Otherwise Herbes de Provence covers the same territory."
+  },
+  {
+    id:"sp_tj1",
+    name:"Trader Joe's 21 Seasoning Salute",
+    emoji:"🫙",
+    priority:true,
+    buy:"Trader Joe's — free with purchase, extremely affordable",
+    recipes:["Sheet Pan Roast Chicken Thighs","Rotisserie Chicken Grain Bowls","Turkey Bolognese"],
+    howToUse:"Sheet Pan Chicken: use instead of individual herbs — 1.5 tsp replaces thyme + rosemary + paprika. Grain Bowls: season the warm grains with a pinch before assembling. Bolognese: add 1 tsp alongside or instead of Italian seasoning.",
+    note:"Salt-free, 21 herbs and spices, costs almost nothing at Trader Joe's. Rivals anything Burlap & Barrel makes for Italian/herb flavor. Grab a jar next time you're at TJ's — no reason not to have this in your pantry."
+  },
+  {
+    id:"sp_siete1",
+    name:"Siete Taco Seasoning",
+    emoji:"🌮",
+    priority:false,
+    buy:"Publix · Whole Foods · Target — available now",
+    recipes:["PF Chang's Lettuce Cups","Turkey Bolognese (Mexican variation)"],
+    howToUse:"Already listed under the combined Taco Blend entry above — this is the standalone Publix-available version. 1.5 tsp replaces all the individual spices in any taco or Mexican-style recipe.",
+    note:"Clean ingredients, grain-free, equally rated to Burlap & Barrel Taco Blend. The go-to until B&B restocks."
   },
 ];
 
-const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
-const STORAGE_KEY = "lemmonMealPlan_v1";
-const PANTRY_SECTIONS = [
-  { section: "🥩 Proteins", items: [
-    { id:"p-amylu",    name:"Amylu Chicken Sausage", sub:"Costco freezer" },
-    { id:"p-wellshire",name:"Wellshire Turkey Bacon", sub:"Fridge" },
-    { id:"p-jennio",   name:"Jennie-O Ground Turkey", sub:"Fridge/freezer" },
-    { id:"p-eggs",     name:"Eggs", sub:"Dozen" },
-    { id:"p-eggwhites", name:"Liquid Egg Whites", sub:"Costco carton" },
-  ]},
-  { section: "🥛 Dairy", items: [
-    { id:"p-fage",     name:"Fage 0% Greek Yogurt", sub:"32oz tub" },
-    { id:"p-fairlife", name:"Fairlife 2% Milk", sub:"Fridge" },
-    { id:"p-cheddar",  name:"Reduced-fat Cheddar", sub:"Shredded bag" },
-    { id:"p-butter",   name:"Land O'Lakes Light Butter", sub:"Fridge" },
-    { id:"p-goodculture", name:"Good Culture Cottage Cheese", sub:"Fridge" },
-  ]},
-  { section: "🌾 Pantry Staples", items: [
-    { id:"p-brami",    name:"Brami Protein Pasta", sub:"Costco" },
-    { id:"p-oats",     name:"Rolled Oats", sub:"Pantry" },
-    { id:"p-avooil",   name:"Avocado Oil", sub:"Costco jug" },
-    { id:"p-brikafrk", name:"Frik & Frak Pasta Sauce", sub:"Whole Foods" },
-    { id:"p-raos",     name:"Rao's Marinara", sub:"Backup" },
-    { id:"p-dctomato", name:"Diced Tomatoes (can)", sub:"Pantry" },
-    { id:"p-waterchs", name:"Water Chestnuts (can)", sub:"Pantry" },
-    { id:"p-pb",       name:"Natural Peanut Butter", sub:"Pantry" },
-    { id:"p-honey",    name:"Honey / Maple Syrup", sub:"Pantry" },
-  ]},
-  { section: "🧂 Spices & Sauces", items: [
-    { id:"p-kblend",   name:"Kinder's The Blend", sub:"Costco" },
-    { id:"p-klemon",   name:"Kinder's Lemon Pepper", sub:"Costco" },
-    { id:"p-ksteak",   name:"Kinder's Buttery Steakhouse", sub:"Costco" },
-    { id:"p-hoisin",   name:"Hoisin Sauce", sub:"Pantry" },
-    { id:"p-soy",      name:"Low-sodium Soy Sauce", sub:"Pantry" },
-    { id:"p-sesame",   name:"Sesame Oil", sub:"Pantry" },
-    { id:"p-italian",  name:"Italian Seasoning", sub:"Pantry" },
-    { id:"p-balsamic", name:"Balsamic Vinegar", sub:"Pantry" },
-  ]},
-  { section: "🍫 Dessert Staples", items: [
-    { id:"p-darkchoc", name:"Dark Chocolate Chips (70%+)", sub:"Pantry" },
-    { id:"p-coconutoil",name:"Coconut Oil", sub:"Pantry" },
-    { id:"p-graham",   name:"Graham Crackers", sub:"Pantry" },
-    { id:"p-almonds",  name:"Slivered Almonds", sub:"Pantry" },
-  ]},
+const DEFAULT_SAUCES = [
+  {
+    id:"sauce1",
+    name:"Nothing Hidden Ranch",
+    emoji:"🥗",
+    calories:70, protein:17,
+    prepTime:"2 min",
+    keeps:"5 days fridge",
+    description:"Burlap & Barrel ranch seasoning + Greek yogurt — creamy, tangy, dramatically better than store-bought. Kids go crazy for this as a veggie dip.",
+    squeezeBottle:true,
+    ingredients:[
+      "1 cup Fage 0% Greek yogurt",
+      "2 tsp Burlap & Barrel Nothing Hidden Ranch seasoning",
+      "2-3 tbsp Fairlife 2% milk (thin to squeeze bottle consistency)",
+      "Squeeze of fresh lemon",
+      "Pinch of salt"
+    ],
+    instructions:[
+      "Combine all ingredients in a bowl and whisk until smooth.",
+      "Taste and adjust — more ranch seasoning for stronger flavor, more milk to thin.",
+      "Pour into a squeeze bottle. Keeps 5 days in the fridge.",
+    ],
+    usedIn:["Grain bowls","Turkey melts","Lettuce cups","Chicken dipping","Carrots & cucumbers for kids"],
+    tips:"Double the batch — this disappears fast. The kids will use it as a dip for everything."
+  },
+  {
+    id:"sauce2",
+    name:"Cottage Cheese Alfredo",
+    emoji:"🧄",
+    calories:110, protein:22,
+    prepTime:"5 min",
+    keeps:"4 days fridge",
+    description:"Blended Good Culture cottage cheese makes a silky Alfredo-style sauce with 22g protein. Better than Olive Garden, RD-approved.",
+    squeezeBottle:false,
+    ingredients:[
+      "1 cup Good Culture 4% cottage cheese",
+      "2 tbsp reduced-fat Parmesan, grated",
+      "1 clove garlic, minced",
+      "Salt & pepper",
+      "Burlap & Barrel Smoked Chipotle Chili Flakes (optional, adults only)",
+      "2-3 tbsp pasta water or Fairlife milk to thin"
+    ],
+    instructions:[
+      "Blend cottage cheese completely smooth in a blender or food processor — at least 60 seconds. No curds should remain.",
+      "Add garlic, Parmesan, salt and pepper. Blend again until silky.",
+      "Heat gently in a saucepan over low heat — do NOT boil or it will separate.",
+      "Add pasta water or milk 1 tbsp at a time to reach desired consistency.",
+      "Toss immediately with hot Brami pasta.",
+    ],
+    usedIn:["Brami protein pasta","White pizza sauce","Roasted chicken topping","Baked pasta"],
+    tips:"The key is blending long enough — keep going until completely smooth. Add pasta water at the end for a silky restaurant-style coating."
+  },
+  {
+    id:"sauce3",
+    name:"Greek Yogurt Tzatziki",
+    emoji:"🌿",
+    calories:90, protein:21,
+    prepTime:"5 min",
+    keeps:"5 days fridge",
+    description:"Classic Greek cucumber-dill sauce. Works as a dip, drizzle, marinade and salad dressing. 21g protein per serving.",
+    squeezeBottle:true,
+    ingredients:[
+      "1 cup Fage 0% Greek yogurt",
+      "½ cucumber, grated on a box grater",
+      "1 clove garlic, minced or grated",
+      "1 tbsp fresh lemon juice",
+      "1 tsp dried dill (or 1 tbsp fresh)",
+      "Salt & pepper to taste"
+    ],
+    instructions:[
+      "Grate cucumber then wrap in a paper towel and squeeze out all moisture — this step is critical or the sauce gets watery.",
+      "Combine yogurt, squeezed cucumber, garlic, lemon juice and dill.",
+      "Stir well. Season with salt and pepper.",
+      "Refrigerate at least 30 min before serving — flavors develop significantly.",
+      "Transfer to squeeze bottle for easy drizzling on bowls.",
+    ],
+    usedIn:["Grain bowls","Chicken marinade","Lettuce cups","Veggie dip for kids","Pita wraps"],
+    tips:"Use as a chicken marinade overnight — the acidity tenderizes beautifully. Also incredible on the grain bowls instead of the Primal Kitchen dressing."
+  },
+  {
+    id:"sauce4",
+    name:"Spicy Yum Yum Sauce",
+    emoji:"🌶️",
+    calories:80, protein:15,
+    prepTime:"3 min",
+    keeps:"7 days fridge",
+    description:"Japanese steakhouse sauce made healthy. Greek yogurt base with sriracha and smoked paprika — goes on absolutely everything.",
+    squeezeBottle:true,
+    ingredients:[
+      "1 cup Fage 0% Greek yogurt",
+      "1 tbsp Primal Kitchen avocado oil mayo",
+      "1-2 tsp sriracha or Cholula (adjust to heat preference)",
+      "1 tsp garlic powder",
+      "1 tsp smoked paprika (or Burlap & Barrel Chipotle Chili Flakes)",
+      "1 tsp rice wine vinegar",
+      "Pinch of sugar or honey",
+      "Salt to taste"
+    ],
+    instructions:[
+      "Whisk all ingredients together until smooth.",
+      "Taste and adjust — more sriracha for heat, more vinegar for tang, pinch of sugar to balance.",
+      "Pour into squeeze bottle. Gets better after a day in the fridge.",
+    ],
+    usedIn:["Sheet pan chicken","Grain bowls","Lettuce cups","Eggs","Turkey melts","Dipping sauce"],
+    tips:"Make a batch Sunday and it goes on everything all week. Skip sriracha for a kid-friendly version — they love it on chicken and eggs."
+  },
+  {
+    id:"sauce5",
+    name:"Lemon Herb Drizzle",
+    emoji:"🍋",
+    calories:65, protein:14,
+    prepTime:"2 min",
+    keeps:"5 days fridge",
+    description:"Bright, light Greek yogurt sauce with Penzeys herbs and lemon. Like a high-protein Primal Kitchen dressing you make yourself.",
+    squeezeBottle:true,
+    ingredients:[
+      "¾ cup Fage 0% Greek yogurt",
+      "2 tbsp Primal Kitchen Greek dressing (or 1 tbsp lemon juice + 1 tbsp olive oil)",
+      "1 tsp Penzeys Mural of Flavor (or dried oregano + thyme)",
+      "1 clove garlic, grated",
+      "Salt & pepper",
+      "1-2 tbsp Fairlife milk to thin"
+    ],
+    instructions:[
+      "Whisk all ingredients together until smooth.",
+      "Add milk 1 tbsp at a time until it reaches a drizzleable consistency.",
+      "Pour into squeeze bottle.",
+    ],
+    usedIn:["Grain bowls","Sheet pan chicken","Salmon","Roasted vegetables","Salads"],
+    tips:"Best on the grain bowls instead of straight Primal Kitchen dressing — same flavor, more protein, lower cost per serving."
+  },
+  {
+    id:"sauce6",
+    name:"Peanut Sauce",
+    emoji:"🥜",
+    calories:110, protein:8,
+    prepTime:"3 min",
+    keeps:"7 days fridge",
+    description:"Better than PF Chang's. Natural peanut butter base with coconut aminos and ginger — the perfect lettuce cup drizzle.",
+    squeezeBottle:true,
+    ingredients:[
+      "3 tbsp natural peanut butter",
+      "2 tbsp coconut aminos or reduced-sodium soy sauce",
+      "1 tbsp rice wine vinegar",
+      "1 tsp sesame oil",
+      "1 tsp fresh ginger, grated (or ginger paste)",
+      "1-2 tsp sriracha (optional, skip for kids)",
+      "2-3 tbsp warm water to thin"
+    ],
+    instructions:[
+      "Whisk peanut butter, coconut aminos, vinegar, sesame oil and ginger together.",
+      "Add warm water 1 tbsp at a time until it reaches a pourable consistency.",
+      "Taste and adjust — more coconut aminos for saltiness, more vinegar for tang, sriracha for heat.",
+      "Pour into squeeze bottle.",
+    ],
+    usedIn:["PF Chang's Lettuce Cups","Grain bowls","Chicken skewers","Cold noodles","Spring rolls"],
+    tips:"Serve at the table in a squeeze bottle alongside the lettuce cups — game changer. Makes enough for 2 dinner nights."
+  },
 ];
-
-const SWAP_RULES = [
-  { match: /flour tortilla/i,           replace: "Mission Carb Balance flour tortilla" },
-  { match: /\bpasta\b|\bspaghetti\b|\bpenne\b|\brigatoni\b|\bfettuccine\b|\bfarfalle\b|\blinguine\b/i, replace: (m) => `Brami protein pasta (use instead of ${m})` },
-  { match: /marinara sauce|tomato sauce|pasta sauce|jarred sauce/i, replace: "Frik & Frak pasta sauce (or Rao's if unavailable)" },
-  { match: /\bsour cream\b/i,           replace: "0% Greek yogurt (Fage) in place of sour cream" },
-  { match: /full.fat greek yogurt|whole.milk greek yogurt/i, replace: "0% plain Greek yogurt (Fage)" },
-  { match: /\bcream cheese\b/i,         replace: "Philadelphia ⅓ less fat cream cheese" },
-  { match: /shredded (mozzarella|cheddar|monterey jack|pepper jack|mexican blend|colby|italian blend)/i,
-    replace: (m) => `reduced-fat ${m.replace("shredded ","shredded ")}` },
-  { match: /^(.+)(slices?|sliced) (cheddar|mozzarella|provolone|swiss|american)/i,
-    replace: (m) => `reduced-fat ${m}` },
-  { match: /\bunsalted butter\b|\bsalted butter\b|(?<!peanut )(?<!almond )\bbutter\b/i,
-    replace: "Land O'Lakes light butter" },
-  { match: /80\/20 ground beef|ground beef \(80|regular ground beef/i, replace: "96/4 extra lean ground beef (93/7 if unavailable)" },
-  { match: /\bcottage cheese\b/i,       replace: "Good Culture cottage cheese" },
-  { match: /^(\d+\s+cups?\s+)?white rice$|^(\d+\s+cups?\s+)?jasmine rice$/i,
-    replace: (m) => `${m} (or cauliflower rice for lower carb)` },
-  { match: /\bwhole milk\b|\b2% milk\b|\bregular milk\b/i, replace: "Fairlife 2% milk" },
-  { match: /\bmayonnaise\b|\bbmayo\b/i, replace: "Primal Kitchen avocado oil mayo" },
-  { match: /\bheavy cream\b|\bhalf[- ]and[- ]half\b/i, replace: "evaporated skim milk (or Fairlife whole milk for richness)" },
-  { match: /\bground chicken\b/i, replace: "99/1 ground turkey breast (leaner)" },
-  { match: /vegetable oil|canola oil/i, replace: "refined avocado oil" },
-];
-
-function applySwaps(ingredients) {
-  if (!ingredients || !Array.isArray(ingredients)) return ingredients;
-  return ingredients.map(ing => {
-    if (ing.startsWith("---")) return ing;
-    let result = ing;
-    for (const rule of SWAP_RULES) {
-      if (rule.match.test(result)) {
-        result = typeof rule.replace === "function"
-          ? result.replace(rule.match, rule.replace)
-          : result.replace(rule.match, rule.replace);
-        break;
-      }
-    }
-    return result;
-  });
-}
-
-function getSwapDiff(original, swapped) {
-  const changes = [];
-  original.forEach((ing, i) => {
-    if (swapped[i] && swapped[i] !== ing) {
-      changes.push({ from: ing, to: swapped[i] });
-    }
-  });
-  return changes;
-}
 
 let state = {
   breakfasts: JSON.parse(JSON.stringify(DEFAULT_BREAKFASTS)),
@@ -910,6 +1238,7 @@ let state = {
   alexaMergedList: [],
   alexaSyncTime: null,
   ratings: {},  // recipeId -> { stars, chips[], note, date }
+  sauces: JSON.parse(JSON.stringify(DEFAULT_SAUCES)),
   activeRecipes: {},  // recipeId -> false means inactive (default all active)
 };
 
@@ -933,6 +1262,37 @@ async function initSupabase() {
     supabase = null;
     return false;
   }
+}
+
+
+function applySwaps(ingredients) {
+  if (!ingredients || !ingredients.length) return ingredients;
+  return ingredients.map(ing => {
+    if (typeof ing !== "string") return ing;
+    let result = ing;
+    const SWAP_RULES = [
+      { match: /\bwhite rice\b|\brown rice\b/i, replace: () => "cauliflower rice (or farro/quinoa for more protein)" },
+      { match: /\bregular pasta\b|\bspaghetti\b|\bpenne\b|\brigatoni\b|\bfettuccine\b|\bfarfalle\b|\blinguine\b/i, replace: (m) => `Brami protein pasta or Barilla Protein+ (use instead of ${m})` },
+      { match: /\bwhole milk\b/i, replace: () => "Fairlife 2% milk (50% more protein)" },
+      { match: /\bsour cream\b/i, replace: () => "Fage 0% Greek yogurt (same texture, more protein)" },
+      { match: /\bheavy cream\b/i, replace: () => "Fairlife 2% milk or blended cottage cheese" },
+      { match: /\bcottage cheese\b/i, replace: () => "Good Culture 4% cottage cheese" },
+      { match: /\bGreek yogurt\b/i, replace: () => "Fage 0% Greek yogurt" },
+      { match: /\bregular butter\b/i, replace: () => "Land O'Lakes light butter" },
+      { match: /\bvegetable oil\b|\bcanola oil\b/i, replace: () => "refined avocado oil" },
+      { match: /\bsoy sauce\b/i, replace: () => "reduced-sodium soy sauce or coconut aminos" },
+      { match: /\bground beef\b/i, replace: () => "Jennie-O 93/7 ground turkey" },
+      { match: /\bregular bacon\b/i, replace: () => "Wellshire Farms turkey bacon" },
+      { match: /\bpork sausage\b/i, replace: () => "Amylu chicken breakfast sausage (Costco)" },
+    ];
+    for (const rule of SWAP_RULES) {
+      if (rule.match.test(result)) {
+        result = result.replace(rule.match, rule.replace);
+        break;
+      }
+    }
+    return result;
+  });
 }
 
 async function loadFromSupabase() {
@@ -961,6 +1321,7 @@ async function loadFromSupabase() {
         if (plan.alexaSyncTime) state.alexaSyncTime = plan.alexaSyncTime;
         if (plan.ratings) state.ratings = plan.ratings;
         if (plan.activeRecipes) state.activeRecipes = plan.activeRecipes;
+        if (plan.sauces) state.sauces = plan.sauces;
       setSyncStatus("saved");
     }
   } catch(e) { console.error("Load error:", e); setSyncStatus("offline"); }
@@ -970,7 +1331,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -1003,6 +1364,7 @@ function loadFromLocal() {
     if (saved.alexaSyncTime) state.alexaSyncTime = saved.alexaSyncTime;
     if (saved.ratings) state.ratings = saved.ratings;
     if (saved.activeRecipes) state.activeRecipes = saved.activeRecipes;
+    if (saved.sauces) state.sauces = saved.sauces;
   } catch(e) {}
 }
 
@@ -1025,7 +1387,7 @@ function showTab(tab) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
   document.getElementById("page-" + tab).classList.add("active");
-  const tabs = ["plan","grocery","swaps","kids","pantry","settings"];
+  const tabs = ["plan","grocery","swaps","kids","pantry","sauces","settings","cook"];
   document.querySelectorAll(".tab-btn")[tabs.indexOf(tab)].classList.add("active");
   renderTab(tab);
 }
@@ -1038,6 +1400,7 @@ function renderTab(tab) {
   if (tab === "settings") renderSettings();
   if (tab === "cook")     renderCookHome();
   if (tab === "pantry")   renderPantry();
+  if (tab === "sauces")   renderSauces();
 }
 
 function uid() { return Math.random().toString(36).slice(2,8); }
@@ -1146,7 +1509,7 @@ function closeModalForce() {
 }
 
 function viewRecipe(section, id) {
-  const list = section === "breakfast" ? state.breakfasts : section === "lunch" ? state.lunches : state.dinners;
+  const list = section === "breakfast" ? state.breakfasts : section === "lunch" ? state.lunches : section === "dessert" ? state.desserts : state.dinners;
   const item = list.find(x => x.id === id);
   if (!item) return;
 
@@ -1555,6 +1918,7 @@ function renderItemCard(item, section) {
         </div>
         <div class="card-actions" onclick="event.stopPropagation()">
           <button onclick="toggleRecipeActive('${item.id}',event)" style="padding:6px 12px;border-radius:8px;border:none;background:${active?"var(--green)":"rgba(255,255,255,0.08)"};color:${active?"#0a0f1a":"var(--muted)"};font-size:13px;font-weight:700;cursor:pointer">${active?"✓ On":"Off"}</button>
+          <button onclick="event.stopPropagation();startCooking('${section}','${item.id}')" style="padding:6px 12px;border-radius:8px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer">👨‍🍳</button>
           <button class="btn-edit" onclick="editItem('${section}','${item.id}')">Edit</button>
           <button class="btn-del" onclick="deleteItem('${section}','${item.id}')">✕</button>
         </div>
@@ -1578,6 +1942,7 @@ function renderDinnerCard(dinner, i, total) {
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">
           <button onclick="toggleRecipeActive('${dinner.id}',event)" style="padding:6px 12px;border-radius:8px;border:none;background:${isActive(dinner.id)?"var(--green)":"rgba(255,255,255,0.08)"};color:${isActive(dinner.id)?"#0a0f1a":"var(--muted)"};font-size:13px;font-weight:700;cursor:pointer">${isActive(dinner.id)?"✓ On":"Off"}</button>
+          <button onclick="event.stopPropagation();startCooking('dinner','${dinner.id}')" style="padding:6px 12px;border-radius:8px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer">👨‍🍳</button>
           <button style="padding:6px 12px;border-radius:8px;border:1px solid var(--indigo);background:transparent;color:var(--indigo);font-size:13px;cursor:pointer" onclick="editItem('dinner','${dinner.id}')">Edit</button>
           <button style="padding:6px 12px;border-radius:8px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:13px;cursor:pointer" onclick="deleteItem('dinner','${dinner.id}')">✕</button>
         </div>
@@ -1842,29 +2207,27 @@ function renderSwaps() {
       </div>
     </div>`).join("");
 
-  const blendCards = state.spiceBlends.map(b => `
-    <div class="swap-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+  const blendCards = state.spiceBlends.map(b => {
+    const priorityBadge = b.priority ? `<span style="padding:3px 10px;border-radius:20px;background:linear-gradient(135deg,var(--green),#059669);color:#0a0f1a;font-size:11px;font-weight:700">⭐ PRIORITY BUY</span>` : `<span style="padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.06);color:var(--dim);font-size:11px">Already owned / optional</span>`;
+    const recipesHtml = b.recipes && b.recipes.length ? `<div style="margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">📋 Used in your recipes:</div>${b.recipes.map(r=>`<div style="font-size:13px;color:var(--muted);padding:2px 0">• ${esc(r)}</div>`).join("")}</div>` : "";
+    const howToHtml = b.howToUse ? `<div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:10px 12px;margin-bottom:8px"><div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:4px">👨‍🍳 How to use:</div><div style="font-size:13px;color:var(--muted);line-height:1.5">${esc(b.howToUse)}</div></div>` : "";
+    const buyHtml = b.buy ? `<div style="font-size:12px;color:var(--amber)">📍 ${esc(b.buy)}</div>` : "";
+    return `
+    <div class="swap-card" style="border:${b.priority?"1.5px solid rgba(16,185,129,0.3)":"1px solid rgba(255,255,255,0.06)"}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:22px">${b.emoji||"🫙"}</span>
         <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-            <span style="font-size:20px">${b.emoji||"🫙"}</span>
-            <div>
-              <div style="color:var(--text);font-size:15px;font-weight:700">${esc(b.name)}</div>
-              <div style="color:var(--amber);font-size:12px">${esc(b.rating)}</div>
-            </div>
-          </div>
-          <span class="tag tag-green" style="margin-bottom:6px;display:inline-block">⏱ ${esc(b.timesSaved)}</span>
-          ${b.replaces?`<div style="font-size:12px;color:var(--muted);margin-bottom:4px"><span style="color:var(--dim)">Replaces: </span>${esc(b.replaces)}</div>`:""}
-          ${b.usedFor&&b.usedFor.length?'<div style="font-size:12px;color:var(--dim);margin-bottom:5px">Used for: '+b.usedFor.join(" · ")+'</div>':""}
-          ${b.where?'<div style="font-size:12px;color:var(--muted);margin-bottom:5px"><span style="color:var(--amber)">📍 </span>'+esc(b.where)+'</div>':""}
-          ${b.note?`<div class="info-box tip"><span class="info-label" style="color:#fbbf24">💡 </span>${esc(b.note)}</div>`:""}
+          <div style="color:var(--text);font-size:16px;font-weight:700">${esc(b.name)}</div>
+          <div style="margin-top:4px">${priorityBadge}</div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px;margin-left:10px;flex-shrink:0">
-          <button onclick="editBlend('${b.id}')" style="padding:5px 10px;border-radius:8px;border:1px solid var(--indigo);background:transparent;color:var(--indigo);font-size:12px;cursor:pointer">Edit</button>
-          <button onclick="deleteBlend('${b.id}')" style="padding:5px 10px;border-radius:8px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:12px;cursor:pointer">✕</button>
-        </div>
+        <button onclick="deleteSpiceBlend('${b.id}')" style="padding:4px 8px;border-radius:6px;border:1px solid var(--red);background:transparent;color:var(--red);font-size:12px;cursor:pointer">✕</button>
       </div>
-    </div>`).join("");
+      ${recipesHtml}
+      ${howToHtml}
+      ${b.note?`<div style="font-size:13px;color:var(--dim);margin-bottom:6px;font-style:italic">${esc(b.note)}</div>`:""}
+      ${buyHtml}
+    </div>`;
+  }).join("");
 
   el.innerHTML = `
     <div style="margin-bottom:14px">
@@ -2454,6 +2817,76 @@ function cyclePantry(id) {
   renderPantry();
 }
 
+
+function renderSauces() {
+  const el = document.getElementById("page-sauces");
+  const saucesHtml = state.sauces.map(sauce => {
+    const ingredientsHtml = sauce.ingredients.map(i => 
+      `<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:15px;color:#cbd5e1">
+        <span style="color:var(--green);flex-shrink:0">•</span><span>${esc(i)}</span>
+      </div>`
+    ).join("");
+    const stepsHtml = sauce.instructions.map((step, i) => 
+      `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+        <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#0a0f1a;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</div>
+        <div style="font-size:15px;color:#cbd5e1;line-height:1.5">${esc(step)}</div>
+      </div>`
+    ).join("");
+    const usedInHtml = sauce.usedIn.map(u => 
+      `<span style="padding:4px 10px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--green);font-size:12px">${esc(u)}</span>`
+    ).join("");
+    return `
+      <div style="background:var(--surface);border-radius:16px;margin-bottom:16px;overflow:hidden;border:1px solid rgba(255,255,255,0.08)">
+        <div style="padding:16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <span style="font-size:32px">${sauce.emoji}</span>
+            <div style="flex:1">
+              <div style="font-size:18px;font-weight:700;color:var(--text)">${esc(sauce.name)}</div>
+              <div style="font-size:13px;color:var(--dim);margin-top:2px">${esc(sauce.description)}</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <span style="padding:5px 12px;border-radius:20px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--green);font-size:13px;font-weight:700">${sauce.protein}g protein</span>
+            <span style="padding:5px 12px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--muted);font-size:13px">${sauce.calories} cal</span>
+            <span style="padding:5px 12px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--muted);font-size:13px">⏱ ${esc(sauce.prepTime)}</span>
+            <span style="padding:5px 12px;border-radius:20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--muted);font-size:13px">🧊 ${esc(sauce.keeps)}</span>
+            ${sauce.squeezeBottle ? `<span style="padding:5px 12px;border-radius:20px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.3);color:var(--indigo);font-size:13px">🫙 Squeeze bottle</span>` : ""}
+          </div>
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Ingredients</div>
+          ${ingredientsHtml}
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Instructions</div>
+          ${stepsHtml}
+        </div>
+        <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Use on</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${usedInHtml}</div>
+        </div>
+        ${sauce.tips ? `
+        <div style="padding:14px 16px;background:rgba(245,158,11,0.04);border-top:1px solid rgba(245,158,11,0.15)">
+          <div style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:4px">💡 Pro tip</div>
+          <div style="font-size:14px;color:var(--muted);line-height:1.5">${esc(sauce.tips)}</div>
+        </div>` : ""}
+      </div>`;
+  }).join("");
+
+  el.innerHTML = `
+    <div style="margin-bottom:16px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px">🫙 Squeeze Bottle Sauces</div>
+      <div style="color:var(--dim);font-size:14px">High-protein homemade sauces. Make Sunday, use all week.</div>
+    </div>
+    <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:6px">🗓 Sunday prep tip</div>
+      <div style="font-size:14px;color:var(--muted);line-height:1.5">Make 2-3 of these on Sunday during your meal prep. They keep 5-7 days and make every meal this week dramatically better — and higher protein.</div>
+    </div>
+    ${saucesHtml}
+    <div style="height:30px"></div>
+  `;
+}
+
 function renderPantry() {
   const el = document.getElementById("page-pantry");
   const allItems = PANTRY_SECTIONS.flatMap(s => s.items);
@@ -2556,9 +2989,15 @@ function renderCookHome() {
 }
 
 function startCooking(section,id) {
-  const list=section==="breakfast"?state.breakfasts:section==="lunch"?state.lunches:state.dinners;
+  const list=section==="breakfast"?state.breakfasts:section==="lunch"?state.lunches:section==="dessert"?state.desserts:state.dinners;
   const recipe=list.find(r=>r.id===id); if(!recipe)return;
   cookState={recipe,step:0,mode:"steps",checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};
+  // Switch to cook tab
+  currentTab="cook";
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("page-cook").classList.add("active");
+  document.querySelectorAll(".tab-btn")[7].classList.add("active");
   renderCookScreen();
 }
 
