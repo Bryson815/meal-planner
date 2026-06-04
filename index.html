@@ -1306,9 +1306,11 @@ async function loadFromSupabase() {
     }
     if (data && data.plan) {
       const plan = data.plan;
-      if (plan.breakfasts) state.breakfasts = plan.breakfasts.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
-      if (plan.lunches)    state.lunches    = plan.lunches.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
-      if (plan.dinners)    state.dinners    = plan.dinners.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
+      const safeMap = (arr) => (arr || []).filter(r => r && r.id).map(r => ({...r, ingredients: applySwaps(r.ingredients || []), instructions: r.instructions || [], tips: r.tips || ""}));
+      if (plan.breakfasts) state.breakfasts = safeMap(plan.breakfasts);
+      if (plan.lunches)    state.lunches    = safeMap(plan.lunches);
+      if (plan.dinners)    state.dinners    = safeMap(plan.dinners);
+      if (plan.desserts)   state.desserts   = safeMap(plan.desserts);
       if (plan.swaps)      state.swaps      = plan.swaps;
       if (plan.spiceBlends) state.spiceBlends = plan.spiceBlends;
       if (plan.userEmail)  state.userEmail  = plan.userEmail;
@@ -1348,9 +1350,11 @@ function loadFromLocal() {
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (saved.supabaseUrl) { state.supabaseUrl = saved.supabaseUrl; state.supabaseKey = saved.supabaseKey; }
-    if (saved.breakfasts) state.breakfasts = saved.breakfasts.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
-    if (saved.lunches)    state.lunches    = saved.lunches.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
-    if (saved.dinners)    state.dinners    = saved.dinners.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
+    const safeMapLocal = (arr) => (arr || []).filter(r => r && r.id).map(r => ({...r, ingredients: applySwaps(r.ingredients || []), instructions: r.instructions || [], tips: r.tips || ""}));
+    if (saved.breakfasts) state.breakfasts = safeMapLocal(saved.breakfasts);
+    if (saved.lunches)    state.lunches    = safeMapLocal(saved.lunches);
+    if (saved.dinners)    state.dinners    = safeMapLocal(saved.dinners);
+    if (saved.desserts)   state.desserts   = safeMapLocal(saved.desserts);
     if (saved.desserts)   state.desserts   = saved.desserts;
     if (saved.swaps)      state.swaps      = saved.swaps;
     if (saved.spiceBlends) state.spiceBlends = saved.spiceBlends;
