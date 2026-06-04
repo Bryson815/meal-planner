@@ -1266,7 +1266,7 @@ async function initSupabase() {
 
 
 function applySwaps(ingredients) {
-  if (!ingredients || !ingredients.length) return ingredients;
+  if (!ingredients || !Array.isArray(ingredients) || !ingredients.length) return [];
   return ingredients.map(ing => {
     if (typeof ing !== "string") return ing;
     let result = ing;
@@ -1306,9 +1306,9 @@ async function loadFromSupabase() {
     }
     if (data && data.plan) {
       const plan = data.plan;
-      if (plan.breakfasts) state.breakfasts = plan.breakfasts.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
-      if (plan.lunches)    state.lunches    = plan.lunches.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
-      if (plan.dinners)    state.dinners    = plan.dinners.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
+      if (plan.breakfasts) state.breakfasts = plan.breakfasts.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
+      if (plan.lunches)    state.lunches    = plan.lunches.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
+      if (plan.dinners)    state.dinners    = plan.dinners.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
       if (plan.swaps)      state.swaps      = plan.swaps;
       if (plan.spiceBlends) state.spiceBlends = plan.spiceBlends;
       if (plan.userEmail)  state.userEmail  = plan.userEmail;
@@ -1348,9 +1348,9 @@ function loadFromLocal() {
     if (!raw) return;
     const saved = JSON.parse(raw);
     if (saved.supabaseUrl) { state.supabaseUrl = saved.supabaseUrl; state.supabaseKey = saved.supabaseKey; }
-    if (saved.breakfasts) state.breakfasts = saved.breakfasts.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
-    if (saved.lunches)    state.lunches    = saved.lunches.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
-    if (saved.dinners)    state.dinners    = saved.dinners.map(r => ({...r, ingredients: applySwaps(r.ingredients)}));
+    if (saved.breakfasts) state.breakfasts = saved.breakfasts.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
+    if (saved.lunches)    state.lunches    = saved.lunches.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
+    if (saved.dinners)    state.dinners    = saved.dinners.map(r => ({...r, ingredients: applySwaps(r.ingredients || [])}));
     if (saved.desserts)   state.desserts   = saved.desserts;
     if (saved.swaps)      state.swaps      = saved.swaps;
     if (saved.spiceBlends) state.spiceBlends = saved.spiceBlends;
@@ -2058,7 +2058,7 @@ function buildSmartGroceryList() {
     ...state.breakfasts,
     ...state.lunches,
     ...state.desserts,
-  ].filter(r => isActive(r.id));
+  ].filter(r => r && isActive(r.id));
   const CAT_RULES = [
     { cat:"🥩 Protein & Meat",    re:/chicken|turkey(?! bacon)|salmon|fish|beef|steak|pork|shrimp|ground|deli|rotisserie|amylu|jennie|wellshire/i },
     { cat:"🥓 Deli & Sausage",    re:/turkey bacon|sausage|bacon|deli/i },
@@ -3092,7 +3092,7 @@ async function exportToPaprika() {
     ...state.breakfasts,
     ...state.lunches,
     ...state.desserts,
-  ].filter(r => isActive(r.id));
+  ].filter(r => r && isActive(r.id));
   const paprikaRecipes = allRecipes.map(r => {
     const ingredients = (r.ingredients || [])
       .filter(i => !i.startsWith("---"))
@@ -3337,9 +3337,9 @@ async function init() {
   // Version check - clear old incompatible localStorage data
   try {
     var storedVersion = localStorage.getItem('lemmonPlannerVersion');
-    if (storedVersion !== '2.0') {
+    if (storedVersion !== '2.1') {
       localStorage.removeItem('lemmonMealPlan_v1');
-      localStorage.setItem('lemmonPlannerVersion', '2.0');
+      localStorage.setItem('lemmonPlannerVersion', '2.1');
     }
   } catch(e) {}
   loadFromLocal();
