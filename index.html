@@ -21,12 +21,16 @@
     <button class="tab-btn" onclick="showTab('kids')">👧</button>
     <button class="tab-btn" onclick="showTab('pantry')">🧄</button>
     <button class="tab-btn" onclick="showTab('sauces')">🫙</button>
+    <button class="tab-btn" onclick="showTab('history')">📖</button>
+    <button class="tab-btn" onclick="showTab('nutrition')">📊</button>
+    <button class="tab-btn" onclick="showTab('prep')">🔪</button>
     <button class="tab-btn" onclick="showTab('settings')">⚙️</button>
     <button class="tab-btn" onclick="showTab('cook')" style="background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:700">👨‍🍳 Cook</button>
   </div>
 </nav>
 
 <!-- PAGES -->
+<div id="pull-indicator" style="position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(16,185,129,0.9);color:#0a0f1a;padding:6px 16px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none">↓ Pull to sync</div>
 <div id="page-plan" class="page active"></div>
 <div id="page-grocery" class="page"></div>
 <div id="page-swaps" class="page"></div>
@@ -34,7 +38,14 @@
 <div id="page-settings" class="page"></div>
 <div id="page-pantry" class="page"></div>
 <div id="page-sauces" class="page"></div>
-<div id="page-cook" class="page" style="padding:0;"></div>
+<div id="page-history" class="page"></div>
+<div id="page-nutrition" class="page"></div>
+<div id="page-prep" class="page"></div>
+<div id="page-cook" class="page" style="padding:0;">
+<div id="multi-timer-container" style="display:none;position:sticky;top:60px;z-index:50;background:#0a0f1a;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.08)">
+<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">⏱️ Active Timers</div>
+<div id="multi-timer-panel"></div>
+</div></div>
 
 <!-- MODAL -->
 <div id="modal" class="modal-overlay" style="display:none" onclick="closeModal(event)">
@@ -380,6 +391,7 @@ const DEFAULT_DINNERS = [
       "1 small onion, diced",
       "1 medium carrot, grated (add with onion — melts into the filling)",
       "½ cup mushrooms, very finely diced (adds moisture and umami, invisible in sauce)",
+      "Optional: ½ cup bagged coleslaw mix stirred in at the end — adds crunch and volume for ~12 calories",
       "¼ cup hoisin sauce",
       "2 tbsp reduced-sodium soy sauce or coconut aminos",
       "1 tbsp rice wine vinegar",
@@ -515,6 +527,1135 @@ const DEFAULT_DINNERS = [
     ],
     tips:"MAILLARD: The cast iron must be ripping hot before the steak goes in — a drop of water should evaporate instantly. Cold or crowded pan = grey steamed steak instead of a crust. | DRY THE STEAK: Pat completely dry before marinating. Any surface moisture prevents browning. This single step is the difference between restaurant-quality and home-cook results. | ANCHOVY SECRET: Don't skip the anchovy in the salsa verde — it doesn't taste like fish at all, it just adds a deep savory richness that makes everyone ask what's in the sauce. | CHARRED LEMON: The charred lemon is the acid finish — squeezing it over right before serving wakes up every other flavor on the plate. Don't serve without it. | RESTING: 3 min rest is non-negotiable. Cut immediately and you lose half the juices onto the cutting board.",
     kidNote:"Kids eat the steak — skip the salsa verde for them or offer your Nothing Hidden Ranch as a dipping sauce instead. The steak itself is mild and kid-friendly.",
+    active:true
+  }
+
+  ,{
+    id:"dinner5",
+    name:"Slow Cooker Chicken Tacos",
+    emoji:"🌮",
+    day:"Tuesday",
+    calories:320,
+    protein:38,
+    activeTime:"10 min",
+    prepTime:"10 min + 6-8 hrs slow cooker",
+    hiddenVeg:"Add a grated zucchini or carrot to the slow cooker — completely disappears into the chicken",
+    leftoverNote:"🔄 Make a double batch — use leftovers for burrito bowls, quesadillas, or grain bowls later in the week.",
+    source:"Family staple — dump and go slow cooker recipe",
+    description:"The easiest dinner you'll ever make. Dump everything in the slow cooker in the morning, shred with two forks at dinner time. Kids build their own — zero negotiation.",
+    ingredients:[
+      "--- THE CHICKEN ---",
+      "2 lbs boneless skinless chicken thighs (thighs stay juicier than breasts in slow cooker)",
+      "1 can (14oz) diced tomatoes with green chiles (Rotel) — don't drain",
+      "1 packet Siete Taco Seasoning OR 1.5 tsp Burlap & Barrel Yo Quiero Taco Blend",
+      "1 small onion, roughly chopped",
+      "3 cloves garlic, smashed (no need to mince)",
+      "½ tsp Dan-O's Original",
+      "Juice of 1 lime",
+      "--- TACO BAR ---",
+      "Small flour or corn tortillas (Mission Extra Thin for lower cal)",
+      "Shredded reduced-fat Mexican blend cheese",
+      "Shredded lettuce or cabbage",
+      "Newman's Own Mild salsa or TJ's Thick & Chunky",
+      "Fage 0% Greek yogurt (in place of sour cream — 17g protein vs 0)",
+      "Sliced avocado or guacamole",
+      "Cholula or Frank's RedHot on the side for adults",
+      "🫙 Drizzle: Spicy Yum Yum Sauce from Sauces tab — incredible on tacos"
+    ],
+    instructions:[
+      "── MISE EN PLACE (takes 5 minutes the night before or morning of) ──",
+      "Roughly chop the onion — no need to be precise, it all shreds together.",
+      "Smash 3 garlic cloves with the flat of your knife — no mincing needed.",
+      "── SLOW COOKER (morning — 5 min active) ──",
+      "Place chicken thighs in slow cooker in a single layer.",
+      "Pour entire can of Rotel over the chicken — liquid and all.",
+      "Sprinkle Siete Taco Seasoning and Dan-O's evenly over everything.",
+      "Add onion, garlic and squeeze of lime juice. That's it.",
+      "Cook on LOW 6-8 hours or HIGH 3-4 hours.",
+      "── DINNER TIME (5 min) ──",
+      "Use two forks to shred the chicken directly in the slow cooker — it falls apart effortlessly.",
+      "Stir shredded chicken into the juices. Taste and adjust salt.",
+      "Set up a taco bar — tortillas, cheese, lettuce, salsa, Greek yogurt, avocado.",
+      "Let the kids build their own — they always eat more when they assemble it themselves.",
+      "ACID FINISH: squeeze of fresh lime over your assembled taco right before eating."
+    ],
+    tips:"THIGHS NOT BREASTS: Chicken breasts go chalky and dry in the slow cooker. Thighs stay juicy and shreddable — don't substitute. | GREEK YOGURT SWAP: Serve Fage 0% as sour cream — it looks identical, tastes nearly identical, and adds 17g protein vs zero. The kids won't notice. | TACO SEASONING: Siete is at Publix now. Burlap & Barrel Yo Quiero is the upgrade when it comes back in stock. Either way — one packet does everything, no measuring individual spices. | LEFTOVER GOLD: This chicken is incredibly versatile — tacos Tuesday, burrito bowls Wednesday, quesadillas Thursday. Make a big batch.",
+    kidNote:"Kids build their own tacos — massive win for getting them to eat. Let them choose their own toppings, they eat every time. Skip the hot sauce for theirs.",
+    active:true
+  }
+  ,{
+    id:"dinner6",
+    name:"Chicken Burrito Bowls",
+    emoji:"🥣",
+    day:"Wednesday",
+    calories:420,
+    protein:45,
+    activeTime:"20 min",
+    prepTime:"20 min + 30 min marinade",
+    hiddenVeg:"Stir grated zucchini into warm rice/cauliflower rice — melts in completely",
+    leftoverNote:"🔄 Use leftover Slow Cooker Taco chicken instead of cooking fresh — this becomes a 5-minute assembly.",
+    source:"Chipotle-style at home — higher protein, lower cost",
+    description:"Chipotle at home for a fraction of the cost and twice the protein. Kids build their own bowls — everyone gets exactly what they want with zero negotiation.",
+    ingredients:[
+      "--- THE CHICKEN ---",
+      "1.5 lbs boneless skinless chicken thighs",
+      "2 tbsp avocado oil",
+      "1.5 tsp Siete Taco Seasoning OR Dan-O's Spicy + pinch of cumin",
+      "1 tsp Burlap & Barrel Low & Slow Chili Powder",
+      "Juice of 1 lime",
+      "Salt to taste",
+      "--- THE BOWL BASE ---",
+      "1 cup cauliflower rice OR farro OR quinoa (cauliflower rice for lowest cal)",
+      "½ zucchini, grated and stirred into warm base (invisible)",
+      "1 can black beans, drained and rinsed, warmed with pinch of cumin + Dan-O's",
+      "--- TOPPINGS ---",
+      "1 cup cherry tomatoes, halved OR Newman's Own salsa",
+      "½ cup corn (frozen is fine, thaw and pat dry)",
+      "Shredded reduced-fat Mexican cheese",
+      "Fage 0% Greek yogurt (sour cream swap)",
+      "Sliced avocado",
+      "Cholula or Frank's RedHot for adults",
+      "🫙 Sauces: Spicy Yum Yum Sauce or Nothing Hidden Ranch from Sauces tab"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Pat chicken thighs completely dry with paper towels.",
+      "In a bowl combine avocado oil, taco seasoning, chili powder, lime juice. Add chicken and toss to coat. Marinate 30 min minimum (overnight in fridge is better).",
+      "Prepare your base: cook farro/quinoa per package, or microwave cauliflower rice. While warm, stir in grated zucchini.",
+      "Warm black beans in a small saucepan with a pinch of cumin and Dan-O's.",
+      "Prep toppings: halve cherry tomatoes, thaw corn, slice avocado.",
+      "── COOK THE CHICKEN ──",
+      "Heat cast iron or skillet over HIGH heat until smoking.",
+      "Add chicken thighs — cook UNDISTURBED 4-5 min until deep golden crust forms.",
+      "Flip — cook another 4 min. Internal temp 165°F.",
+      "Rest 5 min then slice into strips.",
+      "── ASSEMBLE ──",
+      "Build bowls: base first, then beans, chicken strips, tomatoes, corn, cheese.",
+      "Top with Greek yogurt, avocado, and your choice of sauce.",
+      "ACID FINISH: squeeze of fresh lime over everything right before eating.",
+      "Set up a taco bar style so kids build their own bowls."
+    ],
+    tips:"MAILLARD: Cast iron on HIGH heat is essential for the Chipotle-style char on the chicken. Don't move it for the full 4-5 min. | SHORTCUT: If you made Slow Cooker Chicken Tacos earlier in the week, skip the chicken cook entirely — just reheat the shredded taco chicken and assemble the bowl. This becomes a 5-minute dinner. | CAULIFLOWER RICE: Lowest calorie base option. Microwave a bag of Birds Eye cauliflower rice, stir in the zucchini, season with Dan-O's. Kids usually can't tell if the cheese and toppings are good. | LOW & SLOW CHILI POWDER: This is where Burlap & Barrel Low & Slow Chili Powder really shines — richer and smokier than regular chili powder on the chicken.",
+    kidNote:"Set up as a build-your-own bar — kids always eat more when they choose their own toppings. Keep the chicken mild (skip the chili powder on theirs if needed). Cheese, corn and beans are usually the kid favorites.",
+    active:true
+  }
+  ,{
+    id:"dinner7",
+    name:"Sheet Pan Salmon with Roasted Veg",
+    emoji:"🐟",
+    day:"Thursday",
+    calories:380,
+    protein:42,
+    activeTime:"10 min",
+    prepTime:"10 min + 15 min roast",
+    hiddenVeg:"Roasted zucchini and cherry tomatoes alongside — not hidden but most kids eat roasted veg",
+    leftoverNote:"🔄 Leftover salmon is incredible flaked over a grain bowl the next day with tzatziki.",
+    source:"Fastest healthy dinner in the rotation",
+    description:"Fastest healthy dinner you'll make. Everything on one pan, 15 minutes in the oven. Elegant enough to feel special, simple enough for a Tuesday night.",
+    ingredients:[
+      "--- THE SALMON ---",
+      "4 salmon fillets (6oz each), skin-on",
+      "2 tbsp avocado oil",
+      "1 tsp Burlap & Barrel Herbes de Provence OR Penzeys Sunny Paris",
+      "1 tsp Dan-O's Original",
+      "½ tsp Burlap & Barrel Smoked Chipotle Chili Flakes (adults — add at table)",
+      "Salt and black pepper",
+      "1 lemon, half sliced for roasting, half for finishing",
+      "--- THE VEG ---",
+      "2 cups cherry tomatoes, left whole",
+      "2 medium zucchini, cut into half-moons",
+      "1 red onion, cut into wedges",
+      "2 tbsp avocado oil",
+      "Dan-O's Original + salt to season",
+      "--- SAUCES ---",
+      "🫙 Greek Yogurt Tzatziki from Sauces tab — serve alongside",
+      "🫙 Lemon Herb Drizzle from Sauces tab — drizzle over finished salmon"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Preheat oven to 425°F.",
+      "Pat salmon fillets completely dry with paper towels — critical for a good crust.",
+      "Cut zucchini into half-moons, cut red onion into wedges.",
+      "Slice half the lemon into thin rounds for roasting.",
+      "── BUILD THE PAN ──",
+      "On a large sheet pan, toss cherry tomatoes, zucchini and red onion with 2 tbsp oil and Dan-O's. Spread in a single layer.",
+      "Nestle salmon fillets skin-side DOWN among the vegetables.",
+      "Brush salmon with avocado oil. Season generously with Herbes de Provence, Dan-O's, salt and pepper.",
+      "Lay lemon slices on top of each fillet.",
+      "── ROAST ──",
+      "Roast at 425°F for 12-15 min depending on thickness. Salmon is done when it flakes easily with a fork and is opaque throughout.",
+      "Do NOT flip the salmon — it cooks perfectly skin-side down the whole time.",
+      "── FINISH ──",
+      "ACID FINISH: Squeeze the remaining lemon half over everything the moment it comes out of the oven. This step is essential.",
+      "Serve salmon over or alongside the roasted veg.",
+      "Drizzle with Lemon Herb Drizzle or serve Tzatziki alongside for dipping."
+    ],
+    tips:"DRY THE SALMON: Same rule as chicken — pat completely dry before seasoning. Any moisture steams instead of roasts and you lose the crust. | DON'T OVERCOOK: Salmon at 425°F needs only 12-15 min. Overcooked salmon is dry and chalky — pull it when it just flakes. The center can still look slightly translucent. | HERBES DE PROVENCE: This is the perfect use for your Burlap & Barrel Herbes de Provence — the lavender and herb notes pair beautifully with salmon. One shake covers all 4 fillets. | ACID IS ESSENTIAL: The lemon squeeze at the end isn't optional — it lifts the entire dish. | SKIN ON: Cook skin-side down the whole time. The skin protects the fish and lifts off easily after cooking if the kids don't want it.",
+    kidNote:"Salmon is one of the easier fish for kids to accept — mild flavor especially when well-seasoned. Serve their portion with tzatziki for dipping — makes it interactive. If they resist, flake it and mix into a grain bowl with cheese.",
+    active:true
+  }
+  ,{
+    id:"dinner8",
+    name:"Greek Chicken Bowls",
+    emoji:"🫒",
+    day:"Friday",
+    calories:410,
+    protein:44,
+    activeTime:"20 min",
+    prepTime:"20 min + 1 hr marinade",
+    hiddenVeg:"Spinach blended into tzatziki — completely invisible",
+    leftoverNote:"🔄 Leftover chicken is incredible in a wrap with tzatziki and cucumber the next day.",
+    source:"Uses your squeeze bottle tzatziki sauce perfectly",
+    description:"Mediterranean chicken bowls with homemade tzatziki. Bright, fresh, high protein — feels like a restaurant meal. Uses your Nothing Hidden Ranch and Tzatziki squeeze bottles.",
+    ingredients:[
+      "--- THE CHICKEN ---",
+      "1.5 lbs boneless skinless chicken thighs",
+      "3 tbsp avocado oil",
+      "Juice of 1 lemon",
+      "3 cloves garlic, minced or grated",
+      "1.5 tsp Penzeys Sunny Paris OR Burlap & Barrel Herbes de Provence",
+      "1 tsp Dan-O's Original",
+      "½ tsp Penzeys Four Peppercorn Blend",
+      "Salt to taste",
+      "--- THE BOWL ---",
+      "1 cup farro or quinoa, cooked",
+      "½ zucchini, grated into warm grains (invisible)",
+      "1 bag arugula or mixed greens",
+      "1 cup cherry tomatoes, halved",
+      "1 cucumber, diced",
+      "½ cup hummus",
+      "¼ red onion, very thinly sliced",
+      "Kalamata olives (optional — adults)",
+      "Reduced-fat feta crumbled on top",
+      "--- SAUCES ---",
+      "🫙 Greek Yogurt Tzatziki from Sauces tab — the star of this bowl",
+      "🫙 Lemon Herb Drizzle from Sauces tab — secondary drizzle"
+    ],
+    instructions:[
+      "── MISE EN PLACE (1 hr before or morning) ──",
+      "Pat chicken thighs dry. In a bowl whisk together oil, lemon juice, garlic, Sunny Paris/Herbes de Provence, Dan-O's, pepper and salt.",
+      "Add chicken and toss to coat. Marinate at least 1 hour — overnight in the fridge is significantly better.",
+      "Make your Tzatziki sauce from the Sauces tab and refrigerate — flavor improves as it sits.",
+      "Cook farro or quinoa per package. While hot, stir in grated zucchini.",
+      "Prep toppings: halve cherry tomatoes, dice cucumber, thinly slice red onion, crumble feta.",
+      "── COOK THE CHICKEN ──",
+      "Heat cast iron skillet over HIGH heat until smoking.",
+      "Add marinated chicken UNDISTURBED — cook 4-5 min until deeply golden.",
+      "Flip — cook another 4 min. Rest 5 min then slice.",
+      "── ASSEMBLE ──",
+      "Base of grains, then greens, sliced chicken, cherry tomatoes, cucumber, red onion.",
+      "Add a generous dollop of hummus and crumbled feta.",
+      "ACID FINISH: squeeze of fresh lemon right before serving.",
+      "Drizzle generously with Tzatziki from your squeeze bottle."
+    ],
+    tips:"MARINADE TIME: The longer the better — overnight in the fridge transforms this. The lemon juice tenderizes the chicken dramatically. | SUNNY PARIS: This is the perfect use for your Penzeys Sunny Paris — the shallot and herb profile is designed for exactly this kind of Mediterranean chicken. | TZATZIKI: Make it the day before if possible — the flavors develop significantly overnight. This is what makes the bowl taste restaurant-quality. | ACID FINISH: Fresh lemon squeeze right before eating is non-negotiable — it lifts the tzatziki and brightens everything. | RED ONION: Soak sliced red onion in cold water for 10 min if you want to mellow the bite — especially for the kids.",
+    kidNote:"Build as a bowl bar — kids choose their own toppings. Most kids like the chicken, cucumber and hummus. Skip the red onion and olives for theirs. Tzatziki is usually kid-friendly — try it as a dipping sauce for the chicken.",
+    active:true
+  }
+  ,{
+    id:"dinner9",
+    name:"Slow Cooker Turkey Chili",
+    emoji:"🌶️",
+    day:"Sunday",
+    calories:340,
+    protein:42,
+    activeTime:"15 min",
+    prepTime:"15 min + 6-8 hrs slow cooker",
+    hiddenVeg:"Grated zucchini + carrot cooked in — completely disappears. Blend in a handful of spinach puree for extra boost.",
+    leftoverNote:"🔄 Makes 6-8 servings. Freezes perfectly in individual portions — future lunches and dinners done. Gets better on day 2 and 3.",
+    source:"Sunday dump recipe — feeds the family all week",
+    description:"Sunday dump-and-go chili that feeds the whole family all week. High protein, hidden veg, incredible with toppings. Gets better every day in the fridge.",
+    ingredients:[
+      "--- THE CHILI ---",
+      "1.5 lbs Jennie-O 93/7 ground turkey",
+      "1 small zucchini, grated on box grater",
+      "2 carrots, grated on box grater",
+      "1 small onion, diced",
+      "3 cloves garlic, minced",
+      "1 can (14oz) diced tomatoes",
+      "1 can (14oz) crushed tomatoes",
+      "1 can (15oz) kidney beans, drained and rinsed",
+      "1 can (15oz) black beans, drained and rinsed",
+      "1 cup Kettle & Fire Chicken Bone Broth (10g protein/cup — swap for regular low-sodium chicken broth if unavailable)",
+      "2 tsp Burlap & Barrel Low & Slow Chili Powder (the hero ingredient here)",
+      "1 tsp Siete Taco Seasoning OR Dan-O's Spicy",
+      "1 tsp cumin",
+      "1 tsp smoked paprika",
+      "½ tsp Dan-O's Original",
+      "Salt and pepper to taste",
+      "--- TOPPINGS ---",
+      "Fage 0% Greek yogurt (sour cream swap)",
+      "Shredded reduced-fat cheddar",
+      "Sliced green onions",
+      "Cholula or Frank's RedHot for adults",
+      "Fritos or cornbread for the kids",
+      "🫙 Nothing Hidden Ranch from Sauces tab — drizzle over bowl"
+    ],
+    instructions:[
+      "── MISE EN PLACE (15 min Sunday morning) ──",
+      "Brown the ground turkey first — this step is worth it: heat a skillet over HIGH heat, add turkey in one layer, UNDISTURBED 3-4 min to brown, then break up. Drain any excess liquid.",
+      "Dice the onion, mince the garlic.",
+      "Grate zucchini and both carrots on a box grater.",
+      "── SLOW COOKER (dump and go) ──",
+      "Add browned turkey to slow cooker.",
+      "Add diced onion, garlic, grated zucchini and carrot.",
+      "Pour in both cans of tomatoes, both cans of drained beans, and chicken broth.",
+      "Add Low & Slow Chili Powder, taco seasoning, cumin, smoked paprika and Dan-O's. Stir everything together.",
+      "Cook on LOW 6-8 hours or HIGH 3-4 hours.",
+      "── FINISH ──",
+      "Taste and adjust seasoning — chili usually needs a pinch more salt at the end.",
+      "ACID FINISH: stir in a small squeeze of lime juice right before serving. Brightens the whole pot.",
+      "Serve with toppings set out buffet-style.",
+      "Cool leftovers completely before refrigerating. Freeze in individual 2-cup portions."
+    ],
+    tips:"BROWN THE TURKEY: Unlike the Bolognese where you can skip some steps, browning the turkey before the slow cooker is worth the extra 5 minutes — the Maillard crust adds depth you can't get from slow cooking alone. | LOW & SLOW CHILI POWDER: This is the single biggest upgrade you can make to any chili. Burlap & Barrel Low & Slow is richer, smokier and more complex than any store-bought chili powder. Use it generously. | HIDDEN VEG: Grated zucchini and carrot completely disappear after 6-8 hours — the kids will never know. Works the same as the Bolognese. | GETS BETTER: Day 2 and 3 chili is noticeably better than day 1 as flavors meld. Make Sunday, eat all week. | FREEZE IT: Freeze in 2-cup portions for instant future lunches — reheat in 2 min from frozen.",
+    kidNote:"Kids usually love chili with toppings — cheese, Fritos, and Greek yogurt make it fun. Let them add their own toppings. Mild enough for kids if you go easy on the Dan-O's Spicy — use Original only for their portions.",
+    active:true
+  }
+  ,{
+    id:"dinner10",
+    name:"Reverse Sear Beef Tenderloin",
+    emoji:"🥩",
+    day:"Saturday",
+    calories:480,
+    protein:52,
+    activeTime:"25 min",
+    prepTime:"Dry brine 4-24 hrs + 35-50 min oven + 5 min sear",
+    hiddenVeg:"Serve with roasted veg on the side — this one is about the beef",
+    leftoverNote:"🔄 Leftover tenderloin makes incredible French dip sandwiches — slice thin, warm briefly in homemade au jus, serve on a toasted baguette with Boar's Head American and caramelized onions.",
+    source:"Reverse sear method — preferred by serious home cooks over smoker or straight sear",
+    description:"The special occasion recipe the whole family loves. Reverse sear gives you edge-to-edge perfect doneness with a deep mahogany crust. Better than any restaurant version at a fraction of the cost.",
+    ingredients:[
+      "--- THE TENDERLOIN ---",
+      "1 whole beef tenderloin (3-4 lbs), trimmed and tied (or ask butcher to tie it)",
+      "Diamond Crystal kosher salt — generous coat (NOTE: if using Morton kosher salt, use HALF the amount — Morton is nearly twice as dense as Diamond Crystal)",
+      "Coarse black pepper or Penzeys Four Peppercorn Blend — generous coat",
+      "1 tsp garlic powder",
+      "Kinder's Buttery Steakhouse seasoning — light coat over salt and pepper",
+      "2 tbsp refined avocado oil (high smoke point — do NOT use olive oil)",
+      "--- HERB BUTTER FINISH ---",
+      "3 tbsp Land O'Lakes light butter, softened",
+      "1 clove garlic, finely minced",
+      "1 tbsp fresh thyme or rosemary, finely chopped",
+      "Pinch of Burlap & Barrel Herb & Sea Salt",
+      "--- FRENCH DIP LEFTOVERS (optional) ---",
+      "1 tbsp butter",
+      "1 large onion, thinly sliced (for caramelizing)",
+      "½ cup dry red wine",
+      "2 cups beef stock (low sodium)",
+      "1 tsp Worcestershire sauce",
+      "Salt and pepper",
+      "1 baguette, split and toasted",
+      "Boar's Head American cheese (melts cleanest) or provolone",
+      "🫙 Serve alongside: Nothing Hidden Ranch or Lemon Herb Drizzle from Sauces tab"
+    ],
+    instructions:[
+      "── DRY BRINE (4-24 hours ahead — the night before is ideal) ──",
+      "Pat tenderloin completely dry with paper towels.",
+      "Season generously on all sides with Diamond Crystal kosher salt (or HALF as much Morton), coarse pepper and garlic powder.",
+      "Place on a wire rack over a sheet pan — uncovered in the fridge. The surface dries out perfectly overnight for the best crust.",
+      "Do NOT skip this step — it's the single biggest difference between good and great tenderloin.",
+      "── 1 HOUR BEFORE COOKING ──",
+      "Pull tenderloin from fridge and let sit at room temperature for 45-60 min. Cold meat cooks unevenly.",
+      "Make herb butter: mix softened butter with minced garlic, fresh thyme/rosemary and Herb & Sea Salt. Set aside.",
+      "Preheat oven to 275°F. Place tenderloin on a wire rack set over a sheet pan.",
+      "── REVERSE SEAR — OVEN FIRST ──",
+      "Insert a probe thermometer into the thickest part of the tenderloin.",
+      "Roast at 275°F until internal temp reaches 115-120°F for medium rare (about 25-40 min depending on thickness). This is lower than your final target — the sear finishes it.",
+      "While tenderloin is in oven: heat cast iron skillet over HIGH heat on the stovetop for at least 3-4 min until smoking hot. This is critical.",
+      "── SEAR ──",
+      "Add 2 tbsp avocado oil to the screaming hot cast iron.",
+      "Sear tenderloin on all sides including the ends — 60-90 seconds per side. You want a deep mahogany crust, not grey. Do NOT move it during each side.",
+      "── FINISH ──",
+      "Immediately place herb butter on top of the hot tenderloin — let it melt over the meat.",
+      "REST 10 min minimum — non-negotiable. Cutting early loses all the juices onto the cutting board.",
+      "ACID FINISH: squeeze of fresh lemon or a splash of red wine vinegar over the carved slices right before serving. Brightens the richness dramatically.",
+      "Slice against the grain into medallions.",
+      "── FRENCH DIP FROM LEFTOVERS ──",
+      "Caramelize onion in butter over medium-low heat 30-40 min — low and slow, gentle browning between stirs. Do not rush this.",
+      "Add red wine to the onion pan, scrape up all the fond from the bottom. Reduce 2 min.",
+      "Add beef stock and Worcestershire. Simmer 8-10 min. Season with salt and pepper.",
+      "Slice leftover tenderloin thin and warm BRIEFLY in the simmering jus — 30-60 seconds only. It overcooks fast.",
+      "Load bottom half of baguette with meat, onions and cheese. Broil until cheese melts.",
+      "Serve with a ramekin of the au jus for dipping."
+    ],
+    tips:"DIAMOND CRYSTAL VS MORTON: This is the most important tip. Morton kosher salt is nearly twice as dense as Diamond Crystal by volume. If using Morton, use HALF the amount you think you need or the result will be too salty. Switch to Diamond Crystal for better control — it's the standard in professional kitchens. | DRY BRINE OVERNIGHT: This step does two things — seasons the meat all the way through, and dries the surface for a dramatically better sear. Don't skip it. | REVERSE SEAR: Low oven first, hard sear last — the opposite of traditional. You get edge-to-edge even doneness (no grey band around the outside) and the dried surface from the oven sears better than raw meat. | CAST IRON MUST BE SCREAMING HOT: 3-4 min on high before the meat goes in. A drop of water should vaporize instantly. This is the Maillard crust you're after. | AVOCADO OIL ONLY: Olive oil burns at cast iron searing temps. Refined avocado oil has the highest smoke point of any cooking oil. | REST IS NON-NEGOTIABLE: 10 min minimum. Every minute of rest is worth it — the juices redistribute back into the meat instead of running onto your cutting board. | LEFTOVER TIMING: When warming leftover tenderloin in the jus, 30-60 seconds is all you need. This cut overcooks extremely fast when reheated — err on the side of under.",
+    kidNote:"Kids love tenderloin — it's mild, tender and easy to chew. Serve their portions plain without the herb butter if they're picky about 'green stuff'. The French dip sandwiches are also a huge kid hit — let them dip their own sandwich in the jus.",
+    active:true
+  }
+
+  ,{
+    id:"dinner11",
+    name:"Marcella Hazan Tomato Butter Sauce with Brami",
+    emoji:"🍅",
+    day:"Wednesday",
+    calories:380,
+    protein:32,
+    activeTime:"5 min",
+    prepTime:"5 min + 45 min simmer (mostly hands-off)",
+    hiddenVeg:"Add a grated zucchini or carrot to the sauce — completely disappears",
+    leftoverNote:"🔄 Sauce keeps 5 days in fridge and freezes perfectly. Make a double batch and freeze half.",
+    source:"Marcella Hazan — one of the most beloved recipes on the internet",
+    description:"The most famous 3-ingredient pasta sauce ever made. Butter, canned tomatoes, onion — that's it. Impossibly rich and flavorful. Paired with Brami protein pasta it becomes a genuinely great high-protein weeknight dinner.",
+    ingredients:[
+      "--- THE SAUCE (3 ingredients) ---",
+      "1 can (28oz) whole San Marzano tomatoes — crush by hand before adding",
+      "5 tbsp Land O'Lakes light butter (original uses unsalted — this is the one time butter is non-negotiable)",
+      "1 medium onion, peeled and halved (goes in whole — you remove it at the end)",
+      "Salt to taste",
+      "--- THE PASTA ---",
+      "12 oz Brami protein pasta or Barilla Protein+ (Publix)",
+      "Generous amount of kosher salt for pasta water",
+      "Reduced-fat Parmesan to finish",
+      "--- OPTIONAL ADDITIONS ---",
+      "1 small zucchini, grated on box grater (stir in with tomatoes — melts completely invisible)",
+      "Fresh basil leaves to finish (highly recommended)",
+      "🫙 Serve with: Cottage Cheese Alfredo from Sauces tab as a white sauce variation"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Open the can of tomatoes. Crush each tomato by hand over the pot — squeeze them through your fingers. This is the only prep required.",
+      "Peel and halve the onion. You're leaving it in large pieces — it goes in whole and comes out at the end.",
+      "If adding hidden zucchini: grate on box grater now.",
+      "── MAKE THE SAUCE ──",
+      "Combine crushed tomatoes, butter, and onion halves in a medium saucepan.",
+      "Add grated zucchini if using.",
+      "Bring to a gentle simmer over medium heat, then reduce to LOW.",
+      "Simmer uncovered 45 min, stirring occasionally. The sauce will thicken and deepen in color.",
+      "Remove onion halves and discard. Season with salt.",
+      "ACID CHECK: taste the sauce — if it tastes flat, a tiny pinch of sugar balances any excess acidity from the tomatoes.",
+      "── COOK THE PASTA ──",
+      "Salt your pasta water generously — it should taste like the sea. This is the only chance to season the pasta itself.",
+      "Cook Brami pasta al dente per package. Reserve 1 cup pasta water before draining. Rinse after draining.",
+      "Toss pasta in the sauce. Add a splash of pasta water if needed to loosen.",
+      "── FINISH ──",
+      "ACID FINISH: a tiny squeeze of lemon right before serving brightens everything.",
+      "Finish with freshly grated Parmesan and fresh basil if using.",
+      "Serve immediately — this sauce waits for no one."
+    ],
+    tips:"BUTTER IS THE POINT: This is one recipe where you don't swap the butter — it's what makes the sauce silky and rich. Land O'Lakes light butter works fine and saves calories. | SAN MARZANO: Use canned San Marzano tomatoes if possible (Publix carries them) — they're sweeter and less acidic than regular canned tomatoes and make a noticeable difference in this simple sauce. | CRUSH BY HAND: Don't blend or use a food processor — crushing by hand leaves the right texture. It's messy but takes 30 seconds. | ONION MAGIC: The onion goes in whole and comes out whole. It quietly perfumes the sauce for 45 min and you'd never know it was there. | SIMMER LOW AND SLOW: Don't rush the 45 min — the sauce concentrates and sweetens as it cooks. Set a timer and walk away. | PASTA WATER: Reserve a cup before draining — the starchy water is what makes the sauce coat the pasta perfectly.",
+    kidNote:"Kids almost universally love this sauce — it's mild, slightly sweet, and very approachable. The butter makes it rich enough to feel indulgent. Brami pasta looks and tastes enough like regular pasta that most kids accept it.",
+    active:true
+  }
+  ,{
+    id:"dinner12",
+    name:"Kenji's French Onion Soup",
+    emoji:"🧅",
+    day:"Sunday",
+    calories:420,
+    protein:28,
+    activeTime:"30 min",
+    prepTime:"30 min + 60-75 min caramelizing onions",
+    hiddenVeg:"The onions themselves cook down to almost nothing — 4 lbs becomes a fraction of the volume",
+    leftoverNote:"🔄 Soup base keeps 5 days in fridge and freezes perfectly without the bread and cheese topping. Make a big batch and freeze in portions.",
+    source:"Kenji López-Alt / Serious Eats — the definitive French onion soup recipe",
+    description:"The best French onion soup you'll ever make. You already proved you can caramelize onions for the French dip — same technique, even more rewarding result. Worth every minute of the low-and-slow onion cook.",
+    ingredients:[
+      "--- THE SOUP ---",
+      "4 lbs yellow onions (about 6 large), thinly sliced",
+      "3 tbsp Land O'Lakes light butter",
+      "1 tbsp avocado oil",
+      "½ tsp baking soda (Kenji's secret — dramatically speeds up caramelization)",
+      "1 cup dry white wine or dry sherry",
+      "4 cups beef broth (low sodium) — or Kettle & Fire Bone Broth for extra protein",
+      "2 cups chicken broth (low sodium)",
+      "2 tbsp Worcestershire sauce",
+      "2 sprigs fresh thyme (or ½ tsp dried)",
+      "1 bay leaf",
+      "Salt and black pepper",
+      "--- THE TOPPING ---",
+      "4-6 thick slices crusty bread (baguette or sourdough), toasted",
+      "6 oz Gruyère cheese, grated (or Swiss if unavailable)",
+      "2 oz reduced-fat provolone (adds melt without all the fat of extra Gruyère)"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Slice all onions thinly and uniformly — a mandoline makes this much faster but a sharp knife works.",
+      "Grate the Gruyère cheese and set aside.",
+      "Measure out wine, broths, Worcestershire, and seasonings.",
+      "── CARAMELIZE THE ONIONS (the main event — 60-75 min) ──",
+      "Heat butter and oil in a large Dutch oven over MEDIUM-HIGH heat.",
+      "Add all the onions plus the baking soda — stir to coat. The baking soda raises pH and dramatically speeds up browning.",
+      "Cook uncovered, stirring every 5-7 min. The onions will first steam, then start to brown.",
+      "IMPORTANT: let them sit undisturbed between stirs to build fond on the bottom. Scrape that fond up each time you stir — it's all flavor.",
+      "If the fond is getting too dark before the onions are done, add a splash of water and scrape up.",
+      "After 45-60 min the onions should be deep mahogany brown, jammy and reduced to a fraction of their original volume.",
+      "── BUILD THE SOUP ──",
+      "Add wine to the caramelized onions. Scrape up any remaining fond. Simmer 3 min to cook off the alcohol.",
+      "Add beef broth, chicken broth, Worcestershire, thyme and bay leaf.",
+      "Simmer 15-20 min. Season generously with salt and pepper. Remove thyme sprigs and bay leaf.",
+      "ACID FINISH: taste and adjust — a splash of sherry vinegar or white wine vinegar right before serving brightens the whole soup.",
+      "── THE TOPPING ──",
+      "Preheat broiler.",
+      "Ladle soup into oven-safe bowls. Float a slice of toasted bread on top.",
+      "Cover generously with grated Gruyère and provolone.",
+      "Broil 2-4 min until cheese is bubbling, golden and slightly charred at the edges. Watch closely.",
+      "Serve immediately — the cheese will firm as it cools."
+    ],
+    tips:"BAKING SODA: Kenji's key insight — a tiny amount (½ tsp) makes the onions caramelize in 60 min instead of 90+. Don't skip it. | LOW AND SLOW PATIENCE: Medium-high heat, stirring every 5-7 min, letting the fond build between stirs. This is the same technique you used for the French dip onions — you already know how to do this. | FOND IS FLAVOR: The brown bits stuck to the bottom of the pot are pure concentrated flavor. Scrape them up every time you stir. If they're getting too dark, splash of water and scrape. | KETTLE & FIRE BONE BROTH: Swap regular beef broth for Kettle & Fire — adds extra protein and depth. Worth it here. | GRUYÈRE: The correct cheese for French onion soup. It melts beautifully and has the right nutty flavor. Swiss works as a substitute but Gruyère is worth seeking out. | OVEN-SAFE BOWLS: You need bowls that can go under the broiler. Lodge cast iron mini cocottes or simple ceramic crocks work perfectly.",
+    kidNote:"Kids are often surprisingly into this — the sweet caramelized onions and melted cheese are very approachable. Let them pull the cheese strings off the top. Serve with extra bread for dipping.",
+    active:true
+  }
+  ,{
+    id:"dinner13",
+    name:"Samin Nosrat Buttermilk Roast Chicken",
+    emoji:"🍗",
+    day:"Saturday",
+    calories:390,
+    protein:46,
+    activeTime:"15 min",
+    prepTime:"15 min + overnight marinade + 45 min roast",
+    hiddenVeg:"Serve with roasted veg on the side",
+    leftoverNote:"🔄 Leftover chicken is incredible in grain bowls, tacos, or sandwiches all week. Make extra.",
+    source:"Samin Nosrat — Salt Fat Acid Heat, one of the most acclaimed chicken recipes ever written",
+    description:"The most praised roast chicken recipe of the last decade. Overnight buttermilk marinade transforms the texture and flavor completely — impossibly juicy, deeply seasoned, with the crispiest skin you've ever made at home.",
+    ingredients:[
+      "--- THE CHICKEN ---",
+      "1 whole chicken (3.5-4 lbs) OR 6-8 bone-in skin-on chicken thighs",
+      "1 cup buttermilk (or make your own: 1 cup Fairlife milk + 1 tbsp lemon juice, let sit 5 min)",
+      "2 tbsp Diamond Crystal kosher salt (or 1 tbsp Morton)",
+      "--- SEASONING ---",
+      "1 tsp black pepper",
+      "1 tsp garlic powder",
+      "Burlap & Barrel Herbes de Provence or Penzeys Sunny Paris — generous sprinkle",
+      "2 tbsp avocado oil",
+      "--- SERVING ---",
+      "🫙 Serve with: Lemon Herb Drizzle or Greek Yogurt Tzatziki from Sauces tab",
+      "Charred lemon halves (same technique as the steak skewers)"
+    ],
+    instructions:[
+      "── NIGHT BEFORE (5 min) ──",
+      "Mix buttermilk and salt in a large zip-lock bag or bowl.",
+      "Add chicken pieces. Make sure every surface is coated in the buttermilk.",
+      "Refrigerate overnight — minimum 8 hours, up to 24 hours. The longer the better.",
+      "── DAY OF ──",
+      "Remove chicken from fridge 1 hour before cooking — cold chicken cooks unevenly.",
+      "Preheat oven to 425°F.",
+      "Remove chicken from buttermilk — shake off excess but don't rinse. The coating is fine.",
+      "Pat the skin side DRY with paper towels — this is critical for crispy skin.",
+      "Season with pepper, garlic powder and Herbes de Provence. Drizzle with avocado oil.",
+      "── ROAST ──",
+      "Place chicken skin-side UP on a wire rack over a sheet pan.",
+      "Roast 40-45 min until skin is deep golden brown and internal temp reaches 165°F.",
+      "Do NOT open the oven in the first 30 min.",
+      "── FINISH ──",
+      "Rest 10 min before serving.",
+      "ACID FINISH: squeeze charred lemon over everything right before serving.",
+      "Serve with Lemon Herb Drizzle or Tzatziki from your squeeze bottles."
+    ],
+    tips:"THE OVERNIGHT MARINADE: The buttermilk does two things — the acid tenderizes the meat dramatically, and the proteins in the milk help the skin brown better and more evenly. Don't skip the overnight rest. | DRY THE SKIN: After marinating, pat the skin completely dry before roasting. The buttermilk keeps the meat juicy — the dry skin gives you the crisp. | WIRE RACK: Elevating the chicken lets air circulate underneath so the bottom skin crisps instead of steaming. | THIGHS VS WHOLE CHICKEN: Thighs are easier and more forgiving. The whole chicken is more dramatic but requires a bit more attention to even cooking. Both work perfectly with this marinade. | BUTTERMILK SUBSTITUTE: 1 cup Fairlife milk + 1 tbsp lemon juice, let sit 5 min — works identically.",
+    kidNote:"Kids love this chicken — the overnight marinade makes it incredibly tender and juicy, which makes it easy to chew. The skin is crispy enough to be fun. Serve plain for kids without the lemon finish.",
+    active:true
+  }
+  ,{
+    id:"dinner14",
+    name:"Kenji's Crispy Cast Iron Chicken Thighs",
+    emoji:"🍳",
+    day:"Tuesday",
+    calories:340,
+    protein:42,
+    activeTime:"20 min",
+    prepTime:"5 min + 20 min cook",
+    hiddenVeg:"Serve with roasted veg or a simple salad",
+    leftoverNote:"🔄 Best chicken thigh recipe for meal prep — reheat in a 400°F oven 5 min to re-crisp the skin.",
+    source:"Kenji López-Alt / Serious Eats — most replicated chicken thigh technique online",
+    description:"The fastest route to restaurant-quality crispy chicken thighs at home. Cold pan start is Kenji's counterintuitive key — it renders the fat slowly before the heat cranks up for the crust. 20 minutes, one pan.",
+    ingredients:[
+      "4-6 bone-in skin-on chicken thighs",
+      "Diamond Crystal kosher salt + black pepper",
+      "Dan-O's Original OR Kinder's The Blend OR Tony Chachere's Creole",
+      "Penzeys Four Peppercorn Blend (finishing)",
+      "1 tsp avocado oil",
+      "🫙 Serve with: Spicy Yum Yum Sauce or Lemon Herb Drizzle from Sauces tab",
+      "Charred lemon halves for finishing"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Pat chicken thighs completely dry with paper towels — the most important step.",
+      "Season generously on both sides with salt, pepper and your chosen seasoning blend.",
+      "── COLD PAN START (Kenji's key technique) ──",
+      "Place chicken thighs SKIN SIDE DOWN in a cold cast iron skillet.",
+      "Add a tiny drizzle of avocado oil (just to prevent sticking at first).",
+      "Turn heat to MEDIUM. Do not touch the chicken.",
+      "The fat will slowly render as the pan heats up — you'll hear it gradually start to sizzle louder.",
+      "Cook skin-side down 15-18 min undisturbed. The skin should be deep mahogany and extremely crispy.",
+      "Flip and cook 3-5 min on the flesh side until internal temp reaches 165°F.",
+      "── FINISH ──",
+      "Rest 5 min.",
+      "ACID FINISH: squeeze charred lemon (char it in the same pan while chicken rests) over everything.",
+      "Serve with your Yum Yum Sauce or Lemon Herb Drizzle."
+    ],
+    tips:"COLD PAN START: This is Kenji's insight that changed how everyone cooks chicken thighs. Starting cold lets the fat render slowly and completely — you get impossibly crispy skin without burning. | PATIENCE: 15-18 min skin-side down. Do not move it, do not check it, do not poke it. The skin releases naturally when it's ready. If it's sticking, it's not done. | DRY THE SKIN: Pat completely dry. Any moisture = steam = no crust. | CAST IRON ONLY: The even heat retention of cast iron is what makes this work. A stainless pan is second-best. Non-stick won't give you the same crust. | NO LID: Leave the pan uncovered the whole time — steam is the enemy of crispy skin.",
+    kidNote:"One of the most kid-friendly recipes in the vault — the crispy skin is irresistible and the chicken is juicy and tender. Season more lightly (just salt and pepper) for kids if using Tony Chachere's which has some heat.",
+    active:true
+  }
+  ,{
+    id:"dinner15",
+    name:"Kenji's Smash Burgers",
+    emoji:"🍔",
+    day:"Friday",
+    calories:520,
+    protein:48,
+    activeTime:"20 min",
+    prepTime:"10 min + 10 min cook",
+    hiddenVeg:"Add finely grated zucchini to the burger mix — disappears completely",
+    leftoverNote:"🔄 Make extra patties and refrigerate — reheat in a hot cast iron 2 min per side.",
+    source:"Kenji López-Alt — changed how everyone thinks about burgers",
+    description:"The smash burger technique produces a thin, lacy-edged patty with maximum Maillard crust — dramatically better than a thick formed patty. Kenji's technique is now the gold standard for home burgers.",
+    ingredients:[
+      "--- THE BURGERS ---",
+      "1.5 lbs 80/20 ground beef (fat content matters here — leaner beef won't smash properly)",
+      "Salt and black pepper — season right before smashing",
+      "Kinder's Buttery Steakhouse (light dusting after smashing)",
+      "--- THE BUILD ---",
+      "Martin's Potato Rolls (the correct smash burger bun — soft, slightly sweet)",
+      "Boar's Head American cheese (1-2 slices per patty — melts perfectly)",
+      "Shredded iceberg lettuce",
+      "Thinly sliced white onion",
+      "Pickles",
+      "Smash sauce: 3 tbsp Primal Kitchen mayo + 1 tbsp ketchup + 1 tsp mustard + 1 tsp pickle juice",
+      "🫙 Spicy Yum Yum Sauce from Sauces tab as an elevated burger sauce"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Divide ground beef into loose 3-4 oz balls — do NOT pack them tightly. Loose is key.",
+      "Make smash sauce: mix mayo, ketchup, mustard, pickle juice. Set aside.",
+      "Prep toppings: shred lettuce, slice onion thinly, have cheese slices ready.",
+      "Toast buns cut-side down in a dry pan or toaster — toasted buns are non-negotiable.",
+      "── SMASH ──",
+      "Heat cast iron skillet over HIGH heat until smoking. No oil needed — the beef fat is enough.",
+      "Place a beef ball on the hot pan. Immediately place a piece of parchment paper on top.",
+      "Using a heavy spatula or burger press, SMASH DOWN as hard as you can — press and hold for 10 seconds. You want a thin patty with ragged lacy edges.",
+      "Season the top with salt, pepper and a tiny dusting of Buttery Steakhouse.",
+      "Cook undisturbed 2-3 min until the edges are brown and crispy and the top is mostly grey.",
+      "Flip once. Immediately place American cheese on top. Cook 1 min.",
+      "── BUILD AND SERVE ──",
+      "Spread smash sauce on both bun halves.",
+      "Stack: bottom bun → sauce → lettuce → patty with melted cheese → onion → pickles → top bun.",
+      "Serve immediately — smash burgers do not wait.",
+      "ACID: the pickles and pickle juice in the sauce are your acid finish here."
+    ],
+    tips:"LOOSE BALLS: Do not pack the beef tightly — you want loose, shaggy balls that smash into lacy-edged patties. Packed beef = dense texture. | SMOKING HOT PAN: The pan must be ripping hot. The Maillard crust forms in the first 30 seconds of contact — a cold pan misses the window. | SMASH HARD AND HOLD: Press down with everything you have and hold for 10 seconds. You only get one smash — once the crust forms you can't smash further. | 80/20 BEEF: The fat is what makes this work. Leaner beef = dry, sad smash burger. This is an occasional treat recipe — lean is not the goal here. | AMERICAN CHEESE: Boar's Head American melts into a perfect sheet. It's the right cheese for this. | MARTIN'S POTATO ROLLS: Widely available at Publix. The soft, slightly sweet bun is part of what makes a smash burger a smash burger.",
+    kidNote:"Huge kid hit — the thin crispy patties and melted American cheese are hard to resist. Make smaller patties for kids (2 oz balls). Let them add their own toppings.",
+    active:true
+  }
+  ,{
+    id:"dinner16",
+    name:"Alison Roman's Spiced Chickpea & Spinach Stew",
+    emoji:"🫘",
+    day:"Thursday",
+    calories:320,
+    protein:18,
+    activeTime:"25 min",
+    prepTime:"25 min",
+    hiddenVeg:"Spinach wilts completely into the stew",
+    leftoverNote:"🔄 Gets significantly better on day 2. Make a double batch — freezes perfectly.",
+    source:"Alison Roman — went massively viral, one of the most-made recipes of the last decade",
+    description:"The recipe that broke the internet in 2019. Spiced chickpeas in a rich tomato-coconut broth with wilted greens. Vegetarian but incredibly satisfying — even meat eaters make this weekly.",
+    ingredients:[
+      "2 cans (15oz each) chickpeas, drained and rinsed",
+      "1 can (14oz) crushed tomatoes",
+      "1 can (14oz) full-fat coconut milk",
+      "1 large onion, thinly sliced",
+      "4 cloves garlic, thinly sliced",
+      "2 tsp cumin",
+      "1 tsp turmeric",
+      "1 tsp Burlap & Barrel Low & Slow Chili Powder",
+      "½ tsp red pepper flakes (skip for kids)",
+      "3 tbsp avocado oil",
+      "1 big bunch baby spinach or kale (5-6 oz)",
+      "Salt and black pepper",
+      "Fresh cilantro or parsley to finish",
+      "Fage 0% Greek yogurt to serve (adds protein + cools the heat)",
+      "Brami pasta OR crusty bread OR rice alongside",
+      "🫙 Serve with: Nothing Hidden Ranch or Lemon Herb Drizzle from Sauces tab"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Drain and rinse chickpeas. Pat dry with a paper towel — dry chickpeas crisp better.",
+      "Thinly slice onion and garlic.",
+      "Measure out all spices into one small bowl — cumin, turmeric, chili powder, red pepper flakes.",
+      "── COOK ──",
+      "Heat oil in a large Dutch oven or wide pot over MEDIUM-HIGH heat until shimmering.",
+      "Add chickpeas in a single layer — cook undisturbed 3-4 min until they start to crisp and pop. Season with salt.",
+      "Add onion and garlic. Cook 5 min, stirring occasionally, until softened and golden.",
+      "Add all spices at once. Stir constantly for 2 min — blooming the spices in the oil is critical for depth.",
+      "Add crushed tomatoes. Stir and cook 3 min, scraping up any fond.",
+      "Add coconut milk. Stir to combine. Season generously with salt and pepper.",
+      "Simmer 10 min until slightly thickened.",
+      "Add spinach in handfuls — stir until wilted.",
+      "── FINISH ──",
+      "ACID FINISH: squeeze of lemon right before serving — essential to brighten the coconut and spices.",
+      "Serve topped with a dollop of Fage Greek yogurt, fresh cilantro, and a drizzle of good olive oil.",
+      "Serve alongside Brami pasta, crusty bread, or rice."
+    ],
+    tips:"CRISP THE CHICKPEAS FIRST: Don't skip this — 3-4 min undisturbed in hot oil gives the chickpeas a slightly crispy exterior that holds up in the stew and adds texture. | BLOOM THE SPICES: Adding spices directly to the hot oil before the liquid goes in releases fat-soluble flavor compounds that water-cooking never achieves. Stir constantly for the full 2 min. | COCONUT MILK: Full-fat coconut milk makes this rich and silky. Light coconut milk works but the sauce is thinner. | ACID FINISH: The lemon at the end is non-negotiable — it cuts through the richness of the coconut and brightens everything. | PROTEIN NOTE: This is lower protein than most of your recipes (chickpeas + Greek yogurt topping). Pair with Brami pasta or serve alongside an egg for a complete protein boost.",
+    kidNote:"Mild enough for kids if you skip the red pepper flakes. The coconut milk makes it slightly sweet which kids tend to like. Serve over rice or pasta for a more kid-friendly presentation. The Greek yogurt dollop on top cools it down and adds richness they enjoy.",
+    active:true
+  }
+  ,{
+    id:"dinner17",
+    name:"Sheet Pan Chicken Fajitas",
+    emoji:"🌶️",
+    day:"Tuesday",
+    calories:350,
+    protein:40,
+    activeTime:"15 min",
+    prepTime:"15 min + 25 min roast",
+    hiddenVeg:"Add grated zucchini to the pepper mix — roasts down invisibly",
+    leftoverNote:"🔄 Leftover fajita filling is incredible in burrito bowls, quesadillas, or grain bowls the next day.",
+    source:"Universal weeknight staple — most-saved sheet pan recipe online",
+    description:"Everything a fajita should be — charred peppers, juicy chicken, smoky seasoning — with almost zero active work. One pan, 25 minutes in the oven, dinner is done.",
+    ingredients:[
+      "--- THE FAJITAS ---",
+      "1.5 lbs boneless skinless chicken thighs or breasts, sliced into strips",
+      "3 bell peppers (mixed colors), sliced into strips",
+      "1 large onion, sliced into strips",
+      "1 zucchini, grated (optional hidden veg — toss with the peppers)",
+      "3 tbsp avocado oil",
+      "2 tsp Siete Taco Seasoning OR 1.5 tsp Burlap & Barrel Yo Quiero Taco Blend",
+      "1 tsp Dan-O's Original",
+      "1 tsp Burlap & Barrel Low & Slow Chili Powder",
+      "Juice of 1 lime",
+      "--- SERVING ---",
+      "Small flour or corn tortillas, warmed",
+      "Fage 0% Greek yogurt (sour cream swap)",
+      "Newman's Own salsa or TJ's Thick & Chunky",
+      "Sliced avocado",
+      "Shredded reduced-fat Mexican cheese",
+      "Cholula for adults",
+      "🫙 Spicy Yum Yum Sauce or Nothing Hidden Ranch from Sauces tab"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Preheat oven to 425°F.",
+      "Slice chicken into strips. Slice peppers and onion into uniform strips.",
+      "Grate zucchini if using.",
+      "── BUILD THE PAN ──",
+      "On a large sheet pan combine chicken strips, peppers, onion (and zucchini if using).",
+      "Drizzle with avocado oil. Add taco seasoning, Dan-O's, chili powder and lime juice.",
+      "Toss everything together until evenly coated.",
+      "Spread in a SINGLE LAYER — don't pile everything up or it steams instead of roasts.",
+      "Use two pans if needed.",
+      "── ROAST ──",
+      "Roast at 425°F for 20-25 min until chicken is cooked through and peppers have some char.",
+      "Switch to broil for the last 3-4 min for extra char on the peppers — this makes a huge difference.",
+      "── SERVE ──",
+      "ACID FINISH: squeeze of fresh lime over everything right out of the oven.",
+      "Warm tortillas — wrap in damp paper towel and microwave 30 seconds.",
+      "Set up a taco bar: tortillas, Greek yogurt, salsa, avocado, cheese, hot sauce.",
+      "Let everyone build their own."
+    ],
+    tips:"SINGLE LAYER: The most important tip — if you pile the chicken and veg they steam and get soggy. Spread everything out, use two pans if needed. | BROIL AT THE END: The last 3-4 min under the broiler adds the char that makes these taste like they came off a grill. Watch closely. | SIETE TACO SEASONING: Available at Publix — one packet does all the work of 5-6 individual spices. | ACID FINISH: Fresh lime right out of the oven is what makes fajitas taste like fajitas. Don't skip it. | LEFTOVER GOLD: Fajita filling in a burrito bowl the next day is arguably better than the original dinner.",
+    kidNote:"Huge kid hit — let them build their own fajitas. Mild enough for kids with Siete seasoning (lower heat than many taco blends). The colorful peppers make it visually appealing to kids. Use Greek yogurt as sour cream — they won't know the difference.",
+    active:true
+  }
+  ,{
+    id:"dinner18",
+    name:"Honey Garlic Salmon",
+    emoji:"🍯",
+    day:"Wednesday",
+    calories:360,
+    protein:44,
+    activeTime:"15 min",
+    prepTime:"15 min",
+    hiddenVeg:"Serve with roasted broccoli or asparagus alongside",
+    leftoverNote:"🔄 Leftover salmon is incredible cold over a grain bowl with tzatziki the next day.",
+    source:"Most replicated salmon recipe on the internet — universally loved",
+    description:"The most popular salmon recipe online for good reason — sweet, sticky, garlicky glaze with a perfectly cooked fillet. 15 minutes total. Kids almost always love this one.",
+    ingredients:[
+      "4 salmon fillets (6oz each), skin-on",
+      "--- THE GLAZE ---",
+      "3 tbsp honey or maple syrup",
+      "3 cloves garlic, minced (or Burlap & Barrel Black Garlic Powder — 1 tsp)",
+      "2 tbsp reduced-sodium soy sauce or coconut aminos",
+      "1 tbsp rice wine vinegar",
+      "1 tsp sesame oil",
+      "1 tsp Burlap & Barrel Low & Slow Chili Powder (optional — adds depth without heat)",
+      "--- FINISHING ---",
+      "1 tbsp avocado oil (for searing)",
+      "Sesame seeds and sliced green onions to finish",
+      "Juice of ½ lemon",
+      "🫙 Serve with: Spicy Yum Yum Sauce from Sauces tab — incredible alongside"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Pat salmon fillets completely dry with paper towels.",
+      "Mix glaze in a small bowl: honey, minced garlic, soy sauce, rice wine vinegar, sesame oil, chili powder.",
+      "Slice green onions. Have sesame seeds ready.",
+      "── COOK ──",
+      "Heat avocado oil in a cast iron or non-stick skillet over MEDIUM-HIGH heat.",
+      "Add salmon SKIN SIDE UP first — sear 3-4 min until golden crust forms. Do not move it.",
+      "Flip to skin-side down.",
+      "Pour glaze over the salmon. It will sizzle and bubble immediately.",
+      "Cook 3-4 min, spooning the glaze over the top of the salmon every minute as it thickens.",
+      "The glaze will reduce and become sticky — this is what you want.",
+      "── FINISH ──",
+      "ACID FINISH: squeeze of lemon right before serving.",
+      "Garnish with sesame seeds and green onions.",
+      "Serve with rice, cauliflower rice, or grain bowls alongside."
+    ],
+    tips:"DRY THE SALMON: Always pat dry before searing — moisture is the enemy of a good crust. | DON'T OVERCOOK: Salmon is done when it flakes easily and is barely translucent in the very center. Overcooked salmon is dry and chalky — err on the side of underdone. | GLAZE TIMING: Pour the glaze over after flipping — not before. Adding it too early burns the honey. | BASTING: Spooning the glaze over the top while it reduces in the pan is what gives you the sticky restaurant-quality coating. | BLACK GARLIC POWDER: Burlap & Barrel Black Garlic Powder in the glaze instead of fresh garlic adds a deeper, sweeter garlic flavor that takes this to another level.",
+    kidNote:"One of the most kid-friendly fish recipes ever — the sweet honey glaze makes it very approachable. If kids are fish-resistant, let them dip it in the Yum Yum sauce. This is often the recipe that converts fish-skeptic kids.",
+    active:true
+  }
+  ,{
+    id:"dinner19",
+    name:"Shakshuka",
+    emoji:"🍳",
+    day:"Sunday",
+    calories:280,
+    protein:22,
+    activeTime:"20 min",
+    prepTime:"20 min",
+    hiddenVeg:"Spinach wilts into the sauce invisibly. Grated zucchini also works.",
+    leftoverNote:"🔄 The tomato sauce base keeps 5 days in the fridge. Add fresh eggs when reheating.",
+    source:"Middle Eastern/North African staple — universally beloved breakfast-for-dinner",
+    description:"Eggs poached directly in a spiced tomato sauce — one pan, 20 minutes, endlessly satisfying. Works for breakfast, lunch, or dinner. Incredibly high protein for the calorie count.",
+    ingredients:[
+      "6 large eggs",
+      "1 can (28oz) crushed tomatoes",
+      "1 large onion, diced",
+      "1 red bell pepper, diced",
+      "4 cloves garlic, minced",
+      "2 tbsp avocado oil",
+      "1 tsp cumin",
+      "1 tsp smoked paprika",
+      "½ tsp Burlap & Barrel Low & Slow Chili Powder",
+      "½ tsp turmeric",
+      "Pinch of red pepper flakes (skip for kids)",
+      "Salt and black pepper",
+      "Baby spinach (big handful — wilts in)",
+      "Fresh parsley or cilantro to finish",
+      "Fage 0% Greek yogurt and crumbled feta to serve",
+      "Crusty bread or pita for dipping",
+      "🫙 Nothing Hidden Ranch or Lemon Herb Drizzle from Sauces tab alongside"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Dice onion and bell pepper.",
+      "Mince garlic.",
+      "Measure spices into one small bowl.",
+      "Have eggs ready to crack — you'll add them directly to the sauce.",
+      "── BUILD THE SAUCE ──",
+      "Heat oil in a large oven-safe skillet or Dutch oven over medium heat.",
+      "Add onion and pepper. Cook 6-7 min until softened.",
+      "Add garlic and all spices. Stir constantly 2 min — bloom the spices in the oil.",
+      "Add crushed tomatoes. Season generously with salt and pepper.",
+      "Add spinach — stir until wilted.",
+      "Simmer 10 min until sauce thickens slightly.",
+      "── ADD THE EGGS ──",
+      "Using a spoon, make 6 wells in the sauce.",
+      "Crack one egg into each well.",
+      "Cover the pan and cook on LOW heat 5-8 min until whites are set but yolks are still runny.",
+      "Watch carefully — overcooked yolks are disappointing.",
+      "── FINISH ──",
+      "ACID FINISH: squeeze of lemon over the whole pan right before serving.",
+      "Top with crumbled feta, fresh parsley or cilantro, and a dollop of Greek yogurt.",
+      "Serve directly from the pan with crusty bread for dipping."
+    ],
+    tips:"BLOOM THE SPICES: 2 min stirring the spices in the hot oil before adding tomatoes — non-negotiable. This is where all the depth comes from. | EGG TIMING: 5-8 min covered on LOW. Check at 5 min — whites should be set, yolks still jiggly. They continue cooking after you remove the lid. | DON'T RUSH THE SAUCE: The 10 min simmer concentrates and deepens the tomato flavor significantly. | SERVE FROM THE PAN: Shakshuka is a one-pan dish — bring the whole skillet to the table. Dramatic and zero extra dishes. | PROTEIN BOOST: Add a can of drained white beans or chickpeas to the sauce for extra protein and fiber.",
+    kidNote:"Kids are often surprisingly receptive to shakshuka — they like dipping bread in the sauce and the eggs are familiar. Make a milder version by skipping the chili powder and red pepper flakes. Serve over rice instead of bread if kids prefer.",
+    active:true
+  }
+  ,{
+    id:"dinner20",
+    name:"Slow Cooker Chicken Tikka Masala",
+    emoji:"🍛",
+    day:"Thursday",
+    calories:380,
+    protein:44,
+    activeTime:"15 min",
+    prepTime:"15 min + 4-6 hrs slow cooker",
+    hiddenVeg:"Add grated zucchini or carrot to the sauce — completely disappears",
+    leftoverNote:"🔄 Gets dramatically better on day 2. Freezes perfectly. Make a big batch.",
+    source:"NYT Cooking — most-saved slow cooker recipe for years running",
+    description:"Restaurant-quality Indian tikka masala from a slow cooker. Dump-and-go in the morning, incredible dinner at night. The spices do all the work. Kids typically love the sweet-savory tomato cream sauce.",
+    ingredients:[
+      "--- THE CHICKEN ---",
+      "2 lbs boneless skinless chicken thighs, cut into 2-inch pieces",
+      "1 can (14oz) crushed tomatoes",
+      "1 can (14oz) full-fat coconut milk (or heavy cream — coconut milk is cleaner)",
+      "1 large onion, diced",
+      "4 cloves garlic, minced",
+      "1 tbsp fresh ginger, grated (or ginger paste)",
+      "--- THE SPICES (or use 3 tbsp store-bought tikka masala paste) ---",
+      "2 tsp garam masala",
+      "1 tsp cumin",
+      "1 tsp turmeric",
+      "1 tsp smoked paprika",
+      "1 tsp Burlap & Barrel Low & Slow Chili Powder",
+      "½ tsp coriander",
+      "Salt to taste",
+      "--- HIDDEN VEG ---",
+      "1 small zucchini OR 2 carrots, grated (stir in at start — disappears)",
+      "--- SERVING ---",
+      "Fage 0% Greek yogurt stirred in at the end (adds protein, cools the heat)",
+      "Cauliflower rice OR farro OR Brami pasta alongside",
+      "Fresh cilantro to finish",
+      "Naan bread for the kids",
+      "🫙 Nothing Hidden Ranch from Sauces tab alongside for kids who want a milder dip"
+    ],
+    instructions:[
+      "── MISE EN PLACE (10 min in the morning) ──",
+      "Cut chicken thighs into 2-inch pieces.",
+      "Dice onion. Mince garlic. Grate ginger.",
+      "Grate zucchini or carrot if using.",
+      "── SLOW COOKER (dump and go) ──",
+      "Add chicken, crushed tomatoes, diced onion, garlic, ginger, and all spices to slow cooker.",
+      "Add grated zucchini or carrot.",
+      "Stir to combine.",
+      "Cook on LOW 6-8 hours or HIGH 3-4 hours.",
+      "── FINISH ──",
+      "30 min before serving: stir in coconut milk. Continue cooking on LOW 30 min.",
+      "Stir in 2-3 tbsp Fage Greek yogurt for extra richness and protein.",
+      "ACID FINISH: squeeze of lime right before serving — brightens the whole dish.",
+      "Taste and adjust salt.",
+      "Serve over cauliflower rice, farro, or Brami pasta. Top with fresh cilantro.",
+      "Serve naan alongside for the kids."
+    ],
+    tips:"TIKKA MASALA PASTE SHORTCUT: Pataks or Maya Kaimal tikka masala paste (3 tbsp) replaces all the individual spices and is excellent quality. Available at Whole Foods and most Indian grocery stores. | COCONUT MILK: Stir in at the end not the beginning — adding it for the full cook time can make it grainy. Last 30 min only. | GREEK YOGURT FINISH: Stir in off-heat to add richness and protein without curdling. | GARAM MASALA: The most important spice here. Don't substitute. | DAY 2: Tikka masala gets dramatically better overnight — make it Sunday, eat it Monday. | KIDS: The sauce is mild and slightly sweet — most kids love it. Serve over plain rice for the pickiest eaters.",
+    kidNote:"One of the best kid-friendly Indian recipes — the sauce is sweet, creamy, and mild. Most kids who try this become fans. Serve over plain rice with naan for maximum kid appeal. Skip the chili powder for their portions if concerned about heat.",
+    active:true
+  }
+  ,{
+    id:"dinner21",
+    name:"Serious Eats Turkey Meatballs",
+    emoji:"🍝",
+    day:"Monday",
+    calories:340,
+    protein:38,
+    activeTime:"25 min",
+    prepTime:"25 min",
+    hiddenVeg:"Grated zucchini and spinach in the meatball mix — completely invisible",
+    leftoverNote:"🔄 Meatballs freeze perfectly cooked. Make a big batch, freeze in portions of 4-6. Future dinner in 10 min.",
+    source:"Serious Eats — highest-rated turkey meatball recipe online",
+    description:"The technique that makes turkey meatballs actually good — basting with butter and building a pan sauce. Turkey goes dry easily but this method keeps them juicy and flavorful. Serve with Brami pasta and Rao's.",
+    ingredients:[
+      "--- THE MEATBALLS ---",
+      "1.5 lbs Jennie-O 93/7 ground turkey",
+      "1 small zucchini, grated and squeezed completely dry",
+      "½ cup baby spinach, very finely chopped",
+      "¼ cup Parmesan, grated",
+      "1 egg",
+      "2 cloves garlic, minced",
+      "1 tsp Italian seasoning OR Burlap & Barrel Herbes de Provence",
+      "1 tsp Dan-O's Original",
+      "¼ cup Fairlife 2% milk",
+      "¼ cup breadcrumbs (panko preferred)",
+      "Salt and black pepper",
+      "--- THE PAN SAUCE ---",
+      "2 tbsp Land O'Lakes light butter",
+      "2 cloves garlic, minced",
+      "1 jar Rao's marinara or Frik & Frak",
+      "Fresh basil",
+      "--- SERVING ---",
+      "12 oz Brami protein pasta or Barilla Protein+",
+      "Reduced-fat Parmesan to finish",
+      "🫙 Cottage Cheese Alfredo from Sauces tab as a white sauce option"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Grate zucchini. Wrap in a paper towel and squeeze out ALL moisture — this is critical. Wet zucchini = falling-apart meatballs.",
+      "Very finely chop the spinach.",
+      "Mix milk and breadcrumbs in a small bowl — let sit 5 min to form a panade (keeps meatballs moist).",
+      "── MAKE THE MEATBALLS ──",
+      "In a large bowl combine ground turkey, squeezed zucchini, chopped spinach, Parmesan, egg, garlic, seasoning, Dan-O's, salt and pepper.",
+      "Add the milk-soaked breadcrumbs. Mix gently with your hands — DO NOT overwork the meat or meatballs get tough.",
+      "Roll into golf ball-sized portions (about 1.5 inches). Should make 20-24 meatballs.",
+      "── COOK ──",
+      "Heat avocado oil in a large skillet over MEDIUM-HIGH heat.",
+      "Sear meatballs in batches — don't crowd the pan. Brown on all sides, about 2 min per side. They don't need to be cooked through yet.",
+      "Remove meatballs. Add butter to the same pan. Add minced garlic — cook 1 min.",
+      "Add marinara sauce. Scrape up all the fond from the meatball sear.",
+      "Return meatballs to the sauce. Simmer covered 10-12 min until cooked through.",
+      "── FINISH ──",
+      "ACID FINISH: a tiny splash of red wine vinegar stirred into the sauce brightens everything.",
+      "Serve over Brami pasta with fresh basil and Parmesan.",
+      "Spoon extra sauce generously over the top."
+    ],
+    tips:"SQUEEZE THE ZUCCHINI: Squeeze harder than you think. Every drop of water you remove = a more cohesive meatball. This is the #1 mistake people make. | PANADE: The milk-soaked breadcrumbs are what keep turkey meatballs moist — turkey has almost no fat, so you need this moisture insurance. Don't skip it. | DON'T OVERWORK: Mix until just combined — overmixing develops the protein and makes tough, dense meatballs. | SEAR FIRST: The Maillard crust from searing adds flavor you can't get from simmering alone. Brown them well before they go into the sauce. | FREEZE THEM: These freeze beautifully cooked. Make a double batch, freeze in portions — future dinner in 10 min from frozen.",
+    kidNote:"Kids love meatballs — hidden zucchini and spinach inside, zero detection. Serve with Brami pasta and plenty of sauce. Let kids add their own Parmesan. These are kid-friendly comfort food at its best.",
+    active:true
+  }
+  ,{
+    id:"dinner22",
+    name:"White Bean & Turkey Sausage Stew",
+    emoji:"🫘",
+    day:"Wednesday",
+    calories:360,
+    protein:38,
+    activeTime:"20 min",
+    prepTime:"20 min",
+    hiddenVeg:"Kale or spinach wilts completely into the stew",
+    leftoverNote:"🔄 Gets better every day. Make a big batch and eat all week — keeps 5 days in fridge, freezes perfectly.",
+    source:"NYT Cooking — most-saved bean recipe online",
+    description:"Deeply satisfying one-pot stew — creamy white beans, turkey sausage, kale, and rosemary. Feels like something that simmered all day but takes 20 minutes. The kind of dinner everyone asks for again.",
+    ingredients:[
+      "1 lb Amylu Italian chicken sausage (Costco) OR Wellshire turkey sausage, sliced into rounds",
+      "2 cans (15oz each) white beans (cannellini), drained and rinsed",
+      "1 can (14oz) diced tomatoes",
+      "4 cups Kettle & Fire chicken bone broth",
+      "1 large onion, diced",
+      "4 cloves garlic, minced",
+      "3 cups baby kale or spinach",
+      "2 tbsp avocado oil",
+      "1 tsp fresh rosemary, finely chopped (or ½ tsp dried)",
+      "1 tsp Burlap & Barrel Herbes de Provence",
+      "1 tsp Dan-O's Original",
+      "Salt and black pepper",
+      "Parmesan rind (optional but incredible — drop in while simmering, remove before serving)",
+      "Crusty bread for dipping",
+      "🫙 Lemon Herb Drizzle from Sauces tab drizzled over the top"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Slice sausage into rounds.",
+      "Dice onion. Mince garlic.",
+      "Drain and rinse white beans.",
+      "Have broth, tomatoes and greens ready.",
+      "── COOK ──",
+      "Heat oil in a large Dutch oven over MEDIUM-HIGH heat.",
+      "Add sausage rounds in a single layer — brown undisturbed 3-4 min per side. Remove and set aside.",
+      "Add onion to the same pot. Cook 4-5 min until softened.",
+      "Add garlic, rosemary and Herbes de Provence. Cook 1 min until fragrant.",
+      "Add diced tomatoes — scrape up all the fond from the sausage sear.",
+      "Add white beans and bone broth. Add Parmesan rind if using.",
+      "Return sausage to the pot. Bring to a simmer.",
+      "Simmer 10 min. Taste and adjust seasoning generously.",
+      "Add kale or spinach — stir until wilted.",
+      "── FINISH ──",
+      "ACID FINISH: squeeze of lemon right before serving. Brightens the whole stew dramatically.",
+      "Remove Parmesan rind.",
+      "Drizzle with Lemon Herb Drizzle from your squeeze bottle.",
+      "Serve with crusty bread for dipping."
+    ],
+    tips:"BROWN THE SAUSAGE: Don't skip this — the Maillard crust on the sausage adds depth you can't get any other way. Brown well before the liquid goes in. | PARMESAN RIND: If you have one from a block of Parmesan, drop it in while simmering. It melts into the broth and adds an incredible savory richness. | KETTLE & FIRE BONE BROTH: This is the perfect recipe for bone broth — the extra protein and collagen enrich the stew significantly. | SMASH SOME BEANS: After adding beans, smash about ¼ of them with the back of a spoon against the pot. This thickens the stew naturally without any cream or flour. | ACID FINISH: The lemon at the end is what makes this taste bright and fresh instead of heavy.",
+    kidNote:"Mild and kid-friendly — the white beans are creamy and the sausage is familiar. Kids usually eat this happily, especially with bread for dipping. Spinach is the better green for kids — kale can be chewy.",
+    active:true
+  }
+  ,{
+    id:"dinner23",
+    name:"Kenji's Ground Turkey Tacos",
+    emoji:"🌮",
+    day:"Tuesday",
+    calories:310,
+    protein:36,
+    activeTime:"20 min",
+    prepTime:"20 min",
+    hiddenVeg:"Grated zucchini and carrot cook into the taco meat invisibly",
+    leftoverNote:"🔄 Taco meat keeps 5 days in fridge. Use leftovers for burrito bowls, quesadillas, or taco salad.",
+    source:"Kenji López-Alt — technique-forward ground turkey taco recipe, dramatically better than standard",
+    description:"Kenji's approach transforms ordinary ground turkey tacos into something genuinely great — the technique matters more than the ingredients here. Brown the meat properly, build the fond, bloom the spices.",
+    ingredients:[
+      "1.5 lbs Jennie-O 93/7 ground turkey",
+      "1 small zucchini, grated and squeezed dry",
+      "2 carrots, grated",
+      "1 small onion, finely diced",
+      "3 cloves garlic, minced",
+      "2 tsp Siete Taco Seasoning",
+      "1 tsp Burlap & Barrel Low & Slow Chili Powder",
+      "1 tsp Dan-O's Original",
+      "½ tsp cumin",
+      "½ cup chicken bone broth or water",
+      "1 tbsp tomato paste",
+      "1 tbsp avocado oil",
+      "Salt and black pepper",
+      "--- TACO BAR ---",
+      "Small corn tortillas (charred directly on gas flame if possible)",
+      "Shredded cabbage or coleslaw mix (adds crunch and volume)",
+      "Newman's Own salsa",
+      "Fage 0% Greek yogurt",
+      "Sliced avocado",
+      "Cholula or Frank's RedHot",
+      "Lime wedges",
+      "🫙 Spicy Yum Yum Sauce from Sauces tab"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Grate zucchini and carrots. Squeeze dry in a paper towel.",
+      "Finely dice onion. Mince garlic.",
+      "Measure all spices into one small bowl.",
+      "── COOK THE MEAT (the technique matters here) ──",
+      "Heat oil in a large cast iron or skillet over HIGH heat until smoking.",
+      "Add ground turkey in one large mass — DO NOT BREAK IT UP YET.",
+      "Leave completely undisturbed 3-4 min until bottom is deeply browned. This Maillard crust is the difference.",
+      "NOW break up the meat. Cook another 2-3 min until mostly cooked through.",
+      "Push meat to the sides. Add onion to the center. Cook 3 min.",
+      "Add garlic and grated zucchini/carrot. Cook 2 min.",
+      "Add tomato paste. Stir and cook 2 min — let it caramelize slightly.",
+      "Add all spices. Stir constantly 1 min to bloom in the fat.",
+      "Add bone broth. Scrape up all the fond. Simmer 3-4 min until mostly absorbed.",
+      "Taste and adjust salt generously.",
+      "── SERVE ──",
+      "ACID FINISH: squeeze of lime right before serving.",
+      "Char corn tortillas directly on a gas flame (30 sec per side) or dry cast iron — this step elevates the whole taco.",
+      "Set up a taco bar with all toppings.",
+      "Add a handful of coleslaw mix to each taco for extra crunch and volume."
+    ],
+    tips:"BROWN FIRST DON'T BREAK: The biggest upgrade — leave the turkey as a whole mass for 3-4 min to build a crust before breaking it up. Grey steamed turkey vs browned turkey is night and day in flavor. | TOMATO PASTE: Caramelizing the tomato paste for 2 min adds a deep umami richness. Don't skip it. | BLOOM THE SPICES: 1 min with the spices in the fat before adding liquid — activates fat-soluble flavor compounds. | CHAR THE TORTILLAS: Gas flame or dry cast iron, 30 sec per side. The slight char is what makes street tacos taste like street tacos. | COLESLAW MIX: A handful of plain bagged coleslaw mix in each taco adds crunch and volume for almost zero calories — one of the best low-calorie taco upgrades.",
+    kidNote:"Ground turkey tacos are a universal kid hit. Build-your-own taco bar means kids choose their own adventure. Keep seasoning mild for kids (light on the chili powder). Corn tortillas charred on the flame look impressive and kids love the slight char.",
+    active:true
+  }
+  ,{
+    id:"dinner24",
+    name:"NYT Slow Cooker Short Ribs",
+    emoji:"🥩",
+    day:"Sunday",
+    calories:580,
+    protein:48,
+    activeTime:"25 min",
+    prepTime:"25 min + 6-8 hrs slow cooker",
+    hiddenVeg:"Carrots and celery cook into the braising liquid",
+    leftoverNote:"🔄 Short rib meat shredded into pasta or served over polenta the next day is incredible. The braising liquid becomes an incredible sauce.",
+    source:"NYT Cooking — comfort food gold standard, special occasion recipe",
+    description:"Special occasion comfort food at its best. The slow cooker does all the work after a quick sear — fall-off-the-bone short ribs in a rich red wine braising sauce. Worth every minute for a Sunday dinner.",
+    ingredients:[
+      "3-4 lbs bone-in beef short ribs",
+      "Diamond Crystal kosher salt + black pepper",
+      "Kinder's Buttery Steakhouse (light coat before searing)",
+      "2 tbsp avocado oil",
+      "1 large onion, roughly chopped",
+      "3 carrots, roughly chopped",
+      "3 stalks celery, roughly chopped",
+      "6 cloves garlic, smashed",
+      "2 tbsp tomato paste",
+      "1 cup dry red wine (Cabernet or Merlot)",
+      "2 cups beef bone broth (Kettle & Fire)",
+      "2 sprigs fresh thyme",
+      "1 bay leaf",
+      "1 tbsp Worcestershire sauce",
+      "--- SERVING ---",
+      "Mashed cauliflower or regular mashed potatoes",
+      "OR Brami pasta tossed in the braising liquid",
+      "Fresh parsley to finish",
+      "🫙 Nothing Hidden Ranch alongside as a cooling contrast"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Pat short ribs completely dry with paper towels. Season very generously with salt, pepper, and Buttery Steakhouse.",
+      "Roughly chop onion, carrots and celery — no need to be precise.",
+      "Smash garlic cloves.",
+      "── SEAR (the most important step) ──",
+      "Heat avocado oil in a large cast iron or Dutch oven over HIGH heat until smoking.",
+      "Sear short ribs on all sides — 3-4 min per side until deeply browned. Do not rush this.",
+      "Remove ribs. Add onion, carrot, celery to the same pot. Cook 5 min.",
+      "Add garlic and tomato paste. Cook 2 min, stirring.",
+      "Add red wine — scrape up all the fond. Simmer 3 min to reduce slightly.",
+      "── SLOW COOKER ──",
+      "Transfer vegetables and wine to slow cooker.",
+      "Add bone broth, Worcestershire, thyme and bay leaf.",
+      "Nestle seared short ribs on top.",
+      "Cook on LOW 7-8 hours until meat is completely tender and falling off the bone.",
+      "── FINISH ──",
+      "Remove short ribs carefully — the meat is very tender.",
+      "Strain braising liquid into a saucepan. Simmer 10-15 min to reduce and concentrate.",
+      "ACID FINISH: a splash of red wine vinegar stirred into the sauce brightens the richness.",
+      "Serve ribs over mashed cauliflower or Brami pasta. Spoon reduced sauce over the top.",
+      "Finish with fresh parsley."
+    ],
+    tips:"SEAR PROPERLY: The sear is non-negotiable — deeply browned ribs add a flavor depth the slow cooker alone can never achieve. Take your time with this step. | DRY THE RIBS: Pat completely dry before seasoning. Moisture prevents browning. | FOND IS EVERYTHING: All those brown bits in the pot after searing are concentrated flavor. Scrape every last one into the slow cooker. | REDUCE THE SAUCE: Don't skip simmering the braising liquid after cooking — it goes from thin and watery to a rich, glossy sauce. | SPECIAL OCCASION RECIPE: This is higher calorie than your usual rotation. Worth it for a Sunday dinner — the protein is excellent and the satisfaction factor is very high.",
+    kidNote:"Kids who like meat usually love short ribs — the fall-off-the-bone tenderness is very easy to eat. Serve over mashed potatoes for maximum kid appeal. The meat is mild and very tender.",
     active:true
   }
 ];
@@ -794,6 +1935,30 @@ const DEFAULT_SWAPS = [
     applies:["Pasta sauces","Soups","Creamy sauces","Mashed potatoes"],
     emoji:"🥛",
     note:"In a cooked sauce you genuinely cannot tell the difference."
+  },
+  {
+    id:"s32",
+    category:"Volume & Bulk",
+    original:"Rice, extra pasta, or extra grains as a filler",
+    upgrade:"Bagged Coleslaw Mix",
+    benefit:"~25 calories per cup — adds massive volume and crunch for almost zero caloric cost",
+    protein:"Negligible",
+    where:"Any grocery store — Publix, Kroger, Walmart (plain bagged coleslaw, not the kit with dressing)",
+    applies:["PF Chang's Lettuce Cups","Chicken Burrito Bowls","Slow Cooker Chicken Tacos","Any stir-fry or bowl"],
+    emoji:"🥬",
+    note:"Throw into Lettuce Cups instead of or alongside mushrooms for extra crunch. Great in taco bowls with taco meat + salsa + Greek yogurt. Try it in the Burrito Bowls as a base under the grains for extra volume. Buy plain bagged coleslaw — NOT the kit with the dressing packet."
+  },
+  {
+    id:"s33",
+    category:"Broth & Liquid",
+    original:"Regular chicken broth or stock",
+    upgrade:"Kettle & Fire Bone Broth (Chicken)",
+    benefit:"10g protein per cup vs ~1g in regular broth — free protein with zero effort or taste difference",
+    protein:"10g per cup",
+    where:"Whole Foods · Publix · Target · Amazon — also available at Costco in bulk",
+    applies:["Slow Cooker Turkey Chili","Any soup or stew","Cooking grains (use instead of water)"],
+    emoji:"🍲",
+    note:"1:1 swap for any recipe calling for chicken broth. Use it in the Turkey Chili recipe — adds 10g protein per cup with zero flavor change. Also try cooking your farro or quinoa in bone broth instead of water for a free protein and flavor upgrade."
   },
   {
     id:"s25",
@@ -1237,9 +2402,12 @@ let state = {
   alexaOnlyItems: [],
   alexaMergedList: [],
   alexaSyncTime: null,
-  ratings: {},  // recipeId -> { stars, chips[], note, date }
+  ratings: {},
   sauces: JSON.parse(JSON.stringify(DEFAULT_SAUCES)),
-  activeRecipes: {},  // recipeId -> false means inactive (default all active)
+  activeRecipes: {},
+  weekPlan: {},
+  cookHistory: [],
+  groceryNotes: {},
 };
 
 let supabase = null;
@@ -1324,6 +2492,9 @@ async function loadFromSupabase() {
         if (plan.ratings) state.ratings = plan.ratings;
         if (plan.activeRecipes) state.activeRecipes = plan.activeRecipes;
         if (plan.sauces) state.sauces = plan.sauces;
+        if (plan.weekPlan) state.weekPlan = plan.weekPlan;
+        if (plan.cookHistory) state.cookHistory = plan.cookHistory;
+        if (plan.groceryNotes) state.groceryNotes = plan.groceryNotes;
       setSyncStatus("saved");
     }
   } catch(e) { console.error("Load error:", e); setSyncStatus("offline"); }
@@ -1333,7 +2504,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -1369,6 +2540,9 @@ function loadFromLocal() {
     if (saved.ratings) state.ratings = saved.ratings;
     if (saved.activeRecipes) state.activeRecipes = saved.activeRecipes;
     if (saved.sauces) state.sauces = saved.sauces;
+    if (saved.weekPlan) state.weekPlan = saved.weekPlan;
+    if (saved.cookHistory) state.cookHistory = saved.cookHistory;
+    if (saved.groceryNotes) state.groceryNotes = saved.groceryNotes;
   } catch(e) {}
 }
 
@@ -1391,7 +2565,7 @@ function showTab(tab) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
   document.getElementById("page-" + tab).classList.add("active");
-  const tabs = ["plan","grocery","swaps","kids","pantry","sauces","settings","cook"];
+  const tabs = ["plan","grocery","swaps","kids","pantry","sauces","history","nutrition","prep","settings","cook"];
   document.querySelectorAll(".tab-btn")[tabs.indexOf(tab)].classList.add("active");
   renderTab(tab);
 }
@@ -1405,6 +2579,9 @@ function renderTab(tab) {
   if (tab === "cook")     renderCookHome();
   if (tab === "pantry")   renderPantry();
   if (tab === "sauces")   renderSauces();
+  if (tab === "history")  renderHistoryTab();
+  if (tab === "nutrition") renderNutritionTab();
+  if (tab === "prep")      renderPrepOrderTab();
 }
 
 function uid() { return Math.random().toString(36).slice(2,8); }
@@ -1524,6 +2701,11 @@ function viewRecipe(section, id) {
       return n % 1 === 0 ? String(n) : n.toFixed(1).replace(/\.0$/, "");
     });
   }
+  const scaleHtml = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 12px">
+    <span style="font-size:13px;color:var(--dim);margin-right:4px">Servings:</span>
+    ${[0.5,1,1.5,2,3].map(f => `<button onclick="scaleFactors['${item.id}']=${f};viewRecipe('${section}','${item.id}')" style="padding:5px 10px;border-radius:8px;border:1px solid ${scale===f?'var(--green)':'rgba(255,255,255,0.12)'};background:${scale===f?'rgba(16,185,129,0.15)':'transparent'};color:${scale===f?'var(--green)':'var(--muted)'};font-size:13px;font-weight:${scale===f?'700':'400'};cursor:pointer">${f===0.5?'½':f===1.5?'1½':f}x</button>`).join("")}
+  </div>`;
+  // scaleHtml injected above
   const ingrHtml = (item.ingredients || []).map(ing => {
     if (ing.startsWith("---")) return `<div class="ingredient-section">${esc(ing.replace(/---/g,"").trim())}</div>`;
     return `<div class="ingredient-item"><span class="ingredient-bullet">●</span><span>${esc(scale===1?ing:scaleIngr(ing))}</span></div>`;
@@ -2056,6 +3238,24 @@ const GROCERY_DATA = [
   { cat:"🥫 Canned & Jarred",    items:["Frik & Frak pasta sauce (Whole Foods) or Rao's","1 can diced tomatoes (pasta sauce)","1 can (8oz) water chestnuts (lettuce cups)","Hummus, hoisin sauce, soy sauce, sesame oil"] },
   { cat:"🧂 Seasonings",         items:["Kinder's The Blend (Costco)","Kinder's Lemon Pepper (Costco)","Kinder's Buttery Steakhouse (Costco)","Italian seasoning","Red wine vinegar, red pepper flakes"] },
 ];
+function categorizeGroceryItem(itemText) {
+  const lower = (itemText || "").toLowerCase();
+  const keywords = {
+    "🥦 Produce": ["tomato","lettuce","spinach","zucchini","carrot","onion","garlic","cucumber","arugula","greens","banana","lemon","lime","avocado","pepper","mushroom","corn","potato","parsley","thyme","rosemary","dill","basil","ginger","berry","cabbage","celery","broccoli","scallion","green onion","cilantro","kale"],
+    "🥩 Proteins": ["chicken","turkey","salmon","beef","tenderloin","shrimp","sausage","bacon","tuna","pork","steak","fish","ground turkey","ground beef"],
+    "🥚 Dairy & Eggs": ["milk","yogurt","cheese","butter","cream","feta","parmesan","mozzarella","provolone","cheddar","cottage","fairlife","fage","egg","eggs"],
+    "🍞 Bread & Grains": ["bread","tortilla","baguette","wrap","pita","roll","dave","oat","farro","quinoa","pasta","rice","brami","barilla"],
+    "❄️ Frozen": ["frozen","cauliflower rice"],
+    "🥫 Pantry": ["oil","vinegar","broth","stock","bean","diced tomato","crushed tomato","honey","peanut butter","coconut aminos","hoisin","soy sauce","sesame","vanilla","chocolate","chip","rotel","worcestershire","water chestnut","hummus","tahini"],
+    "🧴 Condiments": ["mustard","ketchup","mayo","salsa","dressing","ranch","buffalo","bbq","sriracha","cholula","frank","primal kitchen","newman","rao","pesto"],
+    "🧂 Spices & Seasonings": ["seasoning","spice","dan-o","kinder","burlap","penzeys","siete","tony","taco blend","chili powder","paprika","cumin","italian seasoning","thyme","rosemary","pepper","salt"],
+  };
+  for (const [section, words] of Object.entries(keywords)) {
+    if (words.some(w => lower.includes(w))) return section;
+  }
+  return "📦 Other";
+}
+
 function buildSmartGroceryList() {
   const allRecipes = [
     ...state.dinners,
@@ -2115,18 +3315,34 @@ function renderGrocery() {
     : smartCatsWithPantry;
   const displayCats = useSmartList ? smartCatsWithAlexa : GROCERY_DATA.map(({cat, items}) => ({cat, items: items.map(text => ({text, sources:[]}))}));
 
-  const cats = displayCats.map(({cat, items}) => {
-    const itemHtml = items.map((item, i) => {
+  // Group items by store section
+  const sectionOrder = ["Produce","Proteins","Dairy & Eggs","Bread & Grains","Frozen","Pantry","Condiments","Spices & Seasonings","Other"];
+  const sectionMap = {};
+  displayCats.forEach(({cat, items}) => {
+    items.forEach((item, i) => {
+      const itemText = typeof item === "string" ? item : (item.text || "");
+      const section = categorizeGroceryItem(itemText);
+      if (!sectionMap[section]) sectionMap[section] = [];
+      sectionMap[section].push({ item, cat, i, itemText });
+    });
+  });
+
+  const cats = sectionOrder.filter(s => sectionMap[s] && sectionMap[s].length).map(section => {
+    const itemHtml = sectionMap[section].map(({item, cat, i, itemText}) => {
       const key = cat + ":" + i;
       const checked = state.grocery[key] ? "checked" : "";
-      const itemText = typeof item === "string" ? item : (item.text || "");
-      const sourceText = (item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + '</span>' : "";
-      return `<div class="grocery-item ${checked}" onclick="toggleGrocery('${esc(key)}',this)">
-        <div class="grocery-check ${checked}">${checked ? "✓" : ""}</div>
-        <span>${esc(itemText)}${sourceText}</span>
+      const sourceText = (item && item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + '</span>' : "";
+      const note = (state.groceryNotes && state.groceryNotes[key]) ? state.groceryNotes[key] : "";
+      return `<div class="grocery-item ${checked}" onclick="toggleGrocery('${esc(key)}',this)" style="flex-direction:column;align-items:flex-start">
+        <div style="display:flex;align-items:center;gap:8px;width:100%">
+          <div class="grocery-check ${checked}">${checked ? "✓" : ""}</div>
+          <span style="flex:1">${esc(itemText)}${sourceText}</span>
+          <button onclick="event.stopPropagation();openGroceryNote('${esc(key)}','${esc(note)}')" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:11px;cursor:pointer;flex-shrink:0">${note ? "✏️" : "+"}</button>
+        </div>
+        ${note ? `<div style="font-size:12px;color:var(--amber);padding:3px 0 0 24px;font-style:italic">📝 ${esc(note)}</div>` : ""}
       </div>`;
     }).join("");
-    return `<div class="grocery-cat"><h3>${cat}</h3>${itemHtml}</div>`;
+    return `<div class="grocery-cat"><h3>${section}</h3>${itemHtml}</div>`;
   }).join("");
 
   const checkedCount = Object.values(state.grocery).filter(Boolean).length;
@@ -2891,6 +4107,747 @@ function renderSauces() {
   `;
 }
 
+
+// ── WEEK PLAN FUNCTIONS ──────────────────────────────────────────────────────
+const WEEK_DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+
+function getAllRecipesFlat() {
+  const all = [];
+  state.dinners.forEach(r => all.push({...r, section:"dinner"}));
+  state.lunches.forEach(r => all.push({...r, section:"lunch"}));
+  state.breakfasts.forEach(r => all.push({...r, section:"breakfast"}));
+  return all;
+}
+
+function getRecipeById(id) {
+  return getAllRecipesFlat().find(r => r.id === id);
+}
+
+function assignDay(day, recipeId, section) {
+  if (!recipeId) {
+    delete state.weekPlan[day];
+  } else {
+    state.weekPlan[day] = { recipeId, section };
+  }
+  scheduleSave();
+  renderTab("plan");
+}
+
+function renderWeekPlanner() {
+  const allRecipes = getAllRecipesFlat().filter(r => isActive(r.id));
+  const optionsHtml = allRecipes.map(r =>
+    `<option value="${r.id}|${r.section}">${r.emoji || ""} ${esc(r.name)}</option>`
+  ).join("");
+
+  const totalPrepTime = WEEK_DAYS.reduce((acc, day) => {
+    const assignment = state.weekPlan[day];
+    if (!assignment) return acc;
+    const recipe = getRecipeById(assignment.recipeId);
+    if (!recipe) return acc;
+    const mins = parseInt((recipe.activeTime || "0").replace(/[^0-9]/g,"")) || 0;
+    return acc + mins;
+  }, 0);
+
+  const daysHtml = WEEK_DAYS.map(day => {
+    const assignment = state.weekPlan[day];
+    const recipe = assignment ? getRecipeById(assignment.recipeId) : null;
+    return `
+      <div style="background:var(--surface);border-radius:14px;padding:14px 16px;margin-bottom:10px;border:1.5px solid ${recipe ? "rgba(16,185,129,0.3)" : "rgba(255,255,255,0.06)"}">
+        <div style="font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${day}</div>
+        ${recipe ? `
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            <span style="font-size:24px">${recipe.emoji || "🍽️"}</span>
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--text)">${esc(recipe.name)}</div>
+              <div style="font-size:12px;color:var(--dim)">${recipe.calories || ""} cal · ${recipe.protein || ""}g protein · ${recipe.activeTime || ""}</div>
+            </div>
+          </div>` : `<div style="font-size:14px;color:var(--dim);margin-bottom:8px">Nothing planned</div>`}
+        <select onchange="(function(e){ const [id,sec] = e.target.value.split('|'); assignDay('${day}', id||'', sec||''); })(event)"
+          style="width:100%;padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:var(--text);font-size:13px">
+          <option value="">— assign a recipe —</option>
+          ${optionsHtml}
+        </select>
+        ${recipe ? `<button onclick="assignDay('${day}','','')" style="width:100%;margin-top:6px;padding:6px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;cursor:pointer">Clear</button>` : ""}
+      </div>`;
+  }).join("");
+
+  const assignedCount = WEEK_DAYS.filter(d => state.weekPlan[d]).length;
+  const totalProtein = WEEK_DAYS.reduce((acc, day) => {
+    const assignment = state.weekPlan[day];
+    if (!assignment) return acc;
+    const recipe = getRecipeById(assignment.recipeId);
+    return acc + (recipe ? (recipe.protein || 0) : 0);
+  }, 0);
+
+  return `
+    <div style="margin-bottom:16px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px">📅 This Week's Plan</div>
+      <div style="color:var(--dim);font-size:14px">Assign recipes to days — grocery list updates automatically</div>
+    </div>
+    <div class="stats-row" style="margin-bottom:16px">
+      <div class="stat-box"><div class="stat-icon">📅</div><div class="stat-val">${assignedCount}</div><div class="stat-label">days planned</div></div>
+      <div class="stat-box"><div class="stat-icon">⚡</div><div class="stat-val">${totalPrepTime}</div><div class="stat-label">total min</div></div>
+      <div class="stat-box"><div class="stat-icon">💪</div><div class="stat-val">${assignedCount > 0 ? Math.round(totalProtein/assignedCount) : 0}g</div><div class="stat-label">avg protein</div></div>
+      <div class="stat-box"><div class="stat-icon">🍽️</div><div class="stat-val">${Object.keys(state.weekPlan).length}</div><div class="stat-label">assigned</div></div>
+    </div>
+    ${assignedCount > 0 ? `
+    <button onclick="clearWeekPlan()" style="width:100%;padding:10px;border-radius:12px;border:1.5px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-weight:600;font-size:14px;cursor:pointer;margin-bottom:14px">
+      🗑️ Clear whole week
+    </button>` : ""}
+    ${daysHtml}
+  `;
+}
+
+function clearWeekPlan() {
+  if (!confirm("Clear all day assignments for this week?")) return;
+  state.weekPlan = {};
+  scheduleSave();
+  renderTab("plan");
+}
+
+// ── COOK HISTORY FUNCTIONS ───────────────────────────────────────────────────
+function logCook(recipeId, recipeName, rating) {
+  if (!state.cookHistory) state.cookHistory = [];
+  state.cookHistory.unshift({
+    recipeId,
+    name: recipeName,
+    date: new Date().toISOString().split("T")[0],
+    rating: rating || 0
+  });
+  // Keep last 200 entries
+  if (state.cookHistory.length > 200) state.cookHistory = state.cookHistory.slice(0, 200);
+  scheduleSave();
+}
+
+function renderCookHistory() {
+  if (!state.cookHistory || !state.cookHistory.length) {
+    return `<div style="text-align:center;padding:40px 20px;color:var(--dim);font-size:15px">No cook history yet.<br>Rate recipes after cooking to build your log!</div>`;
+  }
+
+  // Group by recipe for summary
+  const recipeSummary = {};
+  state.cookHistory.forEach(entry => {
+    if (!recipeSummary[entry.recipeId]) {
+      recipeSummary[entry.recipeId] = { name: entry.name, count: 0, totalRating: 0, lastDate: entry.date };
+    }
+    recipeSummary[entry.recipeId].count++;
+    recipeSummary[entry.recipeId].totalRating += entry.rating || 0;
+    if (entry.date > recipeSummary[entry.recipeId].lastDate) {
+      recipeSummary[entry.recipeId].lastDate = entry.date;
+    }
+  });
+
+  const summaryHtml = Object.values(recipeSummary)
+    .sort((a,b) => b.count - a.count)
+    .map(r => {
+      const avgRating = r.count > 0 ? Math.round(r.totalRating / r.count) : 0;
+      const stars = "⭐".repeat(avgRating) + "☆".repeat(5 - avgRating);
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <div style="flex:1">
+            <div style="font-size:15px;font-weight:600;color:var(--text)">${esc(r.name)}</div>
+            <div style="font-size:12px;color:var(--dim);margin-top:2px">Last made: ${r.lastDate}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:12px;color:var(--green);font-weight:700">${r.count}x made</div>
+            <div style="font-size:11px;color:var(--amber)">${stars}</div>
+          </div>
+        </div>`;
+    }).join("");
+
+  const recentHtml = state.cookHistory.slice(0, 20).map(entry => {
+    const stars = "⭐".repeat(entry.rating || 0);
+    return `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+        <div style="flex:1">
+          <div style="font-size:14px;color:var(--text)">${esc(entry.name)}</div>
+          <div style="font-size:12px;color:var(--dim)">${entry.date}</div>
+        </div>
+        <div style="font-size:13px;color:var(--amber)">${stars}</div>
+      </div>`;
+  }).join("");
+
+  return `
+    <div style="margin-bottom:16px">
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">📖 Recipe Summary</div>
+      <div style="color:var(--dim);font-size:13px">How often you've made each recipe</div>
+    </div>
+    <div style="background:var(--surface);border-radius:14px;padding:14px 16px;margin-bottom:20px">
+      ${summaryHtml}
+    </div>
+    <div style="font-size:18px;font-weight:700;margin-bottom:10px">🕐 Recent Cooks</div>
+    <div style="background:var(--surface);border-radius:14px;padding:14px 16px">
+      ${recentHtml}
+    </div>
+  `;
+}
+
+// ── NUTRITION WEEKLY SUMMARY ─────────────────────────────────────────────────
+function renderNutritionSummary() {
+  const activeRecipes = [
+    ...state.dinners,
+    ...state.breakfasts,
+    ...state.lunches,
+  ].filter(r => isActive(r.id));
+
+  if (!activeRecipes.length) return `<div style="color:var(--dim);font-size:14px;text-align:center;padding:20px">No active recipes this week.</div>`;
+
+  const totalCal = activeRecipes.reduce((a,r) => a + (r.calories||0), 0);
+  const totalProt = activeRecipes.reduce((a,r) => a + (r.protein||0), 0);
+  const avgCal = Math.round(totalCal / activeRecipes.length);
+  const avgProt = Math.round(totalProt / activeRecipes.length);
+  const totalPrepMins = activeRecipes.reduce((a,r) => a + (parseInt((r.activeTime||"0").replace(/[^0-9]/g,""))||0), 0);
+
+  const recipeRows = activeRecipes.map(r => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+      <span style="font-size:18px">${r.emoji||"🍽️"}</span>
+      <div style="flex:1">
+        <div style="font-size:14px;color:var(--text)">${esc(r.name)}</div>
+        <div style="font-size:12px;color:var(--dim)">${r.activeTime || ""}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-size:13px;color:var(--text);font-weight:600">${r.protein||0}g</div>
+        <div style="font-size:11px;color:var(--dim)">${r.calories||0} cal</div>
+      </div>
+    </div>`).join("");
+
+  return `
+    <div style="margin-bottom:16px">
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">📊 This Week's Nutrition</div>
+      <div style="color:var(--dim);font-size:13px">Based on ${activeRecipes.length} active recipes</div>
+    </div>
+    <div class="stats-row" style="margin-bottom:16px">
+      <div class="stat-box"><div class="stat-icon">💪</div><div class="stat-val">${avgProt}g</div><div class="stat-label">avg protein</div></div>
+      <div class="stat-box"><div class="stat-icon">🔥</div><div class="stat-val">${avgCal}</div><div class="stat-label">avg cal</div></div>
+      <div class="stat-box"><div class="stat-icon">⏱️</div><div class="stat-val">${totalPrepMins}</div><div class="stat-label">total mins</div></div>
+      <div class="stat-box"><div class="stat-icon">🥗</div><div class="stat-val">${activeRecipes.length}</div><div class="stat-label">recipes</div></div>
+    </div>
+    <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px">
+      <div style="font-size:13px;color:var(--green);font-weight:700;margin-bottom:4px">💪 Protein target check</div>
+      <div style="font-size:14px;color:var(--muted)">${avgProt >= 40 ? "✅ On track — averaging " + avgProt + "g protein per recipe" : "⚠️ Below target — averaging " + avgProt + "g protein (target: 40g+)"}</div>
+    </div>
+    <div style="background:var(--surface);border-radius:14px;padding:14px 16px">
+      ${recipeRows}
+    </div>
+  `;
+}
+
+// ── LEFTOVER CHAIN ───────────────────────────────────────────────────────────
+function renderLeftoverChains() {
+  const chains = [
+    ...state.dinners,
+    ...state.lunches,
+    ...state.breakfasts
+  ].filter(r => r.leftoverNote && isActive(r.id));
+
+  if (!chains.length) return `<div style="color:var(--dim);font-size:14px;padding:20px;text-align:center">No leftover chains this week.<br>Activate recipes with leftover notes to see chains.</div>`;
+
+  return chains.map(r => `
+    <div style="background:var(--surface);border-radius:14px;padding:14px 16px;margin-bottom:10px;border-left:3px solid var(--green)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:20px">${r.emoji||"🍽️"}</span>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">${esc(r.name)}</div>
+      </div>
+      <div style="font-size:14px;color:var(--green)">${esc(r.leftoverNote)}</div>
+    </div>`).join("");
+}
+
+
+function renderHistoryTab() {
+  const el = document.getElementById("page-history");
+  if (!el) return;
+  el.innerHTML = `
+    <div style="margin-bottom:16px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px">📖 Cook History</div>
+      <div style="color:var(--dim);font-size:14px">Your recipe log and leftover chains</div>
+    </div>
+    ${renderCookHistory()}
+    <div style="margin-top:24px;margin-bottom:12px">
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">🔄 Leftover Chains This Week</div>
+      <div style="color:var(--dim);font-size:13px">Cook once, eat twice</div>
+    </div>
+    ${renderLeftoverChains()}
+    <div style="height:30px"></div>
+  `;
+}
+
+function renderNutritionTab() {
+  const el = document.getElementById("page-nutrition");
+  if (!el) return;
+  el.innerHTML = `
+    ${renderNutritionSummary()}
+    <div style="margin-top:24px;margin-bottom:12px">
+      <div style="font-size:18px;font-weight:700;margin-bottom:4px">📅 Weekly Day Planner</div>
+      <div style="color:var(--dim);font-size:13px">Assign recipes to specific days</div>
+    </div>
+    ${renderWeekPlanner()}
+    <div style="height:30px"></div>
+  `;
+}
+
+
+// ── GROCERY NOTES ────────────────────────────────────────────────────────────
+function openGroceryNote(key, currentNote) {
+  const note = prompt("Add a note for this item (e.g. 'get big Costco bag'):", currentNote || "");
+  if (note === null) return; // cancelled
+  if (note.trim()) {
+    if (!state.groceryNotes) state.groceryNotes = {};
+    state.groceryNotes[key] = note.trim();
+  } else {
+    if (state.groceryNotes) delete state.groceryNotes[key];
+  }
+  scheduleSave();
+  renderGrocery();
+}
+
+// ── SUNDAY PREP ORDER ────────────────────────────────────────────────────────
+function generatePrepOrder() {
+  const activeRecipes = [
+    ...state.dinners,
+    ...state.breakfasts,
+    ...state.lunches,
+    ...state.desserts,
+  ].filter(r => r && isActive(r.id));
+
+  if (!activeRecipes.length) return "<div style=\"color:var(--dim);font-size:14px;padding:20px;text-align:center\">No active recipes this week.</div>";
+
+  // Categorize by cook type
+  const slowCooker = activeRecipes.filter(r => r.name && (r.name.toLowerCase().includes("slow cooker") || (r.prepTime && r.prepTime.toLowerCase().includes("slow cooker"))));
+  const batchCook = activeRecipes.filter(r => r.tags && r.tags.includes("prep-ahead") || (r.description && r.description.toLowerCase().includes("batch")));
+  const quickAssembly = activeRecipes.filter(r => {
+    const mins = parseInt((r.activeTime || "0").replace(/[^0-9]/g,"")) || 0;
+    return mins <= 15;
+  });
+  const standard = activeRecipes.filter(r => !slowCooker.includes(r));
+
+  const totalMins = activeRecipes.reduce((a,r) => a + (parseInt((r.activeTime||"0").replace(/[^0-9]/g,""))||0), 0);
+
+  // Build smart order
+  const orderedSteps = [];
+  let step = 1;
+
+  // Step 1: Start slow cooker items first (they cook themselves)
+  if (slowCooker.length) {
+    orderedSteps.push({
+      step: step++,
+      time: "First — set it and forget it",
+      color: "var(--green)",
+      icon: "🥘",
+      recipes: slowCooker,
+      note: "Start these first — they cook unattended while you prep everything else"
+    });
+  }
+
+  // Step 2: Anything that needs to marinate or brine
+  const marinade = activeRecipes.filter(r => r.instructions && r.instructions.some(i => i && (i.toLowerCase().includes("marinat") || i.toLowerCase().includes("dry brine"))));
+  if (marinade.length) {
+    orderedSteps.push({
+      step: step++,
+      time: "Next — start marinades",
+      color: "var(--indigo)",
+      icon: "⏱️",
+      recipes: marinade,
+      note: "Get these marinating early — flavor improves with time"
+    });
+  }
+
+  // Step 3: Batch prep (grating, chopping shared veg)
+  const sharedVeg = [];
+  const needsGrating = activeRecipes.filter(r => r.ingredients && r.ingredients.some(i => i && i.toLowerCase().includes("grate")));
+  if (needsGrating.length > 1) {
+    sharedVeg.push("Grate all zucchini and carrots at once — shared across " + needsGrating.map(r => r.name).join(", "));
+  }
+  const needsGarlic = activeRecipes.filter(r => r.ingredients && r.ingredients.some(i => i && i.toLowerCase().includes("garlic")));
+  if (needsGarlic.length > 1) {
+    sharedVeg.push("Mince all garlic at once — shared across " + needsGarlic.length + " recipes");
+  }
+  const needsOnion = activeRecipes.filter(r => r.ingredients && r.ingredients.some(i => i && i.toLowerCase().includes("onion")));
+  if (needsOnion.length > 1) {
+    sharedVeg.push("Dice all onions at once — shared across " + needsOnion.length + " recipes");
+  }
+
+  if (sharedVeg.length) {
+    orderedSteps.push({
+      step: step++,
+      time: "Batch prep — one knife session for everything",
+      color: "var(--amber)",
+      icon: "🔪",
+      notes: sharedVeg,
+      recipes: [],
+    });
+  }
+
+  // Step 4: Oven items (roasting, baking)
+  const ovenItems = activeRecipes.filter(r => !slowCooker.includes(r) && r.instructions && r.instructions.some(i => i && (i.toLowerCase().includes("oven") || i.toLowerCase().includes("bake") || i.toLowerCase().includes("roast") || i.toLowerCase().includes("375") || i.toLowerCase().includes("425"))));
+  if (ovenItems.length) {
+    orderedSteps.push({
+      step: step++,
+      time: "Oven items — start while stovetop cools",
+      color: "#f472b6",
+      icon: "🔥",
+      recipes: ovenItems,
+      note: "Preheat oven 15 min before you need it"
+    });
+  }
+
+  // Step 5: Remaining stovetop items
+  const stovetop = activeRecipes.filter(r => !slowCooker.includes(r) && !ovenItems.includes(r) && !marinade.includes(r));
+  if (stovetop.length) {
+    orderedSteps.push({
+      step: step++,
+      time: "Stovetop cooking",
+      color: "var(--text)",
+      icon: "🍳",
+      recipes: stovetop,
+      note: null
+    });
+  }
+
+  const stepsHtml = orderedSteps.map(s => {
+    const recipesHtml = (s.recipes || []).map(r => `
+      <div style="display:flex;align-items:center;gap:8px;padding:5px 0">
+        <span style="font-size:16px">${r.emoji||"🍽️"}</span>
+        <div>
+          <div style="font-size:14px;color:var(--text);font-weight:600">${esc(r.name)}</div>
+          <div style="font-size:12px;color:var(--dim)">${r.activeTime||""} active${r.prepTime ? " · " + r.prepTime : ""}</div>
+        </div>
+      </div>`).join("");
+    const notesHtml = (s.notes || []).map(n => `<div style="font-size:13px;color:var(--muted);padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04)">• ${esc(n)}</div>`).join("");
+    return `
+      <div style="background:var(--surface);border-radius:14px;padding:14px 16px;margin-bottom:10px;border-left:3px solid ${s.color}">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:20px">${s.icon}</span>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:${s.color};text-transform:uppercase;letter-spacing:1px">Step ${s.step}</div>
+            <div style="font-size:15px;font-weight:700;color:var(--text)">${s.time}</div>
+          </div>
+        </div>
+        ${s.note ? `<div style="font-size:13px;color:var(--dim);margin-bottom:8px;font-style:italic">${esc(s.note)}</div>` : ""}
+        ${recipesHtml}
+        ${notesHtml}
+      </div>`;
+  }).join("");
+
+  return `
+    <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:12px 16px;margin-bottom:16px">
+      <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:4px">⏱️ Estimated total active time: ~${totalMins} minutes</div>
+      <div style="font-size:13px;color:var(--muted)">Follow this order to minimize total time in the kitchen</div>
+    </div>
+    ${stepsHtml}
+  `;
+}
+
+function renderPrepOrderTab() {
+  const el = document.getElementById("page-prep");
+  if (!el) return;
+  el.innerHTML = `
+    <div style="margin-bottom:16px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px">🔪 Sunday Prep Order</div>
+      <div style="color:var(--dim);font-size:14px">Optimized cooking sequence for your active recipes</div>
+    </div>
+    ${generatePrepOrder()}
+    <div style="height:30px"></div>
+  `;
+}
+
+// ── RECIPE SCALING ────────────────────────────────────────────────────────────
+function setScale(recipeId, factor) {
+  scaleFactors[recipeId] = factor;
+  // Re-render the recipe modal if open
+  const modal = document.getElementById("recipe-modal");
+  if (modal && modal.style.display !== "none") {
+    // Find current recipe and re-render
+    const titleEl = modal.querySelector(".modal-title");
+    if (titleEl) {
+      const allRecipes = [...state.dinners, ...state.breakfasts, ...state.lunches, ...state.desserts];
+      const recipe = allRecipes.find(r => r.name && titleEl.textContent.includes(r.name.substring(0,15)));
+      if (recipe) {
+        const section = state.dinners.includes(recipe) ? "dinner" : state.breakfasts.includes(recipe) ? "breakfast" : state.lunches.includes(recipe) ? "lunch" : "dessert";
+        viewRecipe(section, recipe.id);
+      }
+    }
+  }
+}
+
+
+// ── 1. SMART GROCERY DEDUPLICATION ──────────────────────────────────────────
+function normalizeIngredient(text) {
+  if (!text || typeof text !== "string") return null;
+  const t = text.toLowerCase().trim();
+  // Skip section headers and sauce suggestions
+  if (t.startsWith("---") || t.startsWith("🫙") || t.startsWith("//")) return null;
+  // Extract the core ingredient name (remove quantities and measurements)
+  return t
+    .replace(/^[\d½¼¾⅓⅔]+\s*(cup|tbsp|tsp|oz|lb|lbs|g|kg|ml|l|clove|cloves|head|heads|bunch|can|jar|bag|carton|slice|slices|piece|pieces|sprig|sprigs|pinch|dash|handful|packet|strip|strips|fillet|fillets|sheet|pound|ounce|tablespoon|teaspoon)s?\s*(of\s+)?/gi, "")
+    .replace(/\([^)]*\)/g, "") // remove parenthetical notes
+    .replace(/,.*$/, "") // remove everything after comma
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getIngredientKey(text) {
+  const n = normalizeIngredient(text);
+  if (!n) return null;
+  // Map to canonical ingredient names
+  const mappings = [
+    [/garlic/, "garlic"],
+    [/zucchini/, "zucchini"],
+    [/carrot/, "carrots"],
+    [/onion/, "onion"],
+    [/avocado oil|refined avocado/, "avocado oil"],
+    [/olive oil/, "olive oil"],
+    [/ground turkey|jennie-o/, "ground turkey (Jennie-O 93/7)"],
+    [/chicken thigh/, "boneless skinless chicken thighs"],
+    [/fairlife.*milk|milk.*fairlife/, "Fairlife 2% milk"],
+    [/fage.*yogurt|greek yogurt/, "Fage 0% Greek yogurt"],
+    [/baby spinach|spinach/, "baby spinach"],
+    [/cherry tomato/, "cherry tomatoes"],
+    [/lemon/, "lemon"],
+    [/lime/, "lime"],
+    [/salt/, "kosher salt"],
+    [/black pepper|pepper/, "black pepper"],
+  ];
+  for (const [re, canonical] of mappings) {
+    if (re.test(n)) return canonical;
+  }
+  return n.substring(0, 40); // use first 40 chars as key
+}
+
+function buildDeduplicatedGroceryList(recipes) {
+  // Map: ingredientKey -> { text, sources[], count }
+  const deduped = {};
+  recipes.forEach(recipe => {
+    (recipe.ingredients || []).forEach(ing => {
+      const text = typeof ing === "string" ? ing : (ing.text || "");
+      const key = getIngredientKey(text);
+      if (!key) return;
+      if (!deduped[key]) {
+        deduped[key] = { text, sources: [], count: 0, key };
+      }
+      deduped[key].count++;
+      if (!deduped[key].sources.includes(recipe.name)) {
+        deduped[key].sources.push(recipe.name);
+      }
+    });
+  });
+  return Object.values(deduped);
+}
+
+// ── 2. RECIPE SEARCH ─────────────────────────────────────────────────────────
+let searchQuery = "";
+
+function renderSearchBar() {
+  return `<div style="position:relative;margin-bottom:14px">
+    <input type="text" id="recipe-search" placeholder="🔍 Search recipes..." value="${esc(searchQuery)}"
+      oninput="searchQuery=this.value;renderTab(currentTab)"
+      style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:var(--text);font-size:15px;box-sizing:border-box">
+    ${searchQuery ? `<button onclick="searchQuery='';document.getElementById('recipe-search').value='';renderTab(currentTab)"
+      style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>` : ""}
+  </div>`;
+}
+
+function filterBySearch(recipes) {
+  if (!searchQuery.trim()) return recipes;
+  const q = searchQuery.toLowerCase();
+  return recipes.filter(r =>
+    (r.name && r.name.toLowerCase().includes(q)) ||
+    (r.description && r.description.toLowerCase().includes(q)) ||
+    (r.ingredients && r.ingredients.some(i => i && i.toLowerCase && i.toLowerCase().includes(q))) ||
+    (r.tips && r.tips.toLowerCase().includes(q))
+  );
+}
+
+// ── 3. MULTI-TIMER IN COOK MODE ──────────────────────────────────────────────
+const multiTimers = {}; // id -> { label, seconds, remaining, running, interval }
+
+function addMultiTimer(label, seconds) {
+  const id = "t" + Date.now();
+  multiTimers[id] = { id, label, seconds, remaining: seconds, running: false, interval: null };
+  renderMultiTimerPanel();
+  return id;
+}
+
+function toggleMultiTimer(id) {
+  const t = multiTimers[id];
+  if (!t) return;
+  if (t.running) {
+    clearInterval(t.interval);
+    t.running = false;
+  } else {
+    t.running = true;
+    t.interval = setInterval(() => {
+      t.remaining--;
+      if (t.remaining <= 0) {
+        clearInterval(t.interval);
+        t.running = false;
+        t.remaining = 0;
+        // Vibrate if supported
+        if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+        // Audio beep
+        try {
+          const ctx = new (window.AudioContext || window.webkitAudioContext)();
+          const osc = ctx.createOscillator();
+          osc.connect(ctx.destination);
+          osc.frequency.value = 880;
+          osc.start();
+          setTimeout(() => { osc.stop(); ctx.close(); }, 600);
+        } catch(e) {}
+      }
+      renderMultiTimerPanel();
+    }, 1000);
+  }
+  renderMultiTimerPanel();
+}
+
+function resetMultiTimer(id) {
+  const t = multiTimers[id];
+  if (!t) return;
+  clearInterval(t.interval);
+  t.running = false;
+  t.remaining = t.seconds;
+  renderMultiTimerPanel();
+}
+
+function removeMultiTimer(id) {
+  if (multiTimers[id]) {
+    clearInterval(multiTimers[id].interval);
+    delete multiTimers[id];
+  }
+  renderMultiTimerPanel();
+}
+
+function fmtTimer(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ":" + String(sec).padStart(2, "0");
+}
+
+function renderMultiTimerPanel() {
+  const panel = document.getElementById("multi-timer-panel");
+  if (!panel) return;
+  const timers = Object.values(multiTimers);
+  if (!timers.length) {
+    panel.innerHTML = `<div style="color:var(--dim);font-size:13px;text-align:center;padding:8px">No active timers — tap ⏱️ on any step to start one</div>`;
+    return;
+  }
+  panel.innerHTML = timers.map(t => {
+    const pct = t.seconds > 0 ? (t.remaining / t.seconds) * 100 : 0;
+    const color = t.remaining <= 60 ? "#ef4444" : t.remaining <= 180 ? "var(--amber)" : "var(--green)";
+    return `
+      <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:10px 12px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.08)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div style="font-size:13px;color:var(--muted);flex:1">${esc(t.label)}</div>
+          <div style="font-size:20px;font-weight:700;color:${color};margin:0 8px">${fmtTimer(t.remaining)}</div>
+          <div style="display:flex;gap:4px">
+            <button onclick="toggleMultiTimer('${t.id}')" style="padding:4px 10px;border-radius:8px;border:none;background:${t.running ? "var(--amber)" : "var(--green)"};color:#0a0f1a;font-size:12px;font-weight:700;cursor:pointer">${t.running ? "⏸" : "▶"}</button>
+            <button onclick="resetMultiTimer('${t.id}')" style="padding:4px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">↺</button>
+            <button onclick="removeMultiTimer('${t.id}')" style="padding:4px 8px;border-radius:8px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#ef4444;font-size:12px;cursor:pointer">✕</button>
+          </div>
+        </div>
+        <div style="height:4px;background:rgba(255,255,255,0.08);border-radius:2px">
+          <div style="height:4px;border-radius:2px;background:${color};width:${pct}%;transition:width 1s linear"></div>
+        </div>
+      </div>`;
+  }).join("");
+}
+
+function addTimerFromStep(label, seconds) {
+  addMultiTimer(label, seconds);
+  // Show panel if hidden
+  const panel = document.getElementById("multi-timer-panel");
+  const container = document.getElementById("multi-timer-container");
+  if (container) container.style.display = "block";
+}
+
+// ── 4. PULL TO REFRESH ───────────────────────────────────────────────────────
+let pullStartY = 0;
+let isPulling = false;
+
+function initPullToRefresh() {
+  const el = document.querySelector(".page.active") || document.body;
+  document.addEventListener("touchstart", (e) => {
+    pullStartY = e.touches[0].clientY;
+    isPulling = window.scrollY === 0;
+  }, { passive: true });
+
+  document.addEventListener("touchmove", (e) => {
+    if (!isPulling) return;
+    const pullDist = e.touches[0].clientY - pullStartY;
+    const indicator = document.getElementById("pull-indicator");
+    if (pullDist > 20 && indicator) {
+      indicator.style.opacity = Math.min(pullDist / 80, 1);
+      indicator.style.transform = `translateY(${Math.min(pullDist * 0.4, 30)}px)`;
+    }
+  }, { passive: true });
+
+  document.addEventListener("touchend", async (e) => {
+    const pullDist = e.changedTouches[0].clientY - pullStartY;
+    const indicator = document.getElementById("pull-indicator");
+    if (indicator) { indicator.style.opacity = 0; indicator.style.transform = ""; }
+    if (isPulling && pullDist > 70) {
+      // Trigger sync
+      if (state.supabaseUrl && state.supabaseKey) {
+        const indicator2 = document.getElementById("pull-indicator");
+        if (indicator2) { indicator2.textContent = "🔄 Syncing..."; indicator2.style.opacity = 1; }
+        await loadFromSupabase();
+        renderTab(currentTab);
+        if (indicator2) {
+          indicator2.textContent = "✅ Synced!";
+          setTimeout(() => { indicator2.style.opacity = 0; }, 1500);
+        }
+      }
+    }
+    isPulling = false;
+  });
+}
+
+// ── 5. SWIPE GESTURES ────────────────────────────────────────────────────────
+function initSwipeGestures() {
+  let startX = 0;
+  let startY = 0;
+  let targetCard = null;
+
+  document.addEventListener("touchstart", (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    targetCard = e.target.closest(".card, .dinner-card");
+  }, { passive: true });
+
+  document.addEventListener("touchend", (e) => {
+    if (!targetCard) return;
+    const dx = e.changedTouches[0].clientX - startX;
+    const dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) < 60 || Math.abs(dy) > Math.abs(dx) * 0.8) return; // not a horizontal swipe
+
+    // Get recipe id from card
+    const btn = targetCard.querySelector("[onclick*='toggleRecipeActive']");
+    if (!btn) return;
+    const match = btn.getAttribute("onclick").match(/toggleRecipeActive\('([^']+)'/);
+    if (!match) return;
+    const id = match[1];
+
+    if (dx > 60) {
+      // Swipe right = toggle On/Off
+      state.activeRecipes[id] = !isActive(id);
+      scheduleSave();
+      renderTab(currentTab);
+      if (navigator.vibrate) navigator.vibrate(50);
+    } else if (dx < -60) {
+      // Swipe left = show delete confirm
+      if (confirm("Remove this recipe?")) {
+        state.dinners = state.dinners.filter(r => r.id !== id);
+        state.breakfasts = state.breakfasts.filter(r => r.id !== id);
+        state.lunches = state.lunches.filter(r => r.id !== id);
+        state.desserts = state.desserts.filter(r => r.id !== id);
+        scheduleSave();
+        renderTab(currentTab);
+        if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
+      }
+    }
+    targetCard = null;
+  });
+}
+
 function renderPantry() {
   const el = document.getElementById("page-pantry");
   const allItems = PANTRY_SECTIONS.flatMap(s => s.items);
@@ -3001,7 +4958,7 @@ function startCooking(section,id) {
   document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
   document.getElementById("page-cook").classList.add("active");
-  document.querySelectorAll(".tab-btn")[7].classList.add("active");
+  document.querySelectorAll(".tab-btn")[10].classList.add("active");
   renderCookScreen();
 }
 
@@ -3337,6 +5294,38 @@ function showImportStatus(msg) {
   if (el) { el.textContent = msg; el.style.display = "block"; }
 }
 
+
+function migrateRecipes() {
+  try {
+    var safeArr = function(arr) { return (arr || []).filter(function(r) { return r != null && r.id != null; }); };
+    var loadedDinnerIds = safeArr(state.dinners).map(function(r){return r.id;});
+    var loadedBreakfastIds = safeArr(state.breakfasts).map(function(r){return r.id;});
+    var loadedLunchIds = safeArr(state.lunches).map(function(r){return r.id;});
+    var loadedDessertIds = safeArr(state.desserts).map(function(r){return r.id;});
+    var dessertDefs = safeArr(typeof DEFAULT_DESSERT !== "undefined" ? DEFAULT_DESSERT : []);
+    var missingDinners = safeArr(DEFAULT_DINNERS).filter(function(r){return loadedDinnerIds.indexOf(r.id)<0;});
+    var missingBreakfasts = safeArr(DEFAULT_BREAKFASTS).filter(function(r){return loadedBreakfastIds.indexOf(r.id)<0;});
+    var missingLunches = safeArr(DEFAULT_LUNCHES).filter(function(r){return loadedLunchIds.indexOf(r.id)<0;});
+    var missingDesserts = dessertDefs.filter(function(r){return loadedDessertIds.indexOf(r.id)<0;});
+    var migrated = 0;
+    if (missingDinners.length)    { state.dinners    = safeArr(state.dinners).concat(missingDinners);       migrated += missingDinners.length; }
+    if (missingBreakfasts.length) { state.breakfasts = safeArr(state.breakfasts).concat(missingBreakfasts); migrated += missingBreakfasts.length; }
+    if (missingLunches.length)    { state.lunches    = safeArr(state.lunches).concat(missingLunches);       migrated += missingLunches.length; }
+    if (missingDesserts.length)   { state.desserts   = safeArr(state.desserts).concat(missingDesserts);     migrated += missingDesserts.length; }
+    state.dinners = safeArr(state.dinners).map(function(r){ var def=safeArr(DEFAULT_DINNERS).filter(function(d){return d.id===r.id;})[0]; if(!def)return r; return Object.assign({},r,{instructions:(r.instructions&&r.instructions.length>1)?r.instructions:(def.instructions||[]),tips:r.tips||def.tips||""}); });
+    if (migrated > 0) { console.log("Migrated",migrated,"new recipes"); scheduleSave(); }
+  } catch(e) { console.error("migrateRecipes error:",e); }
+}
+
+async function pingSupabase() {
+  try {
+    if (!state.supabaseUrl || !state.supabaseKey) return;
+    const {createClient} = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
+    const sb = createClient(state.supabaseUrl, state.supabaseKey);
+    await sb.from("meal_plans").select("id").limit(1);
+  } catch(e) {}
+}
+
 async function init() {
   // Version check - clear old incompatible localStorage data
   try {
@@ -3347,6 +5336,7 @@ async function init() {
     }
   } catch(e) {}
   loadFromLocal();
+  migrateRecipes();
   const safeInit = (arr) => (arr||[]).filter(r => r && r.id).map(r => ({...r, ingredients: applySwaps(r.ingredients||[]), instructions: r.instructions||[], tips: r.tips||""}));
   state.breakfasts = safeInit(state.breakfasts);
   state.lunches    = safeInit(state.lunches);
@@ -3366,6 +5356,7 @@ async function init() {
       var ok = await initSupabase();
       if (ok) {
         await loadFromSupabase();
+        migrateRecipes();
         renderTab(currentTab);
       } else {
         setSyncStatus("offline");
@@ -3395,6 +5386,10 @@ function checkUrlImport() {
   }, 400);
 }
 window.addEventListener("hashchange", checkUrlImport);
+
+setTimeout(pingSupabase, 5000);
+initPullToRefresh();
+initSwipeGestures();
 
 init().catch(function(e) {
   var el = document.getElementById("page-plan");
