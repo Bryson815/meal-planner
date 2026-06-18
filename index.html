@@ -6189,7 +6189,7 @@ const FAST_FOOD_CHAINS = [
   ,{
     id:"zaxbys",
     name:"Zaxby\'s",
-    emoji:"\U0001f357",
+    emoji:"🍗",
     rating:5,
     bestFor:"Best Atlanta-area chicken strip hack — huge protein for the calories when ordered right",
     hacks:[
@@ -6254,7 +6254,7 @@ const FAST_FOOD_CHAINS = [
   ,{
     id:"arbys",
     name:"Arby\'s",
-    emoji:"\U0001f969",
+    emoji:"🥩",
     rating:4,
     bestFor:"Highest protein per dollar at any fast food chain — roast beef is legitimately lean",
     hacks:[
@@ -6504,22 +6504,23 @@ async function searchAtlanta(query) {
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
         max_tokens: 1000,
-        system: `You are a nutrition expert helping a family in Atlanta find high-protein, lower-calorie options when ordering from restaurants or chains on DoorDash. 
+        system: `You are a nutrition expert helping a family in Atlanta find high-protein, lower-calorie options when ordering from restaurants or chains on DoorDash.
 The user is a 44-year-old radiologist who prioritizes: high protein (40g+ per meal ideally), lower calorie, family-friendly options.
-He and his wife eat well and care about macros but not in a boring way — they want real food that tastes good.
-For any restaurant or cuisine type, give 2-3 specific dish recommendations with:
-- Exact dish name
-- Estimated protein and calories  
-- Specific ordering modifications (extra protein, light sauce, swap, etc.)
-- One thing to avoid
-Format as clean HTML using these CSS variables: --green, --amber, --text, --dim, --muted, --surface. 
-Use inline styles. Keep it concise and mobile-friendly. No markdown. Return only HTML, no preamble.`,
+For any restaurant or cuisine type, give 2-3 specific dish recommendations with protein and calories estimates and specific ordering hacks.
+Format as clean HTML with inline styles only. Use these exact color values in inline styles: green=#10b981, amber=#f59e0b, text=#f1f5f9, dim=#94a3b8, background=rgba(255,255,255,0.05). 
+Keep it concise and mobile-friendly. No markdown. No CSS classes. No CSS variables. Return only HTML, no preamble, no backticks.`,
         messages: [{ role: "user", content: `Find the best high-protein, lower-calorie options at: ${query}. If it's a local Atlanta restaurant, give specific dish recommendations. If it's a chain, give specific ordering hacks beyond the obvious.` }]
       })
     });
 
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      throw new Error("API error " + response.status + ": " + (errData.error && errData.error.message || response.statusText));
+    }
     const data = await response.json();
+    console.log("Atlanta search response:", data);
     const text = data.content && data.content[0] && data.content[0].text ? data.content[0].text : "";
+    console.log("Result text length:", text.length);
     
     atlantaResults = text || `<div style="color:var(--dim);text-align:center;padding:20px">No results found. Try a different restaurant or cuisine.</div>`;
     atlantaLoading = false;
@@ -6533,7 +6534,8 @@ Use inline styles. Keep it concise and mobile-friendly. No markdown. Return only
 
   } catch(e) {
     atlantaLoading = false;
-    atlantaResults = `<div style="color:#ef4444;padding:14px;background:rgba(239,68,68,0.08);border-radius:12px;font-size:13px">Error loading results. Check your connection and try again.</div>`;
+    atlantaResults = `<div style="color:#ef4444;padding:14px;background:rgba(239,68,68,0.08);border-radius:12px;font-size:13px">Error: ${e.message}. Check your API key in Settings and try again.</div>`;
+    console.error("Atlanta search error:", e);
     renderEatOut();
   }
 }
