@@ -3022,6 +3022,7 @@ let state = {
   cookHistory: [],
   groceryNotes: {},
   vaultSort: "name",
+  anthropicKey: "",  // stored locally only, never sent to Supabase
 };
 
 let supabase = null;
@@ -3130,6 +3131,9 @@ function saveToLocal() {
 }
 
 function loadFromLocal() {
+  // Load API key from localStorage only (never Supabase)
+  const savedKey = localStorage.getItem("lemmonAnthropicKey");
+  if (savedKey) state.anthropicKey = savedKey;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return;
@@ -4756,6 +4760,17 @@ function renderSettings() {
         <div>👧 Daughter, 7 · 👧 Daughter, 5</div>
         <div style="margin-top:8px;color:var(--dim);font-size:12px">Goal: High-protein, lower-calorie, family-friendly</div>
       </div>
+    </div>
+
+    <div style="background:var(--surface);border-radius:var(--radius);padding:18px;margin-bottom:14px">
+      <div style="font-size:14px;color:var(--green);font-weight:700;margin-bottom:6px">🤖 Anthropic API Key</div>
+      <div style="font-size:13px;color:var(--dim);margin-bottom:10px">Required for the Atlanta Restaurant search in the Eat Out tab. Get a free key at console.anthropic.com</div>
+      <input type="password" id="anthropic-key-input" placeholder="sk-ant-..." value="${esc(state.anthropicKey||'')}"
+        style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:var(--text);font-size:14px;box-sizing:border-box;margin-bottom:8px">
+      <button onclick="const k=document.getElementById('anthropic-key-input').value.trim();state.anthropicKey=k;localStorage.setItem('lemmonAnthropicKey',k);alert(k?'✅ API key saved!':'Key cleared.');"
+        style="width:100%;padding:10px;border-radius:10px;border:none;background:var(--green);color:#0a0f1a;font-weight:700;font-size:14px;cursor:pointer">
+        Save API Key
+      </button>
     </div>
 
     <div style="background:var(--surface);border-radius:var(--radius);padding:18px;margin-bottom:14px">
@@ -6414,7 +6429,19 @@ let atlantaLoading = false;
 let atlantaQuery = "";
 
 function renderAtlantaSearch() {
+  const useStatic = window.atlantaMode !== "ai";
   return `
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      <button onclick="window.atlantaMode='static';renderEatOut()"
+        style="flex:1;padding:8px;border-radius:10px;border:none;background:${!useStatic||window.atlantaMode!=='ai'?'rgba(255,255,255,0.06)':'rgba(255,255,255,0.06)'};color:var(--text);font-weight:${useStatic?'700':'400'};font-size:13px;cursor:pointer;border:1.5px solid ${useStatic?'var(--green)':'rgba(255,255,255,0.08)'}">
+        📍 Curated List
+      </button>
+      <button onclick="window.atlantaMode='ai';renderEatOut()"
+        style="flex:1;padding:8px;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:var(--text);font-weight:${!useStatic?'700':'400'};font-size:13px;cursor:pointer;border:1.5px solid ${!useStatic?'var(--green)':'rgba(255,255,255,0.08)'}">
+        🤖 AI Search
+      </button>
+    </div>
+    ${useStatic ? renderAtlantaStatic() : `
     <div style="margin-bottom:14px">
       <div style="font-size:14px;color:var(--dim);margin-bottom:12px">
         Type any restaurant or cuisine — Claude will find the best high-protein, lower-calorie options for ordering on DoorDash
@@ -6438,7 +6465,8 @@ function renderAtlantaSearch() {
           <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">Find the best options anywhere</div>
           <div style="font-size:13px">Try: "Chipotle" · "Japanese" · "Superica" · "Mediterranean" · "pizza"</div>
         </div>` : ""}
-    </div>`;
+    </div>`}
+  `;
 }
 
 function handleAtlantaSearch(query) {
@@ -6451,6 +6479,15 @@ function handleAtlantaSearch(query) {
 }
 
 async function searchAtlanta(query) {
+  if (!query || query.trim().length < 2) return;
+  if (!state.anthropicKey) {
+    atlantaResults = `<div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--amber)">
+      ⚠️ Add your Anthropic API key in ⚙️ Settings to use the restaurant search.<br><br>
+      <span style="font-size:12px;color:var(--dim)">Get a free key at console.anthropic.com — paste it in Settings → Anthropic API Key</span>
+    </div>`;
+    renderEatOut();
+    return;
+  }
   atlantaLoading = true;
   atlantaResults = "";
   renderEatOut();
@@ -6460,6 +6497,8 @@ async function searchAtlanta(query) {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
+        "x-api-key": state.anthropicKey,
+        "anthropic-version": "2023-06-01",
         "anthropic-dangerous-direct-browser-access": "true"
       },
       body: JSON.stringify({
@@ -6499,6 +6538,432 @@ Use inline styles. Keep it concise and mobile-friendly. No markdown. Return only
   }
 }
 
+
+const ATLANTA_RESTAURANTS = [
+  {
+    id:"atl_mediterranean",
+    cuisine:"🫒 Mediterranean & Middle Eastern",
+    restaurants:[
+      {
+        name:"Delbar Middle Eastern",
+        neighborhood:"Inman Park",
+        doordash:true,
+        rating:5,
+        bestFor:"Best high-protein DoorDash order in Inman Park — Mediterranean bowls built for macros",
+        dishes:[
+          { name:"Joojeh Kabab", cal:420, protein:52, note:"Saffron marinated chicken — highest protein item on the menu. Order with shirazi salad instead of rice to cut carbs." },
+          { name:"Koobideh Kabab", cal:480, protein:48, note:"Ground beef and lamb kabab. Ask for extra koobideh, light on the rice, double the grilled tomatoes and peppers." },
+          { name:"Build Your Own Bowl", cal:390, protein:44, note:"Get double protein, skip the pita, load the shirazi salad and grilled veg. Mast-o-khiar (yogurt dip) is your tzatziki equivalent — only 40 cal." }
+        ],
+        avoid:"The lamb shank is incredible but 800+ cal. Save it for a sit-down meal.",
+        hack:"Always ask for protein on the side of the rice rather than on top — easier to eat more protein and less rice. Mast-o-khiar yogurt dip is your high-protein sauce."
+      },
+      {
+        name:"Barcelona Wine Bar",
+        neighborhood:"Inman Park",
+        doordash:true,
+        rating:4,
+        bestFor:"Tapas-style ordering lets you control exactly what you eat — protein-forward picks",
+        dishes:[
+          { name:"Gambas al Ajillo", cal:280, protein:32, note:"Garlic shrimp — one of the highest protein tapas on the menu. Order two portions for a full meal." },
+          { name:"Pollo al Ajillo", cal:380, protein:44, note:"Garlic chicken thighs. Best protein-per-cal item on the menu. Add a green salad alongside." },
+          { name:"Ensalada Verde", cal:120, protein:8, note:"Light green salad — good alongside protein tapas to bulk up the meal for minimal calories." }
+        ],
+        avoid:"The patatas bravas are 400 cal with 6g protein — worst ratio on the menu. The charcuterie board is high fat/high sodium.",
+        hack:"Order 2-3 protein tapas (gambas + pollo + one more) instead of one large entree — you control the macros better and get more variety."
+      }
+    ]
+  },
+  {
+    id:"atl_asian",
+    cuisine:"🍱 Asian & Japanese",
+    restaurants:[
+      {
+        name:"MF Sushi",
+        neighborhood:"Inman Park",
+        doordash:true,
+        rating:5,
+        bestFor:"Highest protein-per-dollar Japanese in Atlanta — sashimi is the move",
+        dishes:[
+          { name:"Sashimi Platter (10pc)", cal:220, protein:38, note:"Pure protein, zero carbs, zero rice. Best macro meal at any sushi restaurant. Ask for extra ginger (0 cal) and wasabi (0 cal) for flavor." },
+          { name:"Tuna Tataki", cal:180, protein:28, note:"Seared tuna, ponzu sauce — bright and lean. One of the best high-protein low-cal items on the menu." },
+          { name:"Naruto Roll (any roll)", cal:280, protein:24, note:"Ask for any roll Naruto style — wrapped in cucumber instead of rice. Cuts ~150 cal per roll with identical protein." }
+        ],
+        avoid:"Tempura rolls add 200-300 cal from batter and frying. The spicy mayo on rolls adds 100-150 cal per roll — ask for it on the side.",
+        hack:"Naruto style (cucumber wrap instead of rice) on any roll saves 150 cal. Sashimi over nigiri saves another 50-80 cal per piece. Extra ginger and wasabi are zero cal flavor bombs."
+      },
+      {
+        name:"Panda Express",
+        neighborhood:"Multiple Atlanta locations",
+        doordash:true,
+        rating:3,
+        bestFor:"Fastest high-protein Asian DoorDash order — specific items only",
+        dishes:[
+          { name:"Grilled Teriyaki Chicken Bowl", cal:300, protein:36, note:"Bowl with grilled chicken only (not fried), super greens instead of rice or chow mein. One of the best macros at any fast casual chain." },
+          { name:"String Bean Chicken Breast", cal:190, protein:14, note:"Lowest calorie entree at Panda. Pair with Grilled Teriyaki for a double protein bowl." },
+          { name:"Super Greens Side", cal:90, protein:6, note:"Kale, broccoli, cabbage — 90 cal, good fiber. Always get this instead of fried rice or chow mein." }
+        ],
+        avoid:"Orange Chicken (490 cal, 25g protein — worst ratio). Fried rice (520 cal). Chow Mein (510 cal). Beijing Beef (470 cal).",
+        hack:"Build a bowl: Grilled Teriyaki Chicken + String Bean Chicken + Super Greens side = 580 cal, 56g protein. Best macro meal at Panda."
+      }
+    ]
+  },
+  {
+    id:"atl_mexican",
+    cuisine:"🌮 Mexican & Latin",
+    restaurants:[
+      {
+        name:"Superica",
+        neighborhood:"Multiple Atlanta locations (Krog St Market nearby)",
+        doordash:true,
+        rating:5,
+        bestFor:"Best Tex-Mex macros in Atlanta when ordered right",
+        dishes:[
+          { name:"Grilled Chicken Tacos (3)", cal:480, protein:42, note:"Corn tortillas, grilled chicken, ask for pico and salsa verde instead of cheese and sour cream. Avocado on the side." },
+          { name:"Fajitas — Chicken", cal:520, protein:48, note:"Skip the flour tortillas or use one only. Load the grilled peppers and onions. Pico and guac instead of sour cream and cheese sauce." },
+          { name:"Ensalada — Chicken", cal:380, protein:36, note:"Grilled chicken salad, lime vinaigrette on the side. One of the cleaner macro options on the menu." }
+        ],
+        avoid:"The queso is incredible but 400 cal before you eat anything. Flour tortillas add 200 cal each. The frozen margs are 400-500 cal.",
+        hack:"Corn tortillas over flour — half the calories. Ask for all sauces on the side. Pico and salsa verde are essentially zero cal. Guac is worth it (~100 cal) over sour cream (120 cal with worse macros)."
+      },
+      {
+        name:"bartaco",
+        neighborhood:"Inman Park / Multiple locations",
+        doordash:true,
+        rating:4,
+        bestFor:"Street taco format means natural portion control — good protein options",
+        dishes:[
+          { name:"Grilled Fish Tacos (3)", cal:360, protein:34, note:"Corn tortillas, grilled (not fried) fish, cabbage slaw. Ask for salsa verde instead of crema." },
+          { name:"Chicken Tinga Tacos (3)", cal:390, protein:38, note:"Braised chicken, good protein. Load with salsa verde and pickled onions — both zero cal." },
+          { name:"Cauliflower Tacos + Chicken", cal:340, protein:30, note:"Mix cauliflower and chicken tacos for variety — lower cal combo with decent protein." }
+        ],
+        avoid:"Pork belly tacos are 480 cal for 3 with only 18g protein — worst ratio. Queso dip. The frozen cocktails.",
+        hack:"Street taco format is naturally portion-controlled. Get 3-4 protein tacos, load with salsa verde (0 cal) and pickled jalapeños (0 cal). Skip the chips and queso."
+      }
+    ]
+  },
+  {
+    id:"atl_american",
+    cuisine:"🥗 American & Bowls",
+    restaurants:[
+      {
+        name:"Kale Me Crazy",
+        neighborhood:"Multiple Atlanta locations",
+        doordash:true,
+        rating:5,
+        bestFor:"Best purpose-built high-protein healthy DoorDash in Atlanta — designed for macros",
+        dishes:[
+          { name:"Power Bowl with Chicken", cal:480, protein:44, note:"Quinoa base, grilled chicken, roasted veg, avocado, lemon tahini. One of the best complete macro meals on DoorDash in Atlanta." },
+          { name:"Protein Smoothie", cal:320, protein:28, note:"Add a protein smoothie as a side — good post-workout addition. Ask for no added sugar." },
+          { name:"Harvest Bowl", cal:420, protein:38, note:"Farro, roasted veg, chicken, pumpkin seeds. Ask for dressing on the side." }
+        ],
+        avoid:"The smoothies with fruit juice base can be 400+ cal of sugar. Always ask for water or almond milk base.",
+        hack:"Add extra grilled chicken to any bowl for ~$3 — pushes protein over 50g. Always get dressing on the side."
+      },
+      {
+        name:"Flower Child",
+        neighborhood:"Buckhead / Multiple ATL locations",
+        doordash:true,
+        rating:4,
+        bestFor:"Clean ingredient bowls — everything macro-labeled on the menu",
+        dishes:[
+          { name:"The Great Grains Bowl", cal:510, protein:38, note:"Farro, roasted chicken, kale, avocado, lemon vinaigrette. Ask for dressing on the side. Solid complete meal." },
+          { name:"Happy Endings Bowl", cal:440, protein:42, note:"Quinoa, grilled chicken, black beans, roasted sweet potato. One of the better protein ratios on the menu." },
+          { name:"Grilled Chicken Salad", cal:380, protein:40, note:"Clean base, ask for dressing on the side. Add avocado for healthy fat." }
+        ],
+        avoid:"The smoothies and juices can be 300-400 cal of sugar. The grain bowls with tahini dressing poured on top — always ask for it on the side.",
+        hack:"Flower Child labels macros clearly — use the menu to compare before ordering. Double protein is available on most bowls for ~$4."
+      }
+    ]
+  },
+  {
+    id:"atl_pizza",
+    cuisine:"🍕 Pizza & Italian",
+    restaurants:[
+      {
+        name:"Fritti",
+        neighborhood:"Inman Park",
+        doordash:true,
+        rating:4,
+        bestFor:"Best pizza order for macros in the neighborhood — specific hacks required",
+        dishes:[
+          { name:"Fritti Salad + Side of Prosciutto", cal:380, protein:32, note:"Get the salad as a base, order prosciutto or grilled chicken on the side as your protein. Much better macros than a full pizza." },
+          { name:"Margherita Pizza (half portion)", cal:480, protein:22, note:"If you're getting pizza, Margherita is the lowest cal option. Eat half, save half. Light cheese is not a standard option but you can ask." },
+          { name:"Arugula Prosciutto Pizza (half)", cal:510, protein:28, note:"Higher protein than Margherita from the prosciutto. Arugula adds volume. Share or eat half." }
+        ],
+        avoid:"Any pizza with extra cheese adds 200+ cal. The fried items (it's in the name — Fritti). Full pizza as a solo order.",
+        hack:"Italian pizza is inherently lower cal than American pizza — thinner crust, less cheese. Still eat half and supplement with a salad for the best macro outcome."
+      }
+    ]
+  }
+
+  ,{
+    id:"atl_indian",
+    cuisine:"🍛 Indian",
+    restaurants:[
+      {
+        name:"Chai Pani",
+        neighborhood:"Decatur (near Atlanta)",
+        doordash:true,
+        rating:5,
+        bestFor:"James Beard Award winning Indian street food — specific items are very macro-friendly",
+        dishes:[
+          { name:"Chicken Tikka", cal:380, protein:44, note:"Tandoor-cooked chicken — highest protein item, lowest fat. Skip the naan and get extra chicken instead. Ask for raita (yogurt sauce) on the side — 30 cal, great dipping sauce." },
+          { name:"Daal (Lentil Soup)", cal:220, protein:14, note:"One of the best side options — high fiber, plant protein, low cal. Add as a side to chicken tikka for a complete high-protein meal." },
+          { name:"Kati Roll — Chicken", cal:420, protein:36, note:"Grilled spiced chicken wrapped in a light flatbread. Better ratio than a burrito. Ask for extra chicken and light on the chutney." }
+        ],
+        avoid:"Samosas (fried dough — 200+ cal each with minimal protein). Biryani is delicious but very calorie-dense from the rice and ghee. Mango lassi is 300+ cal of sugar.",
+        hack:"Tandoor-cooked items (anything 'tikka' or 'tandoori') are always the best macro choice at Indian restaurants — clay oven cooking uses no added fat. Raita (yogurt dip) is your high-protein zero-guilt sauce. Always choose over creamy curry sauces."
+      },
+      {
+        name:"Botiwalla",
+        neighborhood:"Krog Street Market / Inman Park area",
+        doordash:true,
+        rating:5,
+        bestFor:"Fast casual Indian right near you — purpose-built for quick macro-friendly meals",
+        dishes:[
+          { name:"Chicken Tikka Rice Bowl", cal:480, protein:42, note:"Build your bowl: basmati rice base, double chicken tikka, kachumber salad (cucumber tomato), green chutney, raita. Skip the fried items." },
+          { name:"Seekh Kebab Plate", cal:440, protein:46, note:"Ground spiced chicken kebabs — highest protein on the menu. Get with kachumber salad instead of fries. Green chutney on the side (15 cal)." },
+          { name:"Kati Roll — Double Chicken", cal:460, protein:40, note:"Ask for double chicken in the roll. Light on the chutney. This is the most portable high-protein option for lunch." }
+        ],
+        avoid:"The Frankie (similar to Kati Roll but heavier wrap). Fried pakoras. Anything described as 'crispy' — it means deep fried.",
+        hack:"Green chutney is essentially zero calories and adds incredible brightness — use it freely. Red chutney is slightly higher cal but still well under 50 cal. Always choose grilled/tandoor items over curries for best macros on Indian DoorDash."
+      },
+      {
+        name:"Yalla",
+        neighborhood:"Krog Street Market",
+        doordash:true,
+        rating:4,
+        bestFor:"Middle Eastern meets Indian — excellent macro options, close to home",
+        dishes:[
+          { name:"Chicken Shawarma Bowl", cal:490, protein:44, note:"Rice bowl with shawarma chicken, hummus, tomato cucumber salad, pickled turnips. Ask for light rice, extra chicken, tahini on the side." },
+          { name:"Falafel + Chicken Combo Plate", cal:520, protein:38, note:"Get both proteins — falafel for plant protein variety, chicken for animal protein. Skip the pita, double the salad." },
+          { name:"Chicken Shawarma Wrap", cal:430, protein:36, note:"Better ratio than the plate since the wrap controls portions. Ask for extra pickled turnips and light on the garlic sauce." }
+        ],
+        avoid:"Garlic sauce (150+ cal per portion — use sparingly). The fries. Extra hummus as a dip adds 200 cal quickly.",
+        hack:"Pickled turnips and pickled vegetables are zero cal flavor bombs at Middle Eastern spots — always ask for extra. Tahini on the side lets you control portions. The hot sauce is zero cal — use liberally."
+      },
+      {
+        name:"Cafe Agora",
+        neighborhood:"Buckhead / Midtown",
+        doordash:true,
+        rating:5,
+        bestFor:"Best DoorDash Greek/Turkish in Atlanta — the Mixed Grill is the macro king",
+        dishes:[
+          { name:"Agora Mixed Grill", cal:680, protein:72, note:"Adana kebab, kofta, lamb shish, chicken shish, lamb gyro over rice with Greek salad. 72g protein is exceptional. Ask for light rice, double salad." },
+          { name:"Chicken Gyro Wrap", cal:420, protein:38, note:"The DoorDash go-to from Cafe Agora — grilled chicken, tzatziki, tomato, onion, lettuce. Ask for extra chicken and light on the tzatziki." },
+          { name:"Chicken Shish Kebab Plate", cal:480, protein:52, note:"Grilled chicken skewers with Greek salad and pita. Best protein per cal on the menu outside the Mixed Grill. Skip the pita to save 150 cal." }
+        ],
+        avoid:"Baklava and desserts (pure sugar). The rice pilaf is calorie-dense — always swap for extra Greek salad. Creamy dressings on the salad.",
+        hack:"The Mixed Grill is the best value high-protein DoorDash order in Atlanta — multiple proteins, one order, ~72g protein. Worth every penny when you want a real meal. Tzatziki is your low-cal sauce (50 cal per serving vs 140 for ranch)."
+      }
+    ]
+  },
+  {
+    id:"atl_asian2",
+    cuisine:"🍜 Asian (More Options)",
+    restaurants:[
+      {
+        name:"Noodle",
+        neighborhood:"Multiple Atlanta locations",
+        doordash:true,
+        rating:4,
+        bestFor:"Vietnamese pho is one of the best high-protein low-cal delivery meals in any cuisine",
+        dishes:[
+          { name:"Pho Bo — Large (Rare Beef)", cal:420, protein:48, note:"The broth is essentially bone broth — collagen-rich, low cal, incredibly filling. Rare beef cooks in the hot broth. Ask for extra beef. Skip the hoisin (80 cal) and use Sriracha instead (5 cal)." },
+          { name:"Grilled Lemongrass Chicken Bowl", cal:440, protein:42, note:"Rice bowl with grilled chicken, pickled vegetables, and fish sauce vinaigrette. Light and high protein. Ask for extra chicken, light rice." },
+          { name:"Spring Rolls (not fried)", cal:160, protein:12, note:"Fresh (not fried) spring rolls are one of the lowest-cal appetizers in any restaurant — rice paper, shrimp, vermicelli, herbs. Peanut sauce on the side (60 cal)." }
+        ],
+        avoid:"Fried spring rolls vs fresh — 3x the calories. The peanut sauce is 60 cal per cup — use sparingly. Sweetened Thai iced tea is 300+ cal.",
+        hack:"Pho is one of the most underrated high-protein low-cal delivery meals. The beef bone broth is protein-rich and very filling. Always ask for extra protein in pho — it's usually a small upcharge."
+      },
+      {
+        name:"Jinya Ramen",
+        neighborhood:"Multiple Atlanta locations",
+        doordash:true,
+        rating:4,
+        bestFor:"Best ramen macros when ordered with specific modifications",
+        dishes:[
+          { name:"Chicken Paitan Ramen — Light Broth", cal:520, protein:44, note:"Ask for light noodles (half portion) and extra chicken. The chicken paitan broth is lower fat than tonkotsu. Add a soft boiled egg for extra protein (+7g, 70 cal)." },
+          { name:"Spicy Chicken Ramen", cal:540, protein:42, note:"Spicy broth is actually lower cal than cream-based. Extra chicken, light noodles, extra bamboo shoots and bean sprouts (zero cal)." },
+          { name:"Side of Chashu Chicken", cal:120, protein:18, note:"Add a side of chicken chashu to any bowl — best protein add-on on the menu. 18g protein for 120 cal is exceptional." }
+        ],
+        avoid:"Tonkotsu broth adds 200+ cal from pork fat vs chicken broth. Extra noodles add 200 cal. The fried chicken topping. Anything described as 'creamy'.",
+        hack:"Light noodles + extra protein + extra vegetables is the ramen macro hack. Bamboo shoots, bean sprouts, and corn are all zero-low cal volume adds. The broth itself is very low cal — it's the noodles and toppings where calories add up."
+      }
+    ]
+  }
+  ,{
+    id:"atl_tacos",
+    cuisine:"\ud83c\udf2e Tacos & Mexican (Atlanta Spots)",
+    restaurants:[
+      {
+        name:"El Tesoro",
+        neighborhood:"Edgewood (near Inman Park)",
+        doordash:true,
+        rating:5,
+        bestFor:"Best authentic tacos near you — simple prep, lean proteins, handmade corn tortillas",
+        dishes:[
+          { name:"Chicken (Pollo) Tacos (3)", cal:360, protein:36, note:"Simple grilled chicken on handmade corn tortillas with onions and cilantro. One of the leanest authentic taco options in Atlanta. Salsa verde on the side." },
+          { name:"Carne Asada Tacos (3)", cal:400, protein:40, note:"Grilled skirt steak on corn tortillas. Classic prep — onions, cilantro, lime. Ask for extra salsa verde and pickled jalapeños." },
+          { name:"Breakfast Tacos", cal:320, protein:28, note:"El Tesoro is known for breakfast — eggs and chorizo on corn tortillas. Lower cal, highly rated." }
+        ],
+        avoid:"Chips and queso before the meal — easy 400 cal before your tacos arrive. Sour cream adds up fast. Any fried preparation.",
+        hack:"Authentic Mexican tacos are naturally lean — corn tortilla, grilled protein, onions, cilantro, salsa. No cheese, no sour cream by default. Salsa verde and pickled jalapeños at the condiment bar are zero cal. Lime squeeze on each taco is your acid finish."
+      },
+      {
+        name:"Pure Taqueria",
+        neighborhood:"Inman Park",
+        doordash:true,
+        rating:4,
+        bestFor:"Closest quality taco spot to Candler Park — solid grilled protein options",
+        dishes:[
+          { name:"Grilled Chicken Tacos (3) — Corn", cal:410, protein:38, note:"Always ask for corn tortillas not flour — saves 80 cal per taco. Grilled chicken, pico, guacamole." },
+          { name:"Grilled Mahi Fish Tacos (3)", cal:390, protein:34, note:"Grilled not fried mahi on corn tortillas with slaw. Ask for chipotle crema on the side." },
+          { name:"Ensalada — Grilled Chicken", cal:380, protein:40, note:"Better macros than tacos if skipping tortillas. Grilled chicken, mixed greens, black beans, corn, salsa vinaigrette." }
+        ],
+        avoid:"Flour tortillas (200 cal each vs 60 for corn). Queso and chips appetizer. Sour cream.",
+        hack:"Always ask for corn instead of flour — saves 400+ cal on a 3-taco order. Guacamole over sour cream. Salsa verde is free and zero cal."
+      },
+      {
+        name:"Bone Garden Cantina",
+        neighborhood:"West Midtown Atlanta",
+        doordash:true,
+        rating:4,
+        bestFor:"Best birria tacos in Atlanta on DoorDash — the consomme is the secret weapon",
+        dishes:[
+          { name:"Birria Beef Tacos (3)", cal:480, protein:44, note:"Corn tortillas, braised beef birria, onion, cilantro, consomme broth for dipping. Dip briefly — adds protein and collagen. Best birria on DoorDash in Atlanta." },
+          { name:"Chicken Tinga Tacos (3)", cal:390, protein:38, note:"Lower cal than birria with similar protein. Good lighter option." },
+          { name:"Grilled Protein Taco (any)", cal:350, protein:36, note:"Any grilled protein (pollo, carne asada) on corn tortillas. Cleanest macro taco on the menu." }
+        ],
+        avoid:"Fried birria quesatacos — crispy fried version adds 150+ cal per taco. Cheese-heavy preparations. Chips and queso.",
+        hack:"Birria consomme is essentially free protein (collagen-rich bone broth) — dip briefly. Onion and cilantro = zero cal flavor. Lime squeeze on each taco is essential."
+      },
+      {
+        name:"Talkin Tacos",
+        neighborhood:"Multiple Atlanta locations",
+        doordash:true,
+        rating:4,
+        bestFor:"Highly rated local Atlanta taco chain — good macro options when ordered right",
+        dishes:[
+          { name:"Grilled Chicken Street Tacos (3)", cal:380, protein:36, note:"Corn tortillas, grilled chicken, pico, cilantro. Simple and clean. Ask for salsa verde instead of any creamy sauce." },
+          { name:"Shrimp Tacos (3)", cal:340, protein:28, note:"Grilled shrimp on corn tortillas. Lowest cal taco option. Stack with jalapeños and lime." },
+          { name:"Birria Tacos (3)", cal:460, protein:42, note:"Braised beef birria served with consomme. Good protein. Dip briefly not soak." }
+        ],
+        avoid:"Any taco with queso or cheese sauce built in. Fried taco shells. Sour cream as a topping adds up fast across multiple tacos.",
+        hack:"Order extra tacos instead of adding sides — the taco itself is the most macro-efficient item. Hot sauce and pickled jalapeños are zero cal. Always corn over flour."
+      },
+      {
+        name:"General Taco Knowledge",
+        neighborhood:"Applies to any taco restaurant",
+        doordash:true,
+        rating:5,
+        bestFor:"Universal taco ordering hacks that work at any restaurant",
+        dishes:[
+          { name:"Corn Tortillas Always", cal:60, protein:2, note:"Corn tortillas = 60 cal each. Flour tortillas = 180-220 cal each. On a 3-taco order that difference is 360-480 cal. Always corn." },
+          { name:"Best Protein Rankings", cal:0, protein:0, note:"Best protein-per-cal: Chicken (grilled) > Shrimp > Fish (grilled) > Carne Asada > Al Pastor > Carnitas > Barbacoa > Birria. Grilled always beats braised for macros." },
+          { name:"Free Zero-Cal Additions", cal:0, protein:0, note:"Stack these freely at any taco spot: Salsa verde (0 cal), Pico de gallo (10 cal), Pickled jalapeños (0 cal), Pickled onions (5 cal), Cilantro (0 cal), Lime juice (5 cal), Hot sauce (0-5 cal). These are your flavor bombs." }
+        ],
+        avoid:"Crema and sour cream (40-80 cal per taco). Queso as a topping (80+ cal per taco). Flour tortillas. Fried shells. Chips before the meal (300+ cal before you start).",
+        hack:"The perfect taco order: grilled chicken or shrimp on corn tortillas, topped with pico, salsa verde, pickled jalapeños, cilantro, and a squeeze of lime. Zero added sauce, zero cheese. 120-140 cal per taco, 12-15g protein. That is a genuinely great taco."
+      }
+    ]
+  }
+  ,{
+    id:"atl_american2",
+    cuisine:"🥩 Protein-Forward & Steakhouse",
+    restaurants:[
+      {
+        name:"Stoney River",
+        neighborhood:"Multiple Atlanta locations",
+        doordash:true,
+        rating:4,
+        bestFor:"Best steakhouse macros for DoorDash — specific cuts and sides make it work",
+        dishes:[
+          { name:"7oz Filet Mignon", cal:380, protein:52, note:"Leanest steak cut at any steakhouse — very low fat relative to protein. No butter on top (saves 100 cal). Ask for it with steamed asparagus instead of mashed potatoes." },
+          { name:"Grilled Salmon", cal:420, protein:46, note:"Salmon with steamed vegetables — best non-steak macro option. Ask for lemon butter on the side and use sparingly." },
+          { name:"Simple Grilled Chicken", cal:340, protein:48, note:"Highest protein per calorie option on the menu. Plain grilled, ask for extra vegetables instead of starch." }
+        ],
+        avoid:"The steak with compound butter adds 200 cal. Loaded mashed potatoes are 480 cal. The bread basket before the meal. Any cream-based sauce.",
+        hack:"Always swap starch for steamed vegetables at any steakhouse — saves 200-400 cal with zero taste loss. Ask for all sauces on the side. The filet is always the leanest cut."
+      },
+      {
+        name:"Chopt Creative Salad",
+        neighborhood:"Buckhead / Multiple Atlanta",
+        doordash:true,
+        rating:5,
+        bestFor:"Best purpose-built macro salad on DoorDash — protein is built into the concept",
+        dishes:[
+          { name:"Spicy Chicken Caesar — Modified", cal:480, protein:44, note:"Ask for double chicken, light dressing, no croutons. Caesar dressing on the side. This is the highest-protein base salad on the menu." },
+          { name:"Mexican Caesar — Double Protein", cal:510, protein:46, note:"Double chicken or chicken + beans. Corn, black beans, cilantro, tortilla strips (ask for light). Best complete meal at Chopt." },
+          { name:"Build Your Own — Double Protein", cal:440, protein:48, note:"Kale and romaine base, double grilled chicken, every vegetable, light vinaigrette. Skip cheese and croutons. Best macro build on the menu." }
+        ],
+        avoid:"Creamy dressings (150-200 cal per serving). Croutons (120 cal). The wrap instead of the bowl adds 300+ cal from the tortilla.",
+        hack:"Always build your own at Chopt — pre-made salads are harder to modify. Double protein, every vegetable, dressing on the side. Kale base over romaine keeps you fuller longer from the fiber."
+      }
+    ]
+  }
+];
+
+function renderAtlantaStatic() {
+  const expanded = window.atlantaExpanded || {};
+
+  const cuisineHtml = ATLANTA_RESTAURANTS.map(cuisine => {
+    const restaurantHtml = cuisine.restaurants.map(r => {
+      const isExpanded = expanded[r.id || r.name];
+      const dishHtml = isExpanded ? r.dishes.map(d => `
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 12px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.05)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <div style="font-size:14px;font-weight:600;color:var(--text)">${esc(d.name)}</div>
+            <div style="font-size:12px;text-align:right;flex-shrink:0;margin-left:8px">
+              <span style="color:var(--green);font-weight:700">${d.protein}g</span>
+              <span style="color:var(--dim)"> · ${d.cal} cal</span>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--muted)">${esc(d.note)}</div>
+        </div>`).join("") : "";
+
+      const hackAvoidHtml = isExpanded ? `
+        <div style="background:rgba(16,185,129,0.06);border-radius:10px;padding:10px 12px;margin-bottom:6px;border:1px solid rgba(16,185,129,0.15)">
+          <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:4px">💡 THE HACK</div>
+          <div style="font-size:13px;color:var(--text)">${esc(r.hack)}</div>
+        </div>
+        <div style="background:rgba(239,68,68,0.06);border-radius:10px;padding:10px 12px;border:1px solid rgba(239,68,68,0.15)">
+          <div style="font-size:11px;font-weight:700;color:#ef4444;margin-bottom:4px">⚠️ AVOID</div>
+          <div style="font-size:13px;color:var(--muted)">${esc(r.avoid)}</div>
+        </div>` : "";
+
+      return `
+        <div style="background:var(--surface);border-radius:14px;margin-bottom:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
+          <div onclick="if(!window.atlantaExpanded)window.atlantaExpanded={};window.atlantaExpanded['${esc(r.name)}']=!window.atlantaExpanded['${esc(r.name)}'];renderEatOut()"
+            style="display:flex;align-items:center;justify-content:space-between;padding:14px;cursor:pointer">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px">
+                <div style="font-size:15px;font-weight:700;color:var(--text)">${esc(r.name)}</div>
+                ${r.doordash ? '<span style="font-size:10px;padding:2px 6px;border-radius:6px;background:rgba(255,62,0,0.12);color:#ff3e00;font-weight:700">DoorDash</span>' : ""}
+              </div>
+              <div style="font-size:12px;color:var(--dim)">${esc(r.neighborhood)}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">${esc(r.bestFor)}</div>
+            </div>
+            <span style="color:var(--dim);font-size:14px;margin-left:8px">${isExpanded ? "▲" : "▼"}</span>
+          </div>
+          ${isExpanded ? `<div style="padding:0 12px 12px">${dishHtml}${hackAvoidHtml}</div>` : ""}
+        </div>`;
+    }).join("");
+
+    return `
+      <div style="margin-bottom:20px">
+        <div style="font-size:15px;font-weight:700;color:var(--green);margin-bottom:10px">${cuisine.cuisine}</div>
+        ${restaurantHtml}
+      </div>`;
+  }).join("");
+
+  return `
+    <div style="font-size:13px;color:var(--dim);margin-bottom:14px;padding:10px 14px;background:rgba(255,255,255,0.03);border-radius:12px">
+      📍 Curated for Candler Park / Inman Park area · All available on DoorDash · Tap any restaurant for specific dish recommendations
+    </div>
+    ${cuisineHtml}`;
+}
 function renderPantry() {
   const el = document.getElementById("page-pantry");
   const allItems = PANTRY_SECTIONS.flatMap(s => s.items);
