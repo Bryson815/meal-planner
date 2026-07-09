@@ -8011,20 +8011,24 @@ function closeCookMode() {
   if (overlay) overlay.style.display = "none";
   if (cookState && cookState.timer && cookState.timer.interval) {
     clearInterval(cookState.timer.interval);
+    cookState.timer.running = false;
   }
+  cookState = null;
 }
 
 function startCooking(section,id) {
   const list=section==="breakfast"?state.breakfasts:section==="lunch"?state.lunches:section==="dessert"?state.desserts:state.dinners;
-  const recipe=list.find(r=>r.id===id); if(!recipe)return;
+  const recipe=list&&list.find(r=>r&&r.id===id);
+  if(!recipe) return;
   cookState={recipe,step:0,mode:"steps",checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};
-  // Switch to cook tab
-  currentTab="cook";
-  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  document.getElementById("page-cook").classList.add("active");
-  // cook mode is not a nav tab
-  renderCookScreen();
+  // Show cook overlay
+  const overlay=document.getElementById("cook-overlay");
+  if(overlay){
+    overlay.style.display="flex";
+    const titleEl=document.getElementById("cook-overlay-title");
+    if(titleEl) titleEl.textContent=recipe.emoji+" "+recipe.name;
+    renderCookScreen();
+  }
 }
 
 function renderCookScreen() {
@@ -8131,8 +8135,11 @@ function renderCookScreen() {
   </div>
 </div>`;
   }
-  const cookEl = document.getElementById("cook-overlay-content") || document.getElementById("page-cook");
-  if(cookEl) cookEl.innerHTML=`<div style="min-height:100%;display:flex;flex-direction:column;">${body}</div>`;
+  const cookEl = document.getElementById("cook-overlay-content");
+  if(cookEl) {
+    cookEl.innerHTML=`<div style="min-height:calc(100vh - 56px);display:flex;flex-direction:column;">${body}</div>`;
+    cookEl.scrollTop=0;
+  }
 }
 
 function formatTimer(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return h>0?h+":"+String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0"):String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0");}
