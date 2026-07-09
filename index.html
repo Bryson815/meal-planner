@@ -2581,28 +2581,34 @@ const DEFAULT_DINNERS = [
     source:"NYT Cooking — most-saved bean recipe online",
     description:"Deeply satisfying one-pot stew — creamy white beans, turkey sausage, kale, and rosemary. Feels like something that simmered all day but takes 20 minutes. The kind of dinner everyone asks for again.",
     ingredients:[
-      "1 lb Amylu Italian chicken sausage (Costco) — sub: Simple Truth Mild Italian Chicken Sausage or Al Fresco Sweet Italian (Kroger), Wellshire turkey sausage (Publix)",
-      "2 cans (15oz each) white beans (cannellini), drained and rinsed",
-      "1 can (14oz) diced tomatoes",
-      "4 cups Kettle & Fire chicken bone broth — sub: any low-sodium chicken broth (Kroger/Publix)",
+      "--- 🥩 SAUSAGE (sear first, then set aside) ---",
+      "1 lb Amylu Italian chicken sausage (Costco) — sub: Simple Truth Mild Italian Chicken Sausage or Al Fresco Sweet Italian (Kroger)",
+      "2 tbsp avocado oil",
+      "--- 🧅 AROMATICS → same pot after sausage (Bowl 1) ---",
       "1 large onion, diced",
       "4 cloves garlic, minced",
-      "3 cups baby kale or spinach",
-      "2 tbsp avocado oil",
       "1 tsp fresh rosemary, finely chopped (or ½ tsp dried)",
-      "1 tsp Burlap & Barrel Herbes de Provence",
+      "1 tsp Burlap & Barrel Herbes de Provence OR Italian seasoning (Kroger)",
       "1 tsp Dan-O's Original",
-      "Salt and black pepper",
-      "Parmesan rind (optional but incredible — drop in while simmering, remove before serving)",
+      "--- 🫘 STEW BASE → add all at once after aromatics (Bowl 2) ---",
+      "2 cans (15oz each) cannellini beans, drained and rinsed — sub: Kroger brand cannellini",
+      "1 can (14oz) diced tomatoes — fire roasted preferred",
+      "4 cups Kettle & Fire chicken bone broth — sub: any low-sodium chicken broth (Kroger/Publix)",
+      "Parmesan rind (optional — drop in now, remove before serving)",
+      "--- 🌿 ADD LAST (wilt in at the end) ---",
+      "3 cups baby kale or spinach",
+      "Salt and black pepper to taste",
+      "--- SERVING ---",
       "Crusty bread for dipping",
       "🫙 Lemon Herb Drizzle from Sauces tab drizzled over the top"
     ],
     instructions:[
       "── MISE EN PLACE ──",
       "Slice sausage into rounds.",
-      "Dice onion. Mince garlic.",
-      "Drain and rinse white beans.",
-      "Have broth, tomatoes and greens ready.",
+      "Dice onion and mince garlic — keep in one small bowl together (Bowl 1 — aromatics).",
+      "Drain and rinse white beans. Open tomatoes and broth — keep these together (Bowl 2 — stew base).",
+      "Measure out rosemary, Herbes de Provence and Dan-O's into Bowl 1 with the onion and garlic.",
+      "Have greens nearby — they go in last.",
       "── COOK ──",
       "Heat oil in a large Dutch oven over MEDIUM-HIGH heat.",
       "Add sausage rounds in a single layer — brown undisturbed 3-4 min per side. Remove and set aside.",
@@ -8061,7 +8067,7 @@ function renderCookScreen() {
     }
     const tipHtml=(step===total-1&&recipe.tips)?`<div class="cook-tip-box"><div class="cook-tip-label">💡 Pro tip</div><div class="cook-tip-text">${esc(recipe.tips)}</div></div>`:"";
     const hvHtml=(step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"";
-    body=`<div class="cook-step-view"><div class="cook-step-content">${hvHtml}${sectionHeader?`<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(16,185,129,0.15)">${esc(sectionHeader)}</div>`:""}<div class="cook-step-num-badge">Step ${step+1} of ${total}</div><div class="cook-step-text">${esc(stepText)}</div>${timerHtml}${tipHtml}</div><div class="cook-nav"><button class="cook-nav-btn cook-nav-prev" onclick="cookPrev()" ${step===0?"disabled style='opacity:0.3'":" "}>← Prev</button><button class="cook-nav-btn cook-nav-next ${step===total-1?"done":""}" onclick="cookNext()">${step===total-1?"Done 🎉":"Next →"}</button></div></div>`;
+    body=`<div class="cook-step-view"><div class="cook-step-content">${hvHtml}${sectionHeader?`<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(16,185,129,0.15)">${esc(sectionHeader)}</div>`:""}<div class="cook-step-num-badge" style="font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--dim);margin-bottom:16px">Step ${step+1} of ${total}</div><div class="cook-step-text" style="font-size:20px;font-weight:600;line-height:1.55;color:var(--text);letter-spacing:-0.2px">${esc(stepText)}</div>${timerHtml}${tipHtml}</div><div class="cook-nav"><button class="cook-nav-btn cook-nav-prev" onclick="cookPrev()" ${step===0?"disabled style='opacity:0.3'":" "}>← Prev</button><button class="cook-nav-btn cook-nav-next ${step===total-1?"done":""}" onclick="cookNext()">${step===total-1?"Done 🎉":"Next →"}</button></div></div>`;
   }
   document.getElementById("page-cook").innerHTML=`<div class="cook-screen">${header}${body}</div>`;
 }
