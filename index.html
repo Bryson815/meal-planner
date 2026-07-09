@@ -112,7 +112,7 @@ nav{
 }
 /* ── PAGES ───────────────────────────────────────────── */
 .page{display:none;padding:16px;max-width:100%;margin:0;padding-bottom:80px;}
-.page.active{display:block;}
+.page.active{display:block;animation:fadeIn 0.2s ease;}
 
 /* ── CARDS ───────────────────────────────────────────── */
 .card{
@@ -571,7 +571,7 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
 
 /* ── ANIMATIONS ──────────────────────────────────────── */
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
-.page.active{animation:fadeIn 0.2s ease;}
+/* fadeIn merged into .page.active above */
 @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
 .modal-box{animation:slideUp 0.25s ease;}
 
@@ -4741,7 +4741,7 @@ function renderPlan() {
             <div style="flex:1;min-width:0" onclick="viewRecipeById('${recipe.id}')" style="cursor:pointer;flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;min-width:0">
                 <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.1px">${esc(recipe.name)}</div>
-                ${recipe.protein ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--green);flex-shrink:0">${recipe.protein}g</span>` : ""}
+                ${recipe.protein ? '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--green);flex-shrink:0">'+recipe.protein+'g</span>' : ""}
               </div>
               <div style="font-size:11px;color:var(--dim);margin-top:1px">${recipe.activeTime||""}</div>
             </div>
@@ -8098,7 +8098,7 @@ function renderCookScreen() {
 <div style="display:flex;flex-direction:column;min-height:calc(100vh - 56px);padding:0;">
   <!-- Section label + step counter -->
   <div style="padding:20px 28px 0;">
-    ${sectionHeader ? `<div style="font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--green);margin-bottom:10px">${esc(sectionHeader)}</div>` : ""}
+    ${sectionHeader ? "<div style=\"font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--green);margin-bottom:10px\">" + esc(sectionHeader) + "</div>" : ""}
     <div style="font-size:12px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;color:var(--dim)">Step ${step+1} of ${total}</div>
     <!-- Progress bar -->
     <div style="margin-top:10px;height:3px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden">
