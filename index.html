@@ -8094,7 +8094,18 @@ function renderCookScreen() {
       let secs=unit.startsWith("h")?num*3600:unit.startsWith("m")?num*60:num;
       if(!cookState.timer.running&&cookState.timer.seconds===0){cookState.timer.seconds=secs;cookState.timer._original=secs;}
       const t=cookState.timer,disp=formatTimer(t.seconds),cls=t.running?"running":(t.seconds===0&&t._original>0?"done":"");
-      timerHtml=`<div class="cook-timer"><div class="cook-timer-display ${cls}" id="cook-timer-display">${disp}</div><button class="cook-timer-btn" onclick="toggleTimer()">${t.running?"⏸":"▶"}</button><button class="cook-timer-btn" onclick="resetTimer(${secs})">⟳</button></div>`;
+      timerHtml=`
+        <div style="margin-top:24px;display:flex;align-items:center;gap:14px;padding:20px 24px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:16px;">
+          <div id="cook-timer-display" style="font-size:52px;font-weight:800;letter-spacing:-2px;color:${cls==='done'?'#f59e0b':cls==='running'?'#10b981':'var(--text)'};font-variant-numeric:tabular-nums;min-width:130px;">${disp}</div>
+          <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
+            <button onclick="toggleTimer()" style="padding:12px 20px;font-size:18px;font-weight:700;border-radius:12px;border:none;background:${t.running?'rgba(239,68,68,0.15)':'linear-gradient(135deg,#10b981,#059669)'};color:${t.running?'#f87171':'#07090f'};cursor:pointer;letter-spacing:-0.2px;">
+              ${t.running?"⏸ Pause":"▶ Start"}
+            </button>
+            <button onclick="resetTimer(${secs})" style="padding:10px 20px;font-size:15px;font-weight:600;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);cursor:pointer;">
+              ⟳ Reset
+            </button>
+          </div>
+        </div>`;
     }
     const tipHtml=(step===total-1&&recipe.tips)?`<div class="cook-tip-box"><div class="cook-tip-label">💡 Pro tip</div><div class="cook-tip-text">${esc(recipe.tips)}</div></div>`:"";
     const hvHtml=(step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"";
