@@ -4,7 +4,580 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>🥗 Lemmon Family Meal Planner</title>
-<style>:root{--bg:#0a0f1a;--surface:rgba(255,255,255,0.04);--border:rgba(255,255,255,0.08);--green:#10b981;--green-dim:rgba(16,185,129,0.12);--purple:#8b5cf6;--amber:#f59e0b;--pink:#ec4899;--indigo:#6366f1;--red:#ef4444;--text:#f1f5f9;--muted:#94a3b8;--dim:#64748b;--radius:14px;}*{box-sizing:border-box;margin:0;padding:0;}body{background:var(--bg);color:var(--text);font-family:-apple-system,"Segoe UI",sans-serif;min-height:100vh;font-size:16px;}nav{background:rgba(16,185,129,0.06);border-bottom:1px solid rgba(16,185,129,0.15);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}.nav-title{font-size:17px;font-weight:700;}.nav-sub{font-size:11px;color:var(--dim);margin-top:2px;}.nav-tabs{display:flex;gap:5px;flex-wrap:wrap;}.tab-btn{padding:5px 10px;border-radius:16px;border:none;background:rgba(255,255,255,0.06);color:var(--muted);font-weight:600;font-size:13px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;transition:all 0.15s;}.tab-btn.active{background:var(--green);color:#0a0f1a;}.page{display:none;padding:16px 16px;max-width:100%;margin:0;padding-bottom:60px;}.page.active{display:block;}.card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;transition:border-color 0.2s;}.card:hover{border-color:rgba(16,185,129,0.3);}.card-row{display:flex;align-items:center;gap:12px;}.card-emoji{font-size:24px;flex-shrink:0;}.card-body{flex:1;min-width:0;}.card-name{font-size:18px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.card-desc{color:var(--muted);font-size:15px;margin:2px 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.card-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0;}.card-actions button{padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;white-space:nowrap;}.card-actions .btn-edit{border-color:var(--indigo);color:var(--indigo);}.card-actions .btn-del{border-color:var(--red);color:var(--red);}.dinner-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden;}.dinner-card .drag-handle{padding:0 10px;color:var(--dim);cursor:grab;font-size:18px;flex-shrink:0;user-select:none;}.dinner-card .drag-handle:active{cursor:grabbing;}.dinner-card.sortable-ghost{opacity:0.4;}.dinner-card.sortable-chosen{border-color:var(--green);}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}.tag{font-size:12px;font-weight:700;padding:2px 8px;border-radius:20px;}.tag-green{background:rgba(16,185,129,0.12);color:var(--green);}.tag-indigo{background:rgba(99,102,241,0.12);color:var(--indigo);}.tag-amber{background:rgba(245,158,11,0.12);color:var(--amber);}.tag-muted{background:rgba(148,163,184,0.12);color:var(--muted);}.tag-pink{background:rgba(236,72,153,0.12);color:var(--pink);}.tag-purple{background:rgba(139,92,246,0.12);color:var(--purple);}.section-header{display:flex;justify-content:space-between;align-items:flex-end;margin:24px 0 12px;}.section-title{font-size:20px;font-weight:700;}.section-sub{color:var(--dim);font-size:14px;margin-top:2px;}.section-btns{display:flex;gap:6px;}.btn-add{padding:9px 14px;border-radius:10px;border:1.5px solid var(--green);background:transparent;color:var(--green);font-weight:600;font-size:14px;cursor:pointer;}.btn-import{padding:9px 14px;border-radius:10px;border:1.5px solid rgba(225,48,108,0.6);background:transparent;color:#f472b6;font-weight:600;font-size:14px;cursor:pointer;}.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:0;}.modal-box{background:#0f172a;border:1px solid rgba(255,255,255,0.12);border-radius:20px 20px 0 0;padding:24px;width:100%;max-width:100%;max-height:92vh;overflow-y:auto;}.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}.modal-title{font-size:21px;font-weight:700;}.modal-close{background:rgba(255,255,255,0.06);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;}.form-label{color:var(--muted);font-size:13px;display:block;margin-bottom:4px;margin-top:12px;}.form-input{width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:var(--text);font-size:15px;font-family:inherit;}.form-input:focus{outline:none;border-color:var(--green);}textarea.form-input{min-height:90px;resize:vertical;line-height:1.5;}.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}.form-grid-4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}.btn-primary{width:100%;margin-top:20px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-weight:700;font-size:14px;cursor:pointer;}.btn-secondary{flex:1;padding:11px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);font-weight:600;font-size:13px;cursor:pointer;}.recipe-tabs{display:flex;gap:6px;margin-bottom:16px;}.recipe-tab{flex:1;padding:8px;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:var(--muted);font-weight:600;font-size:13px;cursor:pointer;}.recipe-tab.active{background:var(--green);color:#0a0f1a;}.recipe-step{display:flex;gap:12px;margin-bottom:12px;}.step-num{min-width:22px;height:22px;border-radius:50%;background:var(--green);color:#0a0f1a;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}.ingredient-item{color:#cbd5e1;font-size:17px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;gap:8px;align-items:flex-start;}.ingredient-bullet{color:var(--green);font-size:9px;margin-top:4px;flex-shrink:0;}.ingredient-section{color:var(--green);font-size:11px;font-weight:700;padding:8px 0 2px;}.info-box{border-radius:10px;padding:12px 16px;margin-bottom:10px;font-size:15px;color:var(--muted);line-height:1.5;}.info-box.green{background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.2);}.info-box.amber{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);}.info-box.purple{background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);}.info-box.tip{background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);}.info-label{font-weight:700;margin-right:4px;}.macro-row{display:flex;gap:6px;margin-bottom:14px;}.macro-box{flex:1;background:rgba(16,185,129,0.08);border-radius:8px;padding:7px 4px;text-align:center;}.macro-label{color:var(--green);font-size:10px;}.macro-val{color:var(--text);font-size:12px;font-weight:700;}.stats-row{display:flex;gap:8px;margin-bottom:14px;}.stat-box{flex:1;background:var(--surface);border-radius:12px;padding:10px 8px;text-align:center;}.stat-icon{font-size:15px;}.stat-val{color:var(--text);font-size:17px;font-weight:700;}.stat-label{color:var(--dim);font-size:11px;}.grocery-cat{background:var(--surface);border-radius:12px;padding:16px;margin-bottom:10px;}.grocery-cat h3{font-size:17px;color:var(--green);margin-bottom:10px;}.grocery-item{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);align-items:flex-start;font-size:17px;color:#cbd5e1;cursor:pointer;}.grocery-item.checked{text-decoration:line-through;color:var(--dim);}.grocery-check{width:16px;height:16px;border-radius:4px;border:1.5px solid var(--green);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;}.grocery-check.checked{background:var(--green);}.phase-badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:8px;}.research-item{display:flex;gap:12px;margin-bottom:10px;}.research-dot{min-width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:5px;flex-shrink:0;}.swap-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;}.swap-arrow{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:16px;}.swap-from{color:var(--dim);text-decoration:line-through;}.swap-to{color:var(--green);font-weight:600;}.sync-status{font-size:11px;}.sync-status.saving{color:var(--amber);}.sync-status.saved{color:var(--green);}.sync-status.offline{color:var(--dim);}.setup-banner{background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.25);border-radius:12px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--muted);line-height:1.6;}.setup-banner a{color:var(--indigo);}#page-cook{background:#000;min-height:100vh;}.cook-home{padding:20px;}.cook-home-title{font-size:28px;font-weight:800;color:#fff;margin-bottom:6px;}.cook-home-sub{color:#6b7280;font-size:16px;margin-bottom:28px;}.cook-recipe-btn{display:flex;align-items:center;gap:16px;background:#111827;border:2px solid #1f2937;border-radius:20px;padding:20px 24px;margin-bottom:14px;cursor:pointer;transition:border-color 0.2s,background 0.2s;text-align:left;width:100%;}.cook-recipe-btn:hover,.cook-recipe-btn:focus{border-color:#10b981;background:#0d1f17;outline:none;}.cook-recipe-emoji{font-size:42px;flex-shrink:0;}.cook-recipe-name{font-size:20px;font-weight:700;color:#f9fafb;line-height:1.2;}.cook-recipe-meta{font-size:14px;color:#6b7280;margin-top:4px;}.cook-recipe-tags{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}.cook-tag{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;}.cook-tag-green{background:rgba(16,185,129,0.15);color:#10b981;}.cook-tag-purple{background:rgba(139,92,246,0.15);color:#a78bfa;}.cook-tag-amber{background:rgba(245,158,11,0.15);color:#fbbf24;}.cook-screen{display:flex;flex-direction:column;height:100vh;background:#000;}.cook-header{background:#0d1117;border-bottom:2px solid #1f2937;padding:16px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0;}.cook-back-btn{background:#1f2937;border:none;color:#9ca3af;width:44px;height:44px;border-radius:12px;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}.cook-recipe-title{font-size:20px;font-weight:700;color:#f9fafb;flex:1;}.cook-progress-wrap{flex:1;}.cook-progress-bar{height:6px;background:#1f2937;border-radius:3px;overflow:hidden;margin-top:6px;}.cook-progress-fill{height:100%;background:linear-gradient(90deg,#10b981,#059669);border-radius:3px;transition:width 0.4s;}.cook-step-count{font-size:12px;color:#6b7280;}.cook-mode-tabs{display:flex;background:#0d1117;border-bottom:2px solid #1f2937;flex-shrink:0;}.cook-mode-tab{flex:1;padding:12px;border:none;background:transparent;color:#6b7280;font-size:13px;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;transition:all 0.15s;}.cook-mode-tab.active{color:#10b981;border-bottom-color:#10b981;}.cook-step-view{flex:1;overflow:hidden;display:flex;flex-direction:column;}.cook-step-content{flex:1;display:flex;flex-direction:column;justify-content:center;padding:28px 24px;overflow-y:auto;}.cook-step-num-badge{background:#10b981;color:#000;font-size:13px;font-weight:800;padding:4px 14px;border-radius:20px;display:inline-block;margin-bottom:20px;letter-spacing:1px;text-transform:uppercase;}.cook-step-text{font-size:28px;font-weight:600;color:#f9fafb;line-height:1.45;}.cook-tip-box{background:rgba(251,191,36,0.1);border:2px solid rgba(251,191,36,0.3);border-radius:16px;padding:16px 20px;margin-top:24px;}.cook-tip-label{color:#fbbf24;font-size:14px;font-weight:700;margin-bottom:6px;}.cook-tip-text{color:#d1d5db;font-size:16px;line-height:1.5;}.cook-nav{display:flex;gap:12px;padding:16px 20px;background:#0d1117;border-top:2px solid #1f2937;flex-shrink:0;}.cook-nav-btn{flex:1;padding:18px 12px;border-radius:16px;border:none;font-size:18px;font-weight:700;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:8px;}.cook-nav-prev{background:#1f2937;color:#9ca3af;}.cook-nav-prev:active{background:#374151;}.cook-nav-next{background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:20px;}.cook-nav-next:active{opacity:0.85;}.cook-nav-next.done{background:linear-gradient(135deg,#6366f1,#4f46e5);}.cook-timer{display:flex;align-items:center;gap:10px;background:#1f2937;border-radius:12px;padding:12px 16px;margin-top:20px;}.cook-timer-display{font-size:32px;font-weight:800;color:#f9fafb;font-variant-numeric:tabular-nums;min-width:90px;}.cook-timer-display.running{color:#10b981;}.cook-timer-display.done{color:#fbbf24;}.cook-timer-btn{background:#374151;border:none;color:#f9fafb;font-size:24px;width:48px;height:48px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;}.cook-timer-btn:active{background:#4b5563;}.cook-ingr-view{flex:1;overflow-y:auto;padding:20px;}.cook-ingr-section{color:#10b981;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:16px 0 8px;}.cook-ingr-item{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid #1f2937;cursor:pointer;}.cook-ingr-item.checked .cook-ingr-text{text-decoration:line-through;color:#4b5563;}.cook-ingr-check{width:26px;height:26px;border-radius:8px;border:2px solid #374151;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all 0.15s;margin-top:1px;}.cook-ingr-item.checked .cook-ingr-check{background:#10b981;border-color:#10b981;color:#000;}.cook-ingr-text{font-size:18px;color:#e5e7eb;line-height:1.4;}.cook-done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;}.cook-done-emoji{font-size:80px;margin-bottom:20px;}.cook-done-title{font-size:32px;font-weight:800;color:#f9fafb;margin-bottom:12px;}.cook-done-sub{font-size:18px;color:#6b7280;line-height:1.5;margin-bottom:32px;}.cook-done-btn{background:#1f2937;border:none;color:#9ca3af;padding:16px 32px;border-radius:16px;font-size:16px;font-weight:600;cursor:pointer;}.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px;}.cal-day{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:8px 6px;min-height:90px;cursor:pointer;transition:border-color 0.2s;}.cal-day:hover{border-color:rgba(16,185,129,0.4);}.cal-day-name{font-size:10px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}.cal-day-content{display:flex;flex-direction:column;gap:3px;}.cal-chip{font-size:9px;padding:2px 5px;border-radius:6px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.cal-chip-dinner{background:rgba(16,185,129,0.15);color:#10b981;}.cal-chip-breakfast{background:rgba(245,158,11,0.12);color:#f59e0b;}.cal-chip-lunch{background:rgba(99,102,241,0.12);color:#818cf8;}.cal-chip-dessert{background:rgba(236,72,153,0.12);color:#f472b6;}.cal-chip-empty{background:rgba(255,255,255,0.04);color:var(--dim);}.plan-view-tabs{display:flex;gap:6px;margin-bottom:14px;}.plan-view-tab{flex:1;padding:9px;border-radius:10px;border:none;background:rgba(255,255,255,0.06);color:var(--muted);font-weight:600;font-size:13px;cursor:pointer;transition:all 0.15s;}.plan-view-tab.active{background:var(--green);color:#0a0f1a;}.nutri-bar-wrap{margin-bottom:16px;background:var(--surface);border-radius:14px;padding:14px 16px;}.nutri-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}.nutri-bar-label{font-size:13px;color:var(--muted);width:60px;flex-shrink:0;}.nutri-bar-track{flex:1;height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;}.nutri-bar-fill{height:100%;border-radius:4px;transition:width 0.5s;}.nutri-bar-val{font-size:13px;font-weight:700;color:var(--text);width:46px;text-align:right;flex-shrink:0;}.scale-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}.scale-btn{width:36px;height:36px;border-radius:10px;border:1.5px solid var(--border);background:transparent;color:var(--text);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}.scale-btn:hover{border-color:var(--green);color:var(--green);}.scale-display{font-size:15px;font-weight:700;color:var(--text);min-width:80px;text-align:center;}.grocery-source{font-size:10px;color:var(--dim);margin-left:4px;}.pantry-section{margin-bottom:18px;}.pantry-section-title{font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}.pantry-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}.pantry-item{display:flex;align-items:center;gap:8px;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;transition:all 0.15s;}.pantry-item.have{border-color:rgba(16,185,129,0.4);background:rgba(16,185,129,0.06);}.pantry-item.low{border-color:rgba(245,158,11,0.4);background:rgba(245,158,11,0.06);}.pantry-item:active{opacity:0.7;}.pantry-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:2px solid var(--border);}.pantry-item.have .pantry-dot{background:var(--green);border-color:var(--green);}.pantry-item.low .pantry-dot{background:var(--amber);border-color:var(--amber);}.pantry-item-name{font-size:15px;font-weight:600;color:var(--text);flex:1;line-height:1.3;}.pantry-item-sub{font-size:10px;color:var(--dim);margin-top:1px;}.pantry-status-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;flex-shrink:0;}.pantry-item.have .pantry-status-badge{background:rgba(16,185,129,0.15);color:var(--green);}.pantry-item.low .pantry-status-badge{background:rgba(245,158,11,0.15);color:var(--amber);}.pantry-item:not(.have):not(.low) .pantry-status-badge{background:rgba(239,68,68,0.12);color:#ef4444;}.star-row{display:flex;gap:6px;margin:8px 0;}.star-btn{font-size:28px;background:none;border:none;cursor:pointer;padding:2px;transition:transform 0.1s;line-height:1;}.star-btn:active{transform:scale(1.3);}.star-btn.lit{filter:none;}.star-btn.dim{filter:grayscale(1) opacity(0.35);}.rating-chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0;}.rating-chip{padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;transition:all 0.15s;}.rating-chip.selected{border-color:var(--green);background:rgba(16,185,129,0.12);color:var(--green);}.rating-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:700;}.rating-summary{background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.15);border-radius:10px;padding:10px 14px;margin-bottom:10px;}@media (max-width:480px){nav{flex-wrap:wrap;gap:8px;}.form-grid-4{grid-template-columns:1fr 1fr;}}</style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+:root{
+  --bg:#07090f;
+  --bg2:#0d1117;
+  --surface:rgba(255,255,255,0.04);
+  --surface2:rgba(255,255,255,0.07);
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --green:#10b981;
+  --green-dim:rgba(16,185,129,0.1);
+  --green-glow:rgba(16,185,129,0.2);
+  --purple:#8b5cf6;
+  --amber:#f59e0b;
+  --pink:#ec4899;
+  --indigo:#6366f1;
+  --red:#ef4444;
+  --text:#eef2f7;
+  --text2:#c9d4e0;
+  --muted:#8899aa;
+  --dim:#4e6070;
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow:0 4px 24px rgba(0,0,0,0.4);
+  --shadow-sm:0 2px 8px rgba(0,0,0,0.3);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',-apple-system,"Segoe UI",sans-serif;
+  min-height:100vh;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ── NAV ─────────────────────────────────────────────── */
+nav{
+  background:rgba(7,9,15,0.85);
+  border-bottom:1px solid var(--border);
+  padding:10px 16px 6px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+}
+.nav-title{
+  font-size:16px;
+  font-weight:800;
+  letter-spacing:-0.3px;
+  color:var(--text);
+}
+.nav-sub{
+  font-size:10px;
+  color:var(--dim);
+  margin-top:1px;
+  letter-spacing:0.3px;
+  text-transform:uppercase;
+}
+.nav-tabs{
+  display:flex;
+  gap:3px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+}
+.tab-btn{
+  padding:5px 9px;
+  border-radius:10px;
+  border:none;
+  background:transparent;
+  color:var(--dim);
+  font-weight:500;
+  font-size:11px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  cursor:pointer;
+  transition:all 0.15s ease;
+  position:relative;
+}
+.tab-btn:hover{
+  color:var(--muted);
+  background:rgba(255,255,255,0.04);
+}
+.tab-btn.active{
+  background:var(--green-dim);
+  color:var(--green);
+  font-weight:700;
+}
+.tab-btn.active::after{
+  content:'';
+  position:absolute;
+  bottom:-6px;
+  left:50%;
+  transform:translateX(-50%);
+  width:18px;
+  height:2px;
+  background:var(--green);
+  border-radius:2px;
+}
+/* ── PAGES ───────────────────────────────────────────── */
+.page{display:none;padding:16px;max-width:100%;margin:0;padding-bottom:80px;}
+.page.active{display:block;}
+
+/* ── CARDS ───────────────────────────────────────────── */
+.card{
+  background:linear-gradient(145deg,rgba(255,255,255,0.055),rgba(255,255,255,0.025));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:14px;
+  margin-bottom:8px;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+.card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+}
+.card:hover{
+  border-color:var(--border2);
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+}
+.card-row{display:flex;align-items:center;gap:12px;}
+.card-emoji{font-size:26px;flex-shrink:0;}
+.card-body{flex:1;min-width:0;}
+.card-name{
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:-0.2px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  color:var(--text);
+}
+.card-desc{
+  color:var(--muted);
+  font-size:13px;
+  margin:3px 0 8px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  line-height:1.4;
+}
+.card-actions{display:flex;flex-direction:column;gap:4px;flex-shrink:0;}
+.card-actions button{
+  padding:6px 12px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--muted);
+  font-size:13px;
+  font-weight:500;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:all 0.15s;
+}
+.card-actions button:hover{background:var(--surface2);}
+.card-actions .btn-edit{border-color:rgba(99,102,241,0.4);color:var(--indigo);}
+.card-actions .btn-del{border-color:rgba(239,68,68,0.4);color:var(--red);}
+/* ── DINNER CARDS ────────────────────────────────────── */
+.dinner-card{
+  background:linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  margin-bottom:8px;
+  overflow:hidden;
+  transition:border-color 0.2s,box-shadow 0.2s;
+  position:relative;
+}
+.dinner-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);
+  pointer-events:none;
+}
+.dinner-card:hover{border-color:var(--border2);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+.dinner-card .drag-handle{padding:0 10px;color:var(--dim);cursor:grab;font-size:18px;flex-shrink:0;user-select:none;}
+.dinner-card .drag-handle:active{cursor:grabbing;}
+.dinner-card.sortable-ghost{opacity:0.35;}
+.dinner-card.sortable-chosen{border-color:var(--green);box-shadow:0 0 0 1px var(--green-glow);}
+
+/* ── TAGS ────────────────────────────────────────────── */
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;}
+.tag{
+  font-size:11px;
+  font-weight:600;
+  padding:2px 8px;
+  border-radius:20px;
+  letter-spacing:0.1px;
+}
+.tag-green{background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);}
+.tag-indigo{background:rgba(99,102,241,0.1);color:#818cf8;border:1px solid rgba(99,102,241,0.2);}
+.tag-amber{background:rgba(245,158,11,0.1);color:#fbbf24;border:1px solid rgba(245,158,11,0.2);}
+.tag-muted{background:rgba(148,163,184,0.08);color:var(--muted);border:1px solid rgba(148,163,184,0.15);}
+.tag-pink{background:rgba(236,72,153,0.1);color:#f472b6;border:1px solid rgba(236,72,153,0.2);}
+.tag-purple{background:rgba(139,92,246,0.1);color:#a78bfa;border:1px solid rgba(139,92,246,0.2);}
+
+/* ── MODAL ───────────────────────────────────────────── */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  z-index:200;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+.modal-box{
+  background:#0d1117;
+  border:1px solid var(--border2);
+  border-radius:24px 24px 0 0;
+  padding:20px 18px;
+  max-height:88vh;
+  overflow-y:auto;
+  width:100%;
+  max-width:600px;
+  box-shadow:0 -8px 40px rgba(0,0,0,0.6);
+  position:relative;
+}
+.modal-box::before{
+  content:'';
+  display:block;
+  width:36px;height:4px;
+  background:rgba(255,255,255,0.15);
+  border-radius:2px;
+  margin:0 auto 16px;
+}
+.modal-title{
+  font-size:20px;
+  font-weight:800;
+  letter-spacing:-0.4px;
+  margin-bottom:4px;
+  color:var(--text);
+}
+.modal-close{
+  position:absolute;
+  top:16px;right:16px;
+  background:rgba(255,255,255,0.08);
+  border:none;
+  color:var(--muted);
+  width:28px;height:28px;
+  border-radius:50%;
+  font-size:14px;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s;
+}
+.modal-close:hover{background:rgba(255,255,255,0.15);}
+
+/* ── SECTION HEADERS ─────────────────────────────────── */
+.section-header{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.8px;
+  text-transform:uppercase;
+  color:var(--dim);
+  margin:20px 0 10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.section-header::after{
+  content:'';
+  flex:1;
+  height:1px;
+  background:var(--border);
+}
+
+/* ── INPUTS ──────────────────────────────────────────── */
+input,textarea,select{
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  color:var(--text);
+  font-family:inherit;
+  font-size:15px;
+  padding:10px 14px;
+  width:100%;
+  transition:border-color 0.15s,box-shadow 0.15s;
+  outline:none;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--green);
+  box-shadow:0 0 0 3px var(--green-dim);
+}
+input::placeholder,textarea::placeholder{color:var(--dim);}
+
+/* ── BUTTONS ─────────────────────────────────────────── */
+.btn-primary{
+  background:linear-gradient(135deg,#10b981,#059669);
+  color:#07090f;
+  border:none;
+  border-radius:var(--radius-sm);
+  padding:11px 18px;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:opacity 0.15s,transform 0.1s;
+}
+.btn-primary:active{transform:scale(0.98);}
+.btn-ghost{
+  background:transparent;
+  border:1px solid var(--border2);
+  color:var(--muted);
+  border-radius:var(--radius-sm);
+  padding:10px 16px;
+  font-size:14px;
+  font-weight:500;
+  cursor:pointer;
+  transition:background 0.15s,border-color 0.15s;
+}
+.btn-ghost:hover{background:var(--surface2);border-color:var(--border2);}
+
+/* ── WEEK GRID ───────────────────────────────────────── */
+.week-day-header{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.6px;
+  text-transform:uppercase;
+  color:var(--green);
+  padding:12px 0 6px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:8px;
+}
+.meal-slot{
+  background:linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.015));
+  border:1px solid var(--border);
+  border-radius:12px;
+  margin-bottom:6px;
+  overflow:hidden;
+  transition:border-color 0.15s;
+}
+.meal-slot:hover{border-color:var(--border2);}
+.meal-slot-header{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  color:var(--dim);
+  padding:6px 12px 0;
+}
+.meal-slot-content{padding:4px 12px 10px;}
+.meal-recipe-name{
+  font-size:14px;
+  font-weight:600;
+  color:var(--text);
+  margin-bottom:4px;
+}
+.meal-recipe-meta{
+  font-size:12px;
+  color:var(--dim);
+}
+.meal-actions{display:flex;gap:6px;margin-top:6px;}
+.meal-btn{
+  padding:4px 10px;
+  border-radius:6px;
+  border:1px solid var(--border);
+  background:transparent;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:500;
+  cursor:pointer;
+  transition:background 0.15s;
+}
+.meal-btn:hover{background:var(--surface2);}
+.meal-btn-cook{border-color:rgba(16,185,129,0.3);color:var(--green);}
+
+/* ── PANTRY ──────────────────────────────────────────── */
+.pantry-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 14px;
+  background:linear-gradient(145deg,rgba(255,255,255,0.04),rgba(255,255,255,0.02));
+  border:1px solid var(--border);
+  border-radius:10px;
+  margin-bottom:5px;
+  transition:border-color 0.15s;
+}
+.pantry-item:hover{border-color:var(--border2);}
+.pantry-status{
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:700;
+}
+.status-have{background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.2);}
+.status-low{background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.2);}
+.status-out{background:rgba(239,68,68,0.1);color:#f87171;border:1px solid rgba(239,68,68,0.2);}
+
+/* ── GROCERY ─────────────────────────────────────────── */
+.grocery-section-header{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.6px;
+  text-transform:uppercase;
+  color:var(--green);
+  padding:14px 0 6px;
+  display:flex;align-items:center;gap:8px;
+}
+.grocery-section-header::after{
+  content:'';flex:1;height:1px;background:rgba(16,185,129,0.15);
+}
+.grocery-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:9px 14px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:10px;
+  margin-bottom:4px;
+  font-size:14px;
+  transition:background 0.15s;
+}
+.grocery-item:hover{background:rgba(255,255,255,0.05);}
+.grocery-check{
+  width:18px;height:18px;
+  border-radius:5px;
+  border:1.5px solid var(--border2);
+  flex-shrink:0;
+  cursor:pointer;
+  transition:all 0.15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.grocery-check.checked{
+  background:var(--green);
+  border-color:var(--green);
+  color:#07090f;
+  font-size:11px;
+}
+
+/* ── COOK MODE ───────────────────────────────────────── */
+.cook-step{
+  background:linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:14px 16px;
+  margin-bottom:8px;
+  transition:all 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+.cook-step.active-step{
+  border-color:var(--green);
+  box-shadow:0 0 0 1px var(--green-glow);
+}
+.cook-step.active-step::before{
+  content:'';
+  position:absolute;
+  left:0;top:0;bottom:0;
+  width:3px;
+  background:var(--green);
+  border-radius:3px 0 0 3px;
+}
+.cook-step.done-step{
+  opacity:0.5;
+}
+
+/* ── RECIPE MODAL SECTIONS ───────────────────────────── */
+.recipe-section-label{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.8px;
+  text-transform:uppercase;
+  color:var(--green);
+  margin:14px 0 8px;
+}
+.ingredient-section{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  color:var(--dim);
+  padding:10px 0 4px;
+}
+.ingredient-item{
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  padding:5px 0;
+  font-size:14px;
+  color:var(--text2);
+  border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.ingredient-bullet{
+  color:var(--green);
+  font-size:8px;
+  margin-top:5px;
+  flex-shrink:0;
+}
+.recipe-step-item{
+  display:flex;
+  gap:10px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(255,255,255,0.04);
+  font-size:14px;
+  color:var(--text2);
+  line-height:1.5;
+}
+.step-number{
+  width:22px;height:22px;
+  border-radius:50%;
+  background:var(--green-dim);
+  color:var(--green);
+  font-size:11px;
+  font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  margin-top:1px;
+}
+.tip-box{
+  background:rgba(245,158,11,0.06);
+  border:1px solid rgba(245,158,11,0.15);
+  border-radius:10px;
+  padding:10px 12px;
+  margin-top:10px;
+  font-size:13px;
+  color:var(--text2);
+  line-height:1.5;
+}
+.tip-label{
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  color:var(--amber);
+  margin-bottom:4px;
+}
+
+/* ── INFO PILLS ──────────────────────────────────────── */
+.info-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  color:var(--muted);
+}
+.info-pill.protein{background:rgba(16,185,129,0.08);border-color:rgba(16,185,129,0.2);color:var(--green);}
+.info-pill.calories{background:rgba(245,158,11,0.08);border-color:rgba(245,158,11,0.2);color:var(--amber);}
+
+/* ── SCROLL ──────────────────────────────────────────── */
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.2);}
+
+/* ── ANIMATIONS ──────────────────────────────────────── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.page.active{animation:fadeIn 0.2s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.modal-box{animation:slideUp 0.25s ease;}
+
+/* ── MISC ────────────────────────────────────────────── */
+.surface{background:var(--surface);}
+</style>
 </head>
 <body>
 
@@ -95,7 +668,7 @@ const DEFAULT_BREAKFASTS = [
       "1 cup baby spinach, very finely chopped",
       "1 small zucchini, grated and squeezed very dry in a paper towel",
       "½ cup reduced-fat shredded cheddar",
-      "¼ cup Fairlife 2% milk",
+      "¼ cup Fairlife 2% milk — sub: any 2% or whole milk (Kroger)",
       "Kinder's The Blend, Dan-O's Original, Tony Chachere's Creole, OR Tiger x Life Garlicky Steak (one shake replaces salt + pepper + garlic)",
       "🫙 Serve with: Lemon Herb Drizzle or Spicy Yum Yum Sauce from Sauces tab"
     ],
@@ -242,7 +815,7 @@ const DEFAULT_BREAKFASTS = [
       "8 large flour tortillas (Mission Extra Thin for lower cal)",
       "10 large eggs",
       "½ cup liquid egg whites",
-      "½ cup Fairlife 2% milk",
+      "½ cup Fairlife 2% milk — sub: any 2% or whole milk (Kroger)",
       "1 cup baby spinach, very finely chopped",
       "1 small zucchini, grated and squeezed completely dry",
       "1 lb Amylu chicken sausage or Wellshire turkey sausage, cooked and crumbled",
@@ -295,14 +868,14 @@ const DEFAULT_BREAKFASTS = [
     leftoverNote:"🔄 Make extra and freeze between parchment sheets. Pop in toaster from frozen — ready in 2 min.",
     ingredients:[
       "--- MAKES 8-10 PANCAKES (serves 4) ---",
-      "1 cup Good Culture 4% cottage cheese",
+      "1 cup Good Culture 4% cottage cheese — sub: any full-fat cottage cheese (Kroger Simple Truth, Daisy, or Hood)",
       "3 large eggs",
       "1 cup rolled oats",
       "1 tsp vanilla extract",
       "1 tbsp honey or maple syrup",
       "½ tsp baking powder",
       "Pinch of cinnamon",
-      "Land O'Lakes light butter for the pan",
+      "Land O'Lakes light butter — sub: any unsalted butter (Kroger)",
       "--- TOPPINGS ---",
       "Fresh berries or sliced banana",
       "Maple syrup or honey drizzle",
@@ -404,7 +977,7 @@ const DEFAULT_BREAKFASTS = [
       "--- SERVES 4 ---",
       "8 large eggs",
       "½ cup liquid egg whites",
-      "¼ cup Fairlife 2% milk",
+      "¼ cup Fairlife 2% milk — sub: any 2% or whole milk (Kroger)",
       "½ lb Amylu chicken sausage or Wellshire turkey sausage, sliced or crumbled",
       "2 large handfuls baby spinach",
       "½ cup reduced-fat shredded cheddar",
@@ -526,7 +1099,7 @@ const DEFAULT_LUNCHES = [
       "3 cups romaine lettuce, chopped",
       "½ cup cherry tomatoes, halved",
       "¼ cup reduced-fat Parmesan, grated",
-      "Primal Kitchen Caesar dressing (3-4 tbsp per portion)",
+      "Primal Kitchen Caesar dressing — sub: any Caesar dressing at Kroger (Ken's, Brianna's, or store brand)",
       "Salt and black pepper",
       "Optional: anchovies, capers, or croutons for adults",
       "🫙 Nothing Hidden Ranch from Sauces tab as a lighter dressing alternative"
@@ -898,10 +1471,10 @@ const DEFAULT_DINNERS = [
       "½ cup mushrooms, very finely diced (adds moisture and umami, invisible in sauce)",
       "Optional: ½ cup bagged coleslaw mix stirred in at the end — adds crunch and volume for ~12 calories",
       "¼ cup hoisin sauce",
-      "2 tbsp reduced-sodium soy sauce or coconut aminos",
-      "1 tbsp rice wine vinegar",
+      "2 tbsp reduced-sodium soy sauce or coconut aminos — sub: regular low-sodium soy sauce (Kroger/Publix)",
+      "1 tbsp rice wine vinegar — sub: apple cider vinegar or white wine vinegar (Kroger)",
       "1 tsp fresh ginger, grated (or ginger paste)",
-      "1 tsp sesame oil",
+      "1 tsp sesame oil (Asian aisle at Kroger) — sub: a few drops of toasted sesame oil or skip entirely",
       "1 can (8oz) water chestnuts, drained and diced",
       "3 green onions, thinly sliced",
       "Sriracha on the side (skip for kids)",
@@ -1052,16 +1625,16 @@ const DEFAULT_DINNERS = [
       "--- THE CHICKEN ---",
       "2 lbs boneless skinless chicken thighs (thighs stay juicier than breasts in slow cooker)",
       "1 can (14oz) diced tomatoes with green chiles (Rotel) — don't drain",
-      "1 packet Siete Taco Seasoning OR 1.5 tsp Burlap & Barrel Yo Quiero Taco Blend",
+      "1 packet Siete Taco Seasoning (Publix/Kroger) — sub: Old El Paso or McCormick Taco Seasoning (any grocery store)",
       "1 small onion, roughly chopped",
       "3 cloves garlic, smashed (no need to mince)",
       "½ tsp Dan-O's Original",
       "Juice of 1 lime",
       "--- TACO BAR ---",
-      "Small flour or corn tortillas (Mission Extra Thin for lower cal)",
+      "Small flour or corn tortillas — Mission Extra Thin for lower cal, or any store brand (Kroger)",
       "Shredded reduced-fat Mexican blend cheese",
       "Shredded lettuce or cabbage",
-      "Newman's Own Mild salsa or TJ's Thick & Chunky",
+      "Newman's Own Mild salsa — sub: Kroger brand salsa or Pace (any grocery store)",
       "Fage 0% Greek yogurt (in place of sour cream — 17g protein vs 0)",
       "Sliced avocado or guacamole",
       "Cholula or Frank's RedHot on the side for adults",
@@ -1117,7 +1690,7 @@ const DEFAULT_DINNERS = [
       "1 cup cherry tomatoes, halved OR Newman's Own salsa",
       "½ cup corn (frozen is fine, thaw and pat dry)",
       "Shredded reduced-fat Mexican cheese",
-      "Fage 0% Greek yogurt (sour cream swap)",
+      "Fage 0% Greek yogurt (sour cream swap) — sub: any plain Greek yogurt (Chobani, Kroger Simple Truth)",
       "Sliced avocado",
       "Cholula or Frank's RedHot for adults",
       "🫙 Sauces: Spicy Yum Yum Sauce or Nothing Hidden Ranch from Sauces tab"
@@ -1281,7 +1854,7 @@ const DEFAULT_DINNERS = [
       "1 can (14oz) crushed tomatoes",
       "1 can (15oz) kidney beans, drained and rinsed",
       "1 can (15oz) black beans, drained and rinsed",
-      "1 cup Kettle & Fire Chicken Bone Broth (10g protein/cup — swap for regular low-sodium chicken broth if unavailable)",
+      "1 cup Kettle & Fire Chicken Bone Broth (10g protein/cup) — sub: any low-sodium chicken broth (Kroger/Publix)",
       "2 tsp Burlap & Barrel Low & Slow Chili Powder (the hero ingredient here)",
       "1 tsp Siete Taco Seasoning OR Dan-O's Spicy",
       "1 tsp cumin",
@@ -1289,7 +1862,7 @@ const DEFAULT_DINNERS = [
       "½ tsp Dan-O's Original",
       "Salt and pepper to taste",
       "--- TOPPINGS ---",
-      "Fage 0% Greek yogurt (sour cream swap)",
+      "Fage 0% Greek yogurt (sour cream swap) — sub: any plain Greek yogurt (Chobani, Kroger Simple Truth)",
       "Shredded reduced-fat cheddar",
       "Sliced green onions",
       "Cholula or Frank's RedHot for adults",
@@ -1730,7 +2303,7 @@ const DEFAULT_DINNERS = [
       "Juice of 1 lime",
       "--- SERVING ---",
       "Small flour or corn tortillas, warmed",
-      "Fage 0% Greek yogurt (sour cream swap)",
+      "Fage 0% Greek yogurt (sour cream swap) — sub: any plain Greek yogurt (Chobani, Kroger Simple Truth)",
       "Newman's Own salsa or TJ's Thick & Chunky",
       "Sliced avocado",
       "Shredded reduced-fat Mexican cheese",
@@ -1780,9 +2353,9 @@ const DEFAULT_DINNERS = [
       "--- THE GLAZE ---",
       "3 tbsp honey or maple syrup",
       "3 cloves garlic, minced (or Burlap & Barrel Black Garlic Powder — 1 tsp)",
-      "2 tbsp reduced-sodium soy sauce or coconut aminos",
-      "1 tbsp rice wine vinegar",
-      "1 tsp sesame oil",
+      "2 tbsp reduced-sodium soy sauce or coconut aminos — sub: regular low-sodium soy sauce (Kroger/Publix)",
+      "1 tbsp rice wine vinegar — sub: apple cider vinegar or white wine vinegar (Kroger)",
+      "1 tsp sesame oil (Asian aisle at Kroger) — sub: a few drops of toasted sesame oil or skip entirely",
       "1 tsp Burlap & Barrel Low & Slow Chili Powder (optional — adds depth without heat)",
       "--- FINISHING ---",
       "1 tbsp avocado oil (for searing)",
@@ -1957,7 +2530,7 @@ const DEFAULT_DINNERS = [
       "2 cloves garlic, minced",
       "1 tsp Italian seasoning OR Burlap & Barrel Herbes de Provence",
       "1 tsp Dan-O's Original",
-      "¼ cup Fairlife 2% milk",
+      "¼ cup Fairlife 2% milk — sub: any 2% or whole milk (Kroger)",
       "¼ cup breadcrumbs (panko preferred)",
       "Salt and black pepper",
       "--- THE PAN SAUCE ---",
@@ -1966,7 +2539,7 @@ const DEFAULT_DINNERS = [
       "1 jar Rao's marinara or Frik & Frak",
       "Fresh basil",
       "--- SERVING ---",
-      "12 oz Brami protein pasta or Barilla Protein+",
+      "12 oz Brami protein pasta — sub: Barilla Protein+ or Banza (Kroger/Publix), or regular pasta if needed",
       "Reduced-fat Parmesan to finish",
       "🫙 Cottage Cheese Alfredo from Sauces tab as a white sauce option"
     ],
@@ -2008,10 +2581,10 @@ const DEFAULT_DINNERS = [
     source:"NYT Cooking — most-saved bean recipe online",
     description:"Deeply satisfying one-pot stew — creamy white beans, turkey sausage, kale, and rosemary. Feels like something that simmered all day but takes 20 minutes. The kind of dinner everyone asks for again.",
     ingredients:[
-      "1 lb Amylu Italian chicken sausage (Costco) OR Wellshire turkey sausage, sliced into rounds",
+      "1 lb Amylu Italian chicken sausage (Costco) — sub: Simple Truth Mild Italian Chicken Sausage or Al Fresco Sweet Italian (Kroger), Wellshire turkey sausage (Publix)",
       "2 cans (15oz each) white beans (cannellini), drained and rinsed",
       "1 can (14oz) diced tomatoes",
-      "4 cups Kettle & Fire chicken bone broth",
+      "4 cups Kettle & Fire chicken bone broth — sub: any low-sodium chicken broth (Kroger/Publix)",
       "1 large onion, diced",
       "4 cloves garlic, minced",
       "3 cups baby kale or spinach",
@@ -2046,7 +2619,7 @@ const DEFAULT_DINNERS = [
       "Drizzle with Lemon Herb Drizzle from your squeeze bottle.",
       "Serve with crusty bread for dipping."
     ],
-    tips:"SAUSAGE TEMP: Pre-cooked chicken sausage (Amylu) just needs to be browned and heated through — 165°F internal. Raw sausage needs to reach 165°F. The 10 min simmer in the stew finishes cooking both. | BROWN THE SAUSAGE: Don't skip this — the Maillard crust on the sausage adds depth you can't get any other way. Brown well before the liquid goes in. | PARMESAN RIND: If you have one from a block of Parmesan, drop it in while simmering. It melts into the broth and adds an incredible savory richness. | KETTLE & FIRE BONE BROTH: This is the perfect recipe for bone broth — the extra protein and collagen enrich the stew significantly. | SMASH SOME BEANS: After adding beans, smash about ¼ of them with the back of a spoon against the pot. This thickens the stew naturally without any cream or flour. | ACID FINISH: The lemon at the end is what makes this taste bright and fresh instead of heavy.",
+    tips:"KROGER/PUBLIX SWAP: Simple Truth Mild Italian Chicken Sausage or Al Fresco Sweet Italian are perfect substitutes for Amylu Italian — same flavor profile, widely available. | SAUSAGE TEMP: Pre-cooked chicken sausage just needs to be browned and heated through — 165°F internal. Raw sausage needs to reach 165°F. The 10 min simmer in the stew finishes cooking both. | BROWN THE SAUSAGE: Don't skip this — the Maillard crust on the sausage adds depth you can't get any other way. Brown well before the liquid goes in. | PARMESAN RIND: If you have one from a block of Parmesan, drop it in while simmering. It melts into the broth and adds an incredible savory richness. | KETTLE & FIRE BONE BROTH: This is the perfect recipe for bone broth — the extra protein and collagen enrich the stew significantly. | SMASH SOME BEANS: After adding beans, smash about ¼ of them with the back of a spoon against the pot. This thickens the stew naturally without any cream or flour. | ACID FINISH: The lemon at the end is what makes this taste bright and fresh instead of heavy.",
     kidNote:"Mild and kid-friendly — the white beans are creamy and the sausage is familiar. Kids usually eat this happily, especially with bread for dipping. Spinach is the better green for kids — kale can be chewy.",
     active:true
   }
@@ -2192,7 +2765,7 @@ const DEFAULT_DINNERS = [
     ingredients:[
       "--- THE CHICKEN ---",
       "4 boneless skinless chicken breasts (6oz each), pounded to even ½ inch thickness",
-      "½ cup panko breadcrumbs",
+      "½ cup panko breadcrumbs — sub: regular breadcrumbs or crushed crackers (Kroger)",
       "¼ cup reduced-fat Parmesan, grated",
       "1 tsp Italian seasoning or Burlap & Barrel Herbes de Provence",
       "1 tsp Dan-O's Original",
@@ -2201,13 +2774,13 @@ const DEFAULT_DINNERS = [
       "2 large eggs, beaten",
       "2 tbsp avocado oil",
       "--- THE TOPPING ---",
-      "1 jar Rao's Marinara (or Frik & Frak)",
+      "1 jar Rao's Marinara — sub: Kroger Private Selection Marinara or Prego Sensitive (both at Kroger)",
       "1 small zucchini, grated (stir into marinara — invisible)",
       "1 cup reduced-fat shredded mozzarella",
       "¼ cup reduced-fat Parmesan, grated",
       "Fresh basil to finish",
       "--- SERVING ---",
-      "12 oz Brami protein pasta or Kaizen (cook per package)",
+      "12 oz Brami protein pasta or Kaizen — sub: Barilla Protein+ or Banza chickpea pasta (both at Kroger/Publix)",
       "🫙 Cottage Cheese Alfredo from Sauces tab as a white sauce variation"
     ],
     instructions:[
@@ -2254,10 +2827,10 @@ const DEFAULT_DINNERS = [
     description:"Traditional Alfredo is 800+ calories per serving. This version uses cottage cheese instead of heavy cream for a sauce that is rich, creamy and genuinely delicious at half the calories. The secret is the blender — smooth cottage cheese is indistinguishable from cream sauce.",
     ingredients:[
       "--- THE SAUCE ---",
-      "1 cup Good Culture 4% cottage cheese",
+      "1 cup Good Culture 4% cottage cheese — sub: any full-fat cottage cheese (Kroger Simple Truth, Daisy, or Hood)",
       "¼ cup reduced-fat Parmesan, grated (plus more to finish)",
       "2 cloves garlic, minced or grated",
-      "¼ cup Fairlife 2% milk",
+      "¼ cup Fairlife 2% milk — sub: any 2% or whole milk (Kroger)",
       "½ tsp Dan-O's Original",
       "¼ tsp black pepper",
       "Pinch of nutmeg (the secret ingredient — use sparingly)",
@@ -2268,7 +2841,7 @@ const DEFAULT_DINNERS = [
       "Dan-O's Original + Kinder's The Blend to season",
       "Salt and black pepper",
       "--- THE PASTA ---",
-      "12 oz Brami fettuccine or Kaizen pasta (or Barilla Protein+)",
+      "12 oz Brami fettuccine or Kaizen — sub: Barilla Protein+ fettuccine or Banza (Kroger/Publix)",
       "Generous kosher salt for pasta water",
       "1 cup reserved pasta water (critical — do not skip)",
       "--- FINISHING ---",
@@ -2683,7 +3256,7 @@ const DEFAULT_SWAPS = [
     id:"s31",
     category:"Buffalo Sauce",
     original:"Regular buffalo sauce",
-    upgrade:"Primal Kitchen Buffalo Sauce",
+    upgrade:"Primal Kitchen Buffalo Sauce — sub: Frank's RedHot Buffalo Wing Sauce (Kroger/Publix)",
     benefit:"Clean ingredients, avocado oil base, no artificial dyes",
     protein:"Negligible",
     where:"Whole Foods · Publix · Target",
@@ -2916,7 +3489,7 @@ const DEFAULT_SAUCES = [
     description:"Blended Good Culture cottage cheese makes a silky Alfredo-style sauce with 22g protein. Better than Olive Garden, RD-approved.",
     squeezeBottle:false,
     ingredients:[
-      "1 cup Good Culture 4% cottage cheese",
+      "1 cup Good Culture 4% cottage cheese — sub: any full-fat cottage cheese (Kroger Simple Truth, Daisy, or Hood)",
       "2 tbsp reduced-fat Parmesan, grated",
       "1 clove garlic, minced",
       "Salt & pepper",
@@ -3024,8 +3597,8 @@ const DEFAULT_SAUCES = [
     ingredients:[
       "3 tbsp natural peanut butter",
       "2 tbsp coconut aminos or reduced-sodium soy sauce",
-      "1 tbsp rice wine vinegar",
-      "1 tsp sesame oil",
+      "1 tbsp rice wine vinegar — sub: apple cider vinegar or white wine vinegar (Kroger)",
+      "1 tsp sesame oil (Asian aisle at Kroger) — sub: a few drops of toasted sesame oil or skip entirely",
       "1 tsp fresh ginger, grated (or ginger paste)",
       "1-2 tsp sriracha (optional, skip for kids)",
       "2-3 tbsp warm water to thin"
@@ -3196,7 +3769,7 @@ function applySwaps(ingredients) {
       { match: /\bvegetable oil\b|\bcanola oil\b/i, replace: () => "refined avocado oil" },
       { match: /\bsoy sauce\b/i, replace: () => "reduced-sodium soy sauce or coconut aminos" },
       { match: /\bground beef\b/i, replace: () => "Jennie-O 93/7 ground turkey" },
-      { match: /\bregular bacon\b/i, replace: () => "Wellshire Farms turkey bacon" },
+      { match: /\bregular bacon\b/i, replace: () => "Wellshire Farms turkey bacon — sub: Butterball or Jennie-O turkey bacon (Kroger/Publix)" },
       { match: /\bpork sausage\b/i, replace: () => "Amylu chicken breakfast sausage (Costco)" },
     ];
     for (const rule of SWAP_RULES) {
@@ -4156,12 +4729,16 @@ function renderPlan() {
 
       if (recipe) {
         return `
-          <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:${slot.bg};border-radius:10px;margin-bottom:4px;border:1px solid ${slot.border}">
-            <span style="font-size:11px;font-weight:700;color:${slot.color};width:60px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.5px">${slot.label}</span>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:${slot.bg};border-radius:10px;margin-bottom:4px;border:1px solid ${slot.border};position:relative;overflow:hidden;">
+            <div style="position:absolute;left:0;top:0;bottom:0;width:2.5px;background:${slot.color};opacity:0.6;border-radius:2px 0 0 2px;"></div>
+            <span style="font-size:10px;font-weight:700;color:${slot.color};width:58px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.7px;padding-left:6px;">${slot.label}</span>
             <span style="font-size:18px;flex-shrink:0">${recipe.emoji||"🍽️"}</span>
             <div style="flex:1;min-width:0" onclick="viewRecipeById('${recipe.id}')" style="cursor:pointer;flex:1;min-width:0">
-              <div style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(recipe.name)}</div>
-              <div style="font-size:11px;color:var(--dim)">${recipe.protein||""}g protein · ${recipe.activeTime||""}</div>
+              <div style="display:flex;align-items:center;gap:6px;min-width:0">
+                <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.1px">${esc(recipe.name)}</div>
+                ${recipe.protein ? `<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--green);flex-shrink:0">${recipe.protein}g</span>` : ""}
+              </div>
+              <div style="font-size:11px;color:var(--dim);margin-top:1px">${recipe.activeTime||""}</div>
             </div>
             <div style="display:flex;gap:4px;flex-shrink:0">
               <button onclick="openDaySlotPicker('${day}','${slot.key}')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
@@ -4179,9 +4756,10 @@ function renderPlan() {
     }).join("");
 
     return `
-      <div style="background:var(--surface);border-radius:14px;margin-bottom:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)">
-        <div style="padding:10px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.05)">
-          <div style="font-size:13px;font-weight:700;color:var(--text)">${day}</div>
+      <div style="background:linear-gradient(145deg,rgba(255,255,255,0.045),rgba(255,255,255,0.02));border-radius:16px;margin-bottom:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);position:relative;">
+        <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.05);position:relative;">
+          <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--green);margin-bottom:3px;opacity:0.8">${{Sunday:"BATCH DAY",Monday:"WEEKDAY",Tuesday:"WEEKDAY",Wednesday:"MID-WEEK",Thursday:"WEEKDAY",Friday:"FRIDAY",Saturday:"WEEKEND"}[day] || "WEEKDAY"}</div>
+          <div style="font-size:15px;font-weight:800;letter-spacing:-0.3px;color:var(--text)">${day}</div>
         </div>
         <div style="padding:8px 10px">
           ${slotsHtml}
@@ -7418,7 +7996,10 @@ function startCooking(section,id) {
 
 function renderCookScreen() {
   const {recipe,step,mode}=cookState;
-  const steps=recipe.instructions||[],ingrs=recipe.ingredients||[],total=steps.length;
+  // Filter out section dividers (── SECTION ──) from actual steps
+  const allSteps=recipe.instructions||[];
+  const steps=allSteps.filter(s=>!s.startsWith("──"));
+  const ingrs=recipe.ingredients||[],total=steps.length;
   const pct=total>0?Math.round((step/total)*100):0,isDone=step>=total;
 
   const header=`
@@ -7458,6 +8039,17 @@ function renderCookScreen() {
     body=`<div class="cook-ingr-view">${items}</div>`;
   } else {
     const stepText=steps[step]||"";
+    // Find which section this step belongs to
+    let sectionHeader="";
+    let realIdx=0;
+    for(let i=0;i<allSteps.length;i++){
+      if(allSteps[i].startsWith("──")){
+        sectionHeader=allSteps[i].replace(/──/g,"").trim();
+      } else {
+        if(realIdx===step) break;
+        realIdx++;
+      }
+    }
     const timerMatch=stepText.match(/(\d+)\s*(hour|hr|minute|min|second|sec)/i);
     let timerHtml="";
     if(timerMatch){
@@ -7469,7 +8061,7 @@ function renderCookScreen() {
     }
     const tipHtml=(step===total-1&&recipe.tips)?`<div class="cook-tip-box"><div class="cook-tip-label">💡 Pro tip</div><div class="cook-tip-text">${esc(recipe.tips)}</div></div>`:"";
     const hvHtml=(step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"";
-    body=`<div class="cook-step-view"><div class="cook-step-content">${hvHtml}<div class="cook-step-num-badge">Step ${step+1} of ${total}</div><div class="cook-step-text">${esc(stepText)}</div>${timerHtml}${tipHtml}</div><div class="cook-nav"><button class="cook-nav-btn cook-nav-prev" onclick="cookPrev()" ${step===0?"disabled style='opacity:0.3'":" "}>← Prev</button><button class="cook-nav-btn cook-nav-next ${step===total-1?"done":""}" onclick="cookNext()">${step===total-1?"Done 🎉":"Next →"}</button></div></div>`;
+    body=`<div class="cook-step-view"><div class="cook-step-content">${hvHtml}${sectionHeader?`<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--green);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(16,185,129,0.15)">${esc(sectionHeader)}</div>`:""}<div class="cook-step-num-badge">Step ${step+1} of ${total}</div><div class="cook-step-text">${esc(stepText)}</div>${timerHtml}${tipHtml}</div><div class="cook-nav"><button class="cook-nav-btn cook-nav-prev" onclick="cookPrev()" ${step===0?"disabled style='opacity:0.3'":" "}>← Prev</button><button class="cook-nav-btn cook-nav-next ${step===total-1?"done":""}" onclick="cookNext()">${step===total-1?"Done 🎉":"Next →"}</button></div></div>`;
   }
   document.getElementById("page-cook").innerHTML=`<div class="cook-screen">${header}${body}</div>`;
 }
