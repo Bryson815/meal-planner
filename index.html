@@ -9375,14 +9375,14 @@ function renderCookScreen() {
       let isBowlStep = false;
 
       if(s.startsWith('🟡')) {
-        const parts = s.replace(/^🟡\s*/,'').split(/\s*—\s*/);
-        badge = '<div style="display:inline-block;background:rgba(245,158,11,0.15);border:2px solid rgba(245,158,11,0.4);border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#fbbf24">🟡 ' + esc(parts[0].trim()) + '</div><br>';
-        text = parts.slice(1).join(' — ');
+        const parts = s.replace(/^🟡\s*/,'').split(/\s*[—::]\s*/);
+        badge = '<div style="display:inline-block;background:rgba(245,158,11,0.15);border:2px solid rgba(245,158,11,0.4);border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#fbbf24">🟡 ' + esc(parts[0].trim()) + '</div>';
+        text = parts.slice(1).join(' ');
         isBowlStep = true;
       } else if(s.startsWith('🔵')) {
-        const parts = s.replace(/^🔵\s*/,'').split(/\s*—\s*/);
-        badge = '<div style="display:inline-block;background:rgba(99,102,241,0.15);border:2px solid rgba(99,102,241,0.4);border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#818cf8">🔵 ' + esc(parts[0].trim()) + '</div><br>';
-        text = parts.slice(1).join(' — ');
+        const parts = s.replace(/^🔵\s*/,'').split(/\s*[—::]\s*/);
+        badge = '<div style="display:inline-block;background:rgba(99,102,241,0.15);border:2px solid rgba(99,102,241,0.4);border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#818cf8">🔵 ' + esc(parts[0].trim()) + '</div>';
+        text = parts.slice(1).join(' ');
         isBowlStep = true;
       } else if(s.startsWith('🟢') || s.startsWith('🔪') || s.startsWith('🌿') || s.startsWith('🫙')) {
         text = s;
@@ -9390,13 +9390,14 @@ function renderCookScreen() {
 
       // Split on + only when between measurements (not mid-sentence)
       // Pattern: + followed by a number, fraction, or measurement word
-      const ingredParts = text.split(/\s*\+\s*(?=\d|[½¼¾⅓⅔⅛])/);
+      // Split on + when followed by a digit, fraction, or measurement word
+      const ingredParts = text.split(/\s*\+\s*(?=\d|[½¼¾⅓⅔⅛]|(?:a\s+)?(?:splash|pinch|dash|handful))/i);
       let formattedText;
 
       if (ingredParts.length > 1) {
         // Has ingredient list — render each ingredient on its own line
-        const fontSize = isBowlStep ? 'clamp(22px,3vw,36px)' : 'clamp(24px,3.2vw,38px)';
-        formattedText = '<div style="font-size:' + fontSize + ';font-weight:600;line-height:1.5;color:#eef2f7;letter-spacing:-0.2px;max-width:860px;text-transform:none">' +
+        const fontSize = isBowlStep ? 'clamp(22px,3vw,34px)' : 'clamp(24px,3.2vw,38px)';
+        formattedText = '<div style="font-size:' + fontSize + ';font-weight:600;line-height:1.5;color:#eef2f7;letter-spacing:-0.2px;max-width:860px;text-transform:none;margin-top:' + (isBowlStep?'12px':'0') + '">' +
           '<div style="margin-bottom:10px">' + esc(ingredParts[0].trim()) + '</div>' +
           ingredParts.slice(1).map(p =>
             '<div style="display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-top:1px solid rgba(255,255,255,0.07)">' +
