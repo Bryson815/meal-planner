@@ -9372,32 +9372,40 @@ function renderCookScreen() {
       const s = stepText;
       let badge = '';
       let text = s;
+      let isBowlStep = false;
+
       if(s.startsWith('🟡')) {
         const parts = s.replace(/^🟡\s*/,'').split(/\s*—\s*/);
-        badge = '<div style="display:inline-block;background:rgba(245,158,11,0.15);border:2px solid rgba(245,158,11,0.4);border-radius:10px;padding:8px 16px;margin-bottom:20px;font-size:15px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#fbbf24;display:inline-block;margin-bottom:16px">🟡 ' + esc(parts[0].trim()) + '</div>';
+        badge = '<div style="display:inline-block;background:rgba(245,158,11,0.15);border:2px solid rgba(245,158,11,0.4);border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#fbbf24">🟡 ' + esc(parts[0].trim()) + '</div><br>';
         text = parts.slice(1).join(' — ');
+        isBowlStep = true;
       } else if(s.startsWith('🔵')) {
         const parts = s.replace(/^🔵\s*/,'').split(/\s*—\s*/);
-        badge = '<div style="display:inline-block;background:rgba(99,102,241,0.15);border:2px solid rgba(99,102,241,0.4);border-radius:10px;padding:8px 16px;margin-bottom:20px;font-size:15px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#818cf8;display:inline-block;margin-bottom:16px">🔵 ' + esc(parts[0].trim()) + '</div>';
+        badge = '<div style="display:inline-block;background:rgba(99,102,241,0.15);border:2px solid rgba(99,102,241,0.4);border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#818cf8">🔵 ' + esc(parts[0].trim()) + '</div><br>';
         text = parts.slice(1).join(' — ');
-      } else if(s.startsWith('🟢') || s.startsWith('🔪') || s.startsWith('🌿')) {
+        isBowlStep = true;
+      } else if(s.startsWith('🟢') || s.startsWith('🔪') || s.startsWith('🌿') || s.startsWith('🫙')) {
         text = s;
       }
-      // Split ingredient lists on + signs for separate line rendering
-      const ingredParts = text.split(/\s*\+\s*/);
+
+      // Split on + only when between measurements (not mid-sentence)
+      // Pattern: + followed by a number, fraction, or measurement word
+      const ingredParts = text.split(/\s*\+\s*(?=\d|[½¼¾⅓⅔⅛])/);
       let formattedText;
-      if (ingredParts.length > 2) {
-        // Multiple ingredients — render each on its own line
-        formattedText = '<div style="font-size:clamp(20px,2.8vw,32px);font-weight:600;line-height:1.5;color:#eef2f7;letter-spacing:-0.2px;max-width:860px;text-transform:none">' +
-          '<div style="margin-bottom:8px">' + esc(ingredParts[0].trim()) + '</div>' +
+
+      if (ingredParts.length > 1) {
+        // Has ingredient list — render each ingredient on its own line
+        const fontSize = isBowlStep ? 'clamp(22px,3vw,36px)' : 'clamp(24px,3.2vw,38px)';
+        formattedText = '<div style="font-size:' + fontSize + ';font-weight:600;line-height:1.5;color:#eef2f7;letter-spacing:-0.2px;max-width:860px;text-transform:none">' +
+          '<div style="margin-bottom:10px">' + esc(ingredParts[0].trim()) + '</div>' +
           ingredParts.slice(1).map(p =>
-            '<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-top:1px solid rgba(255,255,255,0.07)">' +
-            '<span style="color:#10b981;font-size:20px;font-weight:800;flex-shrink:0;width:20px;text-align:center">+</span>' +
+            '<div style="display:flex;align-items:flex-start;gap:14px;padding:10px 0;border-top:1px solid rgba(255,255,255,0.07)">' +
+            '<span style="color:#10b981;font-size:22px;font-weight:900;flex-shrink:0;line-height:1.4">+</span>' +
             '<span>' + esc(p.trim()) + '</span></div>'
           ).join('') +
         '</div>';
       } else {
-        // Short step — render at full large size
+        // Single instruction — full large size
         formattedText = '<div style="font-size:clamp(26px,3.5vw,42px);font-weight:700;line-height:1.45;color:#eef2f7;letter-spacing:-0.5px;max-width:800px;text-transform:none">' + esc(text) + '</div>';
       }
       return badge + formattedText;
