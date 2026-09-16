@@ -7573,7 +7573,7 @@ let searchQuery = "";
 function renderSearchBar() {
   return `<div style="position:relative;margin-bottom:14px">
     <input type="text" id="recipe-search" placeholder="🔍 Search recipes..." value="${esc(searchQuery)}"
-      oninput="searchQuery=this.value;renderTab(currentTab)"
+      oninput="searchQuery=this.value;(function(){clearTimeout(window._searchTimer);window._searchTimer=setTimeout(function(){var el=document.getElementById('recipe-search');var pos=el?el.selectionStart:-1;renderTab(currentTab);if(el&&pos>=0){var nel=document.getElementById('recipe-search');if(nel){nel.focus();try{nel.setSelectionRange(pos,pos);}catch(e){}}}},150);})();"
       style="width:100%;padding:12px 16px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:var(--text);font-size:15px;box-sizing:border-box">
     ${searchQuery ? `<button onclick="searchQuery='';document.getElementById('recipe-search').value='';renderTab(currentTab)"
       style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>` : ""}
