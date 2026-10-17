@@ -4216,10 +4216,9 @@ const DEFAULT_DINNERS = [
     source:"Synthesized from the top-rated versions — Panera copycat technique with sharp cheddar + Gruyere, Dijon, and a partial blend",
     description:"Better than Panera. Sharp cheddar + Gruyere grated from blocks, fresh broccoli, Dijon for depth, blended about two-thirds for a creamy base with small broccoli pieces. Pot stays neutral for the girls — bold toppings go on adult bowls only. Perfect brisk fall Saturday soup.",
     ingredients:[
-      "--- 🧀 THE CHEESE (grate first, bring to room temp) ---",
+      "--- 🧀 CHEESE BOWL (Bowl 3 — grate both into ONE bowl, bring to room temp) ---",
       "10 oz sharp white cheddar block — grate yourself, NEVER pre-shredded",
       "4 oz Gruyere block — grate yourself",
-      "2 oz cream cheese, softened (optional — adds body, skip to simplify)",
       "--- 🧅 AROMATICS (Bowl 1 — prep together) ---",
       "1 large yellow onion, diced small",
       "2 large carrots, both grated fine on box grater (invisible in the soup)",
@@ -4230,6 +4229,7 @@ const DEFAULT_DINNERS = [
       "1 pinch nutmeg",
       "--- THE BASE ---",
       "4 tbsp unsalted butter",
+      "2 oz cream cheese, softened (optional — adds body; keep separate from the grated cheese)",
       "¼ cup all-purpose flour or Fit Flour",
       "3 cups low-sodium chicken broth (Kettle & Fire preferred) — plus 1 extra cup held back to thin if needed",
       "1 cup whole milk or Fairlife 2%",
@@ -4254,9 +4254,9 @@ const DEFAULT_DINNERS = [
     ],
     instructions:[
       "── MISE EN PLACE ──",
-      "Grate 10 oz sharp cheddar + 4 oz Gruyere on the large holes of a box grater. Set aside at ROOM TEMPERATURE — cold cheese seizes and turns grainy. This is the single most important step.",
-      "🧅 BOWL 1 — Dice 1 large onion small. Grate 2 carrots fine. Mince 3 cloves garlic. Keep together.",
-      "🫙 BOWL 2 — Mix 1 tsp Dijon + 1 tsp Worcestershire + 1 pinch nutmeg. Everything goes in together.",
+      "🧀 CHEESE BOWL — Grate 10 oz sharp cheddar + 4 oz Gruyere, both on the LARGE holes of a box grater, into ONE bowl together. Leave out at room temperature — cold cheese seizes and turns grainy. Keep the 2 oz cream cheese separate; it goes in first, later.",
+      "🟡 BOWL 1 — Dice 1 large onion small + grate 2 carrots fine + mince 3 cloves garlic. All into one bowl — they hit the pot together.",
+      "🔵 BOWL 2 — 1 tsp Dijon + 1 tsp Worcestershire + 1 pinch nutmeg. Small bowl, stir together.",
       "Cut 2 heads broccoli into SMALL florets (bite-sized for the girls). Peel the tough outer layer off the stems and dice them small — they go in too.",
       "Measure 3 cups broth + 1 cup milk + 1 cup cream. Keep 1 extra cup broth nearby to thin at the end if needed.",
       "── BUILD THE BASE ──",
@@ -9732,24 +9732,42 @@ function renderCookScreen() {
       let text = s;
       let isBowlStep = false;
 
-      if(s.startsWith('🟡')) {
-        const parts = s.replace(/^🟡\s*/,'').split(/\s*[—::]\s*/);
-        badge = '<div style="display:inline-block;background:rgba(245,158,11,0.15);border:2px solid rgba(245,158,11,0.4);border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#fbbf24">🟡 ' + esc(parts[0].trim()) + '</div>';
-        text = parts.slice(1).join(' ');
-        isBowlStep = true;
-      } else if(s.startsWith('🔵')) {
-        const parts = s.replace(/^🔵\s*/,'').split(/\s*[—::]\s*/);
-        badge = '<div style="display:inline-block;background:rgba(99,102,241,0.15);border:2px solid rgba(99,102,241,0.4);border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:#818cf8">🔵 ' + esc(parts[0].trim()) + '</div>';
-        text = parts.slice(1).join(' ');
-        isBowlStep = true;
-      } else if(s.startsWith('🟢') || s.startsWith('🔪') || s.startsWith('🌿') || s.startsWith('🫙')) {
+      // Any step that opens with a bowl/sauce marker and a label ("🟡 BOWL 1 — ...") gets a colored badge
+      const BOWL_STYLES = {
+        '🟡': ['rgba(245,158,11,0.15)','rgba(245,158,11,0.4)','#fbbf24'],
+        '🔵': ['rgba(99,102,241,0.15)','rgba(99,102,241,0.4)','#818cf8'],
+        '🟢': ['rgba(16,185,129,0.15)','rgba(16,185,129,0.4)','#34d399'],
+        '🟣': ['rgba(168,85,247,0.15)','rgba(168,85,247,0.4)','#c084fc'],
+        '🧀': ['rgba(250,204,21,0.12)','rgba(250,204,21,0.4)','#fde047'],
+        '🫙': ['rgba(20,184,166,0.15)','rgba(20,184,166,0.4)','#2dd4bf'],
+        '🥔': ['rgba(245,158,11,0.15)','rgba(245,158,11,0.4)','#fbbf24'],
+      };
+      const lead = Object.keys(BOWL_STYLES).find(k => s.startsWith(k));
+      let notePart = '';
+      if (lead) {
+        const rest = s.slice(lead.length).trim();
+        const m = rest.match(/^([^—:\n]{2,40}?)\s*[—:]\s*([\s\S]*)$/);
+        if (m) {
+          const [bg, border, color] = BOWL_STYLES[lead];
+          badge = '<div style="display:inline-block;align-self:flex-start;background:' + bg + ';border:2px solid ' + border + ';border-radius:10px;padding:6px 14px;margin-bottom:16px;font-size:14px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:' + color + '">' + lead + ' ' + esc(m[1].trim()) + '</div>';
+          text = m[2];
+          isBowlStep = true;
+          // Ingredient list ends at the first sentence break; anything after is a note shown underneath
+          const nm = text.match(/^([^.]*?(?:\d|[½¼¾⅓⅔⅛])[^.]*?)\.\s+([A-Z][\s\S]*)$/);
+          if (nm) { text = nm[1]; notePart = nm[2]; }
+        } else {
+          text = rest;
+        }
+      } else if (s.startsWith('🔪') || s.startsWith('🌿')) {
         text = s;
       }
 
-      // Split on + only when between measurements (not mid-sentence)
-      // Pattern: + followed by a number, fraction, or measurement word
-      // Split on + when followed by a digit, fraction, or measurement word
-      const ingredParts = text.split(/\s*\+\s*(?=\d|[½¼¾⅓⅔⅛]|(?:a\s+)?(?:splash|pinch|dash|handful))/i);
+      // Only bowl-labeled steps are ingredient lists — split them on "+" before a quantity.
+      // Plain prose steps stay as one sentence.
+      const ingredParts = isBowlStep
+        ? text.split(/\s*\+\s*(?=\d|[½¼¾⅓⅔⅛]|(?:a\s+)?(?:splash|pinch|dash|handful))/i)
+        : [text];
+      const noteHtml = notePart ? '<div style="margin-top:18px;font-size:clamp(18px,2.2vw,26px);font-weight:500;line-height:1.45;color:#cbd5e1;max-width:860px;text-transform:none">' + esc(notePart) + '</div>' : '';
       let formattedText;
 
       if (ingredParts.length > 1) {
@@ -9766,7 +9784,7 @@ function renderCookScreen() {
         // Single instruction — full large size
         formattedText = '<div style="font-size:clamp(26px,3.5vw,42px);font-weight:700;line-height:1.45;color:#eef2f7;letter-spacing:-0.5px;max-width:800px;text-transform:none">' + esc(text) + '</div>';
       }
-      return badge + formattedText;
+      return badge + formattedText + noteHtml;
     })()}
     ${timerHtml}
     ${tipHtml}
