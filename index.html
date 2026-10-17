@@ -7603,6 +7603,7 @@ function renderPlan() {
 
   el.innerHTML = `
     ${pickerModal}
+    ${renderRatingNudge()}
     <div id="autoplan-modal" class="sp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeAutoplanModal()">
       <div class="sp-box" style="background:#0f172a;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto"></div>
     </div>
@@ -8637,9 +8638,14 @@ function buildRatingHtml(id, section) {
       <div class="star-row">${starHtml}</div>
       <div class="rating-chips">${chipHtml}</div>
       <input class="form-input" id="rating-note-${id}" value="${esc(note)}" placeholder="Quick note (optional)..." style="margin-top:6px;font-size:13px" oninput="debounceSaveNote('${id}','${section}')">
+      <div style="display:flex;gap:8px;margin-top:8px"><input class="form-input" id="rating-log-${id}" placeholder="Add a dated note (what to change next time)…" style="flex:1;font-size:13px"><button onclick="addRatingLog('${id}','${section}')" style="padding:8px 12px;border-radius:10px;border:none;background:rgba(16,185,129,0.2);color:#34d399;font-weight:700;cursor:pointer">💬 Add</button></div>
+      ${(r.log&&r.log.length)?'<div style="margin-top:10px"><div style="font-size:11px;color:var(--dim);font-weight:700;letter-spacing:0.6px;margin-bottom:4px">YOUR NOTES</div>'+r.log.map((n,i)=>'<div style="font-size:13px;color:var(--muted);padding:5px 0;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:8px"><span style="color:var(--dim);flex-shrink:0">'+esc(n.date)+'</span><span style="flex:1">'+esc(n.text)+'</span><button onclick="deleteRatingLog(\''+id+'\',\''+section+'\','+i+')" style="background:none;border:none;color:var(--dim);cursor:pointer">✕</button></div>').join('')+'</div>':''}
     </div>`;
 }
 
+
+function addRatingLog(id,section){ const el=document.getElementById("rating-log-"+id); if(!el||!el.value.trim())return; if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const log=cur.log||[]; log.unshift({date:new Date().toISOString().split("T")[0],text:el.value.trim()}); state.ratings[id]={...cur,log,date:cur.date||new Date().toISOString()}; scheduleSave(); viewRecipe(section,id); }
+function deleteRatingLog(id,section,i){ const cur=(state.ratings||{})[id]; if(!cur||!cur.log)return; cur.log.splice(i,1); scheduleSave(); viewRecipe(section,id); }
 function setStars(id, section, stars) {
   if (!state.ratings) state.ratings = {};
   const cur = state.ratings[id] || {};
@@ -8674,6 +8680,15 @@ function debounceSaveNote(id, section) {
   }, 600);
 }
 
+
+function doneSetStars(id,n){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,stars:n,date:new Date().toISOString()}; const h=(state.cookHistory||[]).find(x=>x.recipeId===id); if(h)h.rating=n; scheduleSave(); renderCookScreen(); }
+function doneToggleChip(id,chip){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const chips=cur.chips||[]; state.ratings[id]={...cur,chips:chips.includes(chip)?chips.filter(c=>c!==chip):[...chips,chip],date:cur.date||new Date().toISOString()}; scheduleSave(); renderCookScreen(); }
+function doneSaveNote(id){ const el=document.getElementById("done-note"); if(!el||!el.value.trim())return; if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const log=cur.log||[]; log.unshift({date:new Date().toISOString().split("T")[0],text:el.value.trim()}); state.ratings[id]={...cur,log,note:el.value.trim(),date:cur.date||new Date().toISOString()}; scheduleSave(); el.value=""; const st=document.getElementById("done-note-status"); if(st){st.textContent="✅ Saved";} setTimeout(()=>renderCookScreen(),600); }
+// Unrated cooks from the last 3 days → nudge on the Plan tab
+function unratedRecentCooks(){ const cut=Date.now()-3*86400000; return (state.cookHistory||[]).filter(h=>{ const d=new Date(h.date+"T12:00:00").getTime(); if(d<cut)return false; const r=(state.ratings||{})[h.recipeId]; return !(r&&r.date&&new Date(r.date).getTime()>=d-43200000); }).filter((h,i,a)=>a.findIndex(x=>x.recipeId===h.recipeId)===i); }
+function renderRatingNudge(){ const list=unratedRecentCooks(); if(!list.length)return ""; return list.slice(0,2).map(h=>{ const when=h.date===new Date().toISOString().split("T")[0]?"tonight":"on "+new Date(h.date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long"}); return '<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#fbbf24">⭐ RATE IT WHILE IT\'S FRESH</div><div style="font-size:15px;font-weight:700">'+esc(h.name)+' <span style="font-weight:400;color:var(--dim)">— cooked '+when+'</span></div></div><div style="display:flex;gap:2px">'+[1,2,3,4,5].map(n=>'<button onclick="nudgeRate(\''+h.recipeId+'\','+n+')" style="font-size:26px;background:none;border:none;cursor:pointer;padding:2px 4px;opacity:0.6">☆</button>').join("")+'</div><button onclick="viewRecipeById(\''+h.recipeId+'\')" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:13px;cursor:pointer">+ note</button><button onclick="dismissNudge(\''+h.recipeId+'\')" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button></div>'; }).join(""); }
+function nudgeRate(id,n){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,stars:n,date:new Date().toISOString()}; const h=(state.cookHistory||[]).find(x=>x.recipeId===id); if(h)h.rating=n; scheduleSave(); renderPlan(); }
+function dismissNudge(id){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,date:new Date().toISOString()}; scheduleSave(); renderPlan(); }
 async function scheduleRatingReminder(id, name, section) {
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -11005,15 +11020,28 @@ function renderCookScreen() {
 
   let body="";
   if(isDone) {
-    body=`<div class="cook-done">
+    // Log this cook once per day per recipe
+    (function(){ const today=new Date().toISOString().split("T")[0]; const already=(state.cookHistory||[]).some(h=>h.recipeId===recipe.id&&h.date===today); if(!already) logCook(recipe.id, recipe.name, 0); })();
+    const section=recipe.section||(state.breakfasts.some(r=>r.id===recipe.id)?"breakfast":state.lunches.some(r=>r.id===recipe.id)?"lunch":"dinner");
+    const rr=(state.ratings||{})[recipe.id]||{};
+    const starsNow=rr.stars||0;
+    const starBtns=[1,2,3,4,5].map(n=>'<button onclick="doneSetStars(\''+recipe.id+'\','+n+')" style="font-size:40px;background:none;border:none;cursor:pointer;padding:4px 6px;opacity:'+(n<=starsNow?1:0.35)+'">'+(n<=starsNow?'⭐':'☆')+'</button>').join('');
+    const chipBtns=RATING_CHIPS.map(c=>'<button onclick="doneToggleChip(\''+recipe.id+'\',\''+c.replace(/'/g,"\\'")+'\')" style="padding:8px 12px;border-radius:999px;border:1px solid '+((rr.chips||[]).includes(c)?'rgba(16,185,129,0.7)':'rgba(255,255,255,0.15)')+';background:'+((rr.chips||[]).includes(c)?'rgba(16,185,129,0.15)':'transparent')+';color:#f1f5f9;font-size:14px;cursor:pointer">'+c+'</button>').join('');
+    const pastNotes=(rr.log||[]).slice(0,3).map(n=>'<div style="font-size:13px;color:var(--muted);padding:4px 0;border-top:1px solid rgba(255,255,255,0.06)"><span style="color:var(--dim)">'+esc(n.date)+'</span> — '+esc(n.text)+'</div>').join('');
+    body=`<div class="cook-done" style="max-width:720px;margin:0 auto;padding:24px 20px 40px;overflow-y:auto">
       <div class="cook-done-emoji">🎉</div>
       <div class="cook-done-title">That's it!</div>
-      <div class="cook-done-sub">${esc(recipe.name)} is ready.<br>${recipe.tips?'"'+esc(recipe.tips)+'"':"Time to eat!"}</div>
-      <div style="background:#111827;border:2px solid #1f2937;border-radius:16px;padding:18px;margin:16px 0;width:100%;text-align:left">
-        <div style="color:#10b981;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">⏰ Rate it tomorrow morning</div>
-        <div style="color:#9ca3af;font-size:13px;line-height:1.5">A reminder will fire at 8am — tap it to rate <strong style="color:#f9fafb">${esc(recipe.name)}</strong> while it's fresh.</div>
+      <div class="cook-done-sub" style="margin-bottom:18px">${esc(recipe.name)} is ready.</div>
+      <div style="background:#111827;border:2px solid #1f2937;border-radius:16px;padding:18px;margin:0 0 14px;width:100%;text-align:left">
+        <div style="color:#10b981;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⭐ Rate it now (or later — it's always on the recipe card)</div>
+        <div style="display:flex;justify-content:center;gap:2px;margin:4px 0 10px">${starBtns}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px">${chipBtns}</div>
+        <textarea id="done-note" placeholder="Notes for next time — what to change, what the girls thought…" style="width:100%;min-height:76px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:15px;box-sizing:border-box;font-family:inherit"></textarea>
+        <button onclick="doneSaveNote('${recipe.id}')" style="margin-top:8px;width:100%;padding:12px;border-radius:12px;border:none;background:rgba(16,185,129,0.2);color:#34d399;font-weight:700;font-size:15px;cursor:pointer">💬 Save note</button>
+        <div id="done-note-status" style="font-size:13px;color:var(--green);text-align:center;margin-top:6px;min-height:16px"></div>
+        ${pastNotes?'<div style="margin-top:10px"><div style="font-size:12px;color:var(--dim);font-weight:700;margin-bottom:4px">EARLIER NOTES</div>'+pastNotes+'</div>':''}
       </div>
-      <button onclick="scheduleRatingReminder('${recipe.id}','${esc(recipe.name)}','${recipe.section||'dinner'}')" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px">✅ Set 8am rating reminder</button>
+      <div style="font-size:13px;color:var(--dim);text-align:left;margin-bottom:14px">${starsNow?'✅ Rated. Logged to History.':'Not rated yet? No problem — the Plan tab will nudge you next time you open the app.'}</div>
       <button class="cook-done-btn" onclick="exitCook()">← Back to recipes</button>
     </div>`;
   } else {
@@ -11055,11 +11083,11 @@ function renderCookScreen() {
       const num=parseInt(timerMatch[1]),unit=timerMatch[2].toLowerCase();
       let secs=unit.startsWith("h")?num*3600:unit.startsWith("m")?num*60:num;
       cookState.timers=cookState.timers||{};
-      if(!cookState.timers[step]) cookState.timers[step]={seconds:secs,_original:secs,running:false,interval:null,endsAt:0,done:false};
+      if(!cookState.timers[step]) cookState.timers[step]={seconds:secs,_original:secs,running:false,interval:null,endsAt:0,done:false,label:timerLabel(stepText,recipe,sectionHeader)};
       const t=cookState.timers[step],disp=formatTimer(t.seconds),cls=t.running?"running":(t.seconds===0&&t._original>0?"done":"");
       timerHtml=`
         <div style="margin-top:24px;display:flex;align-items:center;gap:14px;padding:20px 24px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:16px;">
-          <div id="cook-timer-display" style="font-size:52px;font-weight:800;letter-spacing:-2px;color:${cls==='done'?'#f59e0b':cls==='running'?'#10b981':'var(--text)'};font-variant-numeric:tabular-nums;min-width:130px;">${disp}</div>
+          <div style="display:flex;flex-direction:column"><div style="font-size:13px;font-weight:800;letter-spacing:0.8px;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:2px">⏱ ${esc((cookState.timers[step]&&cookState.timers[step].label)||"Timer")}</div><div id="cook-timer-display" style="font-size:52px;font-weight:800;letter-spacing:-2px;color:${cls==='done'?'#f59e0b':cls==='running'?'#10b981':'var(--text)'};font-variant-numeric:tabular-nums;min-width:130px;">${disp}</div></div>
           <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
             <button onclick="toggleTimer(${step})" style="padding:12px 20px;font-size:18px;font-weight:700;border-radius:12px;border:none;background:${t.running?'rgba(239,68,68,0.15)':'linear-gradient(135deg,#10b981,#059669)'};color:${t.running?'#f87171':'#07090f'};cursor:pointer;letter-spacing:-0.2px;">
               ${t.running?"⏸ Pause":"▶ Start"}
@@ -11199,6 +11227,32 @@ function renderCookScreen() {
 
 function formatTimer(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return h>0?h+":"+String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0"):String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0");}
 
+
+// Human label for a step timer: "Simmer broccoli", "Bake strips", "Rest pork" — verb before the time + the step's main ingredient (or section)
+function timerLabel(stepText, recipe, sectionHeader){
+  const t=(stepText||"").replace(/[🟡🔵🟢🟣🧀🫙🥔]/g,"");
+  const m=t.match(/(\d+)(?:\s*(?:-|–|to)\s*\d+)?\s*(hours?|hrs?|minutes?|mins?|seconds?|secs?)\b/i);
+  let verb="";
+  if(m){
+    const before=t.slice(0,m.index);
+    const sent=before.split(/[.!?]\s+/).pop()||"";
+    const vm=sent.match(/\b(simmer|bake|roast|rest|sear|boil|steam|chill|marinate|cook|fry|saut[eé]|braise|reduce|caramelize|render|toast|broil|grill|smoke|blend|whisk|stir|knead|proof|rise|freeze|brine|soak|melt|warm|preheat|let (?:it |them )?(?:sit|stand|rest|cool)|wait)\w*/i);
+    if(vm) verb=vm[0];
+  }
+  verb=verb?verb.charAt(0).toUpperCase()+verb.slice(1).toLowerCase():"";
+  // main ingredient noun mentioned in this step
+  let noun="";
+  const low=t.toLowerCase();
+  const prefer=["onion","onions","broccoli","chicken","salmon","steak","pork","turkey","shrimp","pasta","rice","meatballs","sauce","strips","bread","potatoes","eggs","dough","beef","cheese","beans","tenders","burgers","patties","gnocchi","dumplings","soup","chili","stew"];
+  noun=prefer.find(w=>new RegExp("\\b"+w+"\\b").test(low))||"";
+  if(!noun&&recipe&&recipe.ingredients){
+    for(const ing of recipe.ingredients){ if(!ing||ing.startsWith("---"))continue; const kws=ingrKeywords(ing); const main=kws[kws.length-1]; if(main&&low.includes(main)){noun=main;break;} }
+  }
+  const label=[verb,noun].filter(Boolean).join(" ");
+  if(label) return label;
+  const sec=(sectionHeader||"").replace(/\(.*?\)/g,"").trim();
+  return sec?sec.charAt(0)+sec.slice(1).toLowerCase():"Timer";
+}
 function renderTimerStrip(currentStep){
   const timers=cookState.timers||{};
   const pills=Object.keys(timers).map(Number).filter(i=>i!==currentStep&&(timers[i].running||timers[i].done)).sort((a,b)=>a-b);
@@ -11207,7 +11261,7 @@ function renderTimerStrip(currentStep){
     const t=timers[i];
     const done=t.done;
     return '<button onclick="cookState.step='+i+';renderCookScreen()" style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;border:2px solid '+(done?'rgba(245,158,11,0.6)':'rgba(16,185,129,0.4)')+';background:'+(done?'rgba(245,158,11,0.15)':'rgba(16,185,129,0.08)')+';color:'+(done?'#fbbf24':'#34d399')+';font-weight:800;font-size:17px;cursor:pointer;'+(done?'animation:cookPulse 1s infinite;':'')+'">'+
-      '<span>⏱ Step '+(i+1)+'</span><span id="cook-timer-pill-'+i+'" style="font-variant-numeric:tabular-nums">'+(done?'DONE':formatTimer(t.seconds))+'</span>'+
+      '<span>⏱ '+esc(t.label||('Step '+(i+1)))+'</span><span id="cook-timer-pill-'+i+'" style="font-variant-numeric:tabular-nums">'+(done?'DONE':formatTimer(t.seconds))+'</span>'+
       (done?'<span onclick="event.stopPropagation();dismissTimer('+i+')" style="margin-left:4px;opacity:0.7">✕</span>':'')+'</button>';
   }).join('')+'</div>';
 }
@@ -11227,7 +11281,7 @@ function toggleTimer(stepIdx){
   },500);
   renderCookScreen();
 }
-function resetTimer(stepIdx,secs){ if(typeof secs==="undefined"){secs=stepIdx;stepIdx=cookState.step;} const t=cookState.timers&&cookState.timers[stepIdx]; if(t&&t.interval) clearInterval(t.interval); cookState.timers[stepIdx]={seconds:secs,_original:secs,running:false,interval:null,endsAt:0,done:false}; renderCookScreen(); }
+function resetTimer(stepIdx,secs){ if(typeof secs==="undefined"){secs=stepIdx;stepIdx=cookState.step;} const t=cookState.timers&&cookState.timers[stepIdx]; if(t&&t.interval) clearInterval(t.interval); cookState.timers[stepIdx]={seconds:secs,_original:secs,running:false,interval:null,endsAt:0,done:false,label:(t&&t.label)||""}; renderCookScreen(); }
 function cookNext(){ cookState.step=Math.min(cookState.step+1,cookState.recipe.instructions.length); renderCookScreen(); }
 function cookPrev(){ cookState.step=Math.max(cookState.step-1,0); renderCookScreen(); }
 function setCookMode(mode){cookState.showIngr=(mode==="ingredients");renderCookScreen();}
