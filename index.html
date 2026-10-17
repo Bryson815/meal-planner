@@ -9973,6 +9973,21 @@ function renderCookScreen() {
       const ingredParts = isBowlStep
         ? text.split(/\s*\+\s*(?=\d|[½¼¾⅓⅔⅛]|(?:a\s+)?(?:splash|pinch|dash|handful|few|squeeze|drizzle|knob|pat)|juice|zest|the\s)/i)
         : [text];
+      // Tidy bowl lists: strip a leading verb from the first item, and move a trailing "into one bowl" clause off the last item into the note
+      if (isBowlStep && ingredParts.length > 1) {
+        let verb = '';
+        const vm = ingredParts[0].match(/^(Measure|Combine|Mix|Whisk together|Whisk|Grate|Set out|Put|Place|Gather)\s+(?=\d|[½¼¾⅓⅔⅛])/i);
+        if (vm) { verb = vm[1]; ingredParts[0] = ingredParts[0].slice(vm[0].length); }
+        const last = ingredParts[ingredParts.length - 1];
+        const tm = last.match(/^(.*?\S)[,]?\s+((?:into|in)\s+(?:one|a|the)\s+[^.]*?(?:bowl|cup|pitcher|saucepan|skillet|pot|pan|bag|jar|dish|container|baggie)[^.]*)$/i);
+        if (tm) {
+          ingredParts[ingredParts.length - 1] = tm[1];
+          const lead = verb ? verb.charAt(0).toUpperCase() + verb.slice(1).toLowerCase() + ' everything ' : 'Everything ';
+          notePart = (lead + tm[2].trim() + '.' + (notePart ? ' ' + notePart : '')).replace(/\.\./g, '.');
+        } else if (verb) {
+          notePart = (verb.charAt(0).toUpperCase() + verb.slice(1).toLowerCase() + ' everything together.' + (notePart ? ' ' + notePart : ''));
+        }
+      }
       const noteHtml = notePart ? '<div style="margin-top:18px;font-size:clamp(18px,2.2vw,26px);font-weight:500;line-height:1.45;color:#cbd5e1;max-width:860px;text-transform:none">' + esc(notePart) + '</div>' : '';
       let formattedText;
 
