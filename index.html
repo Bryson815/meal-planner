@@ -4466,7 +4466,7 @@ const DEFAULT_DINNERS = [
       "── COOK THE BROCCOLI ──",
       "Add 🟢 Bowl 3 (all the broccoli, stems too). Lid ON but cracked open an inch — keeps the liquid from reducing while letting steam out. Simmer 12-15 min until very tender — florets should break apart easily when pressed with a spoon.",
       "── WHILE THE BROCCOLI SIMMERS: SOURDOUGH STRIPS ──",
-      "Start these the moment the broccoli goes in — the 12-15 min simmer is your window. Preheat oven to 400°F.",
+      "SOURDOUGH STRIPS — Preheat the oven to 400°F now. The broccoli simmer gives you the time to make the strips. Skipping the bread? Tap Next through to BLEND.",
       "If using a Publix Bake-at-Home par-baked loaf: unwrap, place directly on the middle rack, bake 10 min at 400°F until golden. Rest 5 min. (Already-baked sourdough: skip this.)",
       "Slice the loaf ¾-inch thick, then cut each slice into 1-inch strips — finger-length, like breadsticks. About 18-22 strips.",
       "🫙 BUTTER CUPS — 3 tbsp butter, melted. Pour half into a second cup and grate 1 clove garlic into it. Plain cup for the girls, garlic cup for the adults.",
@@ -9881,16 +9881,29 @@ function renderCookScreen() {
     const stepText=cookScale===1?(steps[step]||""):scaleAmountsInText(steps[step]||"",cookScale,true);
     // Find which section this step belongs to
     let sectionHeader="";
-    let realIdx=0;
+    let realIdx=0, isSectionStart=false;
     for(let i=0;i<allSteps.length;i++){
       if(allSteps[i].startsWith("──")){
         sectionHeader=allSteps[i].replace(/──/g,"").trim();
+        isSectionStart=true;
       } else {
         if(realIdx===step) break;
         realIdx++;
+        isSectionStart=false;
       }
     }
-    const timerMatch=stepText.match(/(\d+)\s*(hour|hr|minute|min|second|sec)/i);
+    if(step===0) isSectionStart=false;
+    // Offer a timer for durations that are instructions to wait — skip times that merely describe ("the 12-15 min simmer", "after 45 min", "every 30 sec")
+    const timerMatch=(function(){
+      const re=/(\d+)(?:\s*(?:-|–|to)\s*\d+)?\s*(hours?|hrs?|minutes?|mins?|seconds?|secs?)\b/gi;
+      let m;
+      while((m=re.exec(stepText))){
+        const before=stepText.slice(Math.max(0,m.index-30),m.index);
+        if(/\b(the|after|before|first|last|within|every|per|gives?|takes?|window|during|next|another\s+\d|total\s+of|about\s+to|in\s+the)\s*$/i.test(before)) continue;
+        return [m[0],m[1],m[2]];
+      }
+      return null;
+    })();
     let timerHtml="";
     if(timerMatch){
       const num=parseInt(timerMatch[1]),unit=timerMatch[2].toLowerCase();
@@ -9913,7 +9926,8 @@ function renderCookScreen() {
     }
     const tipHtml=(step===total-1&&recipe.tips)?`<div class="cook-tip-box"><div class="cook-tip-label">💡 Pro tip</div><div class="cook-tip-text">${esc(recipe.tips)}</div></div>`:"";
     const eqHtml=(step===0&&recipe.equipment&&recipe.equipment.length)?`<div style="background:rgba(245,158,11,0.08);border:2px solid rgba(245,158,11,0.3);border-radius:14px;padding:14px 18px;margin-bottom:16px"><div style="color:#fbbf24;font-size:13px;font-weight:800;letter-spacing:0.6px;margin-bottom:8px">🍳 YOU'LL NEED</div><div style="display:flex;flex-wrap:wrap;gap:8px">${recipe.equipment.map(e=>`<span style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:6px 14px;font-size:clamp(15px,1.4vw,19px);color:#f1f5f9;font-weight:600">${esc(e)}</span>`).join("")}</div></div>`:"";
-    const hvHtml=eqHtml+((step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"");
+    const secHtml=(isSectionStart&&sectionHeader)?`<div style="background:rgba(16,185,129,0.1);border:2px solid rgba(16,185,129,0.4);border-radius:14px;padding:14px 20px;margin-bottom:20px;align-self:flex-start"><div style="color:#34d399;font-size:12px;font-weight:800;letter-spacing:1.2px;margin-bottom:4px">▶ NEW SECTION</div><div style="color:#f1f5f9;font-size:clamp(20px,2.2vw,28px);font-weight:800;text-transform:none;letter-spacing:-0.3px">${esc(sectionHeader.charAt(0)+sectionHeader.slice(1).toLowerCase())}</div></div>`:"";
+    const hvHtml=secHtml+eqHtml+((step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"");
     const scaleNote=cookScale!==1?'<span class="cook-step-scale-note">'+(cookScale===0.5?'½':cookScale===1.5?'1½':cookScale)+'× RECIPE</span>':'';
     body=`<div class="cook-layout"><div class="cook-main">
 
