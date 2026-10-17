@@ -577,6 +577,120 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
 
 /* ── MISC ────────────────────────────────────────────── */
 .surface{background:var(--surface);}
+.grocery-source{display:inline-block;margin-left:8px;font-size:11px;color:var(--dim);background:rgba(255,255,255,0.06);padding:2px 7px;border-radius:999px;vertical-align:middle}
+
+/* ── Cook mode layout: step left, ingredients right on wide screens ── */
+.cook-layout{position:fixed;inset:0;top:56px;display:flex;flex-direction:row;background:#07090f;}
+.cook-main{flex:1;min-width:0;display:flex;flex-direction:column;}
+.cook-side{display:none;flex-direction:column;width:40%;max-width:560px;min-width:360px;background:#0b1020;border-left:1px solid rgba(255,255,255,0.08);}
+.cook-side-head{flex-shrink:0;padding:14px 20px 10px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.cook-side-title{font-size:13px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#10b981;flex:1;white-space:nowrap}
+.cook-scale-row{display:flex;gap:5px;align-items:center}
+.cook-side-body{flex:1;overflow-y:auto;padding:8px 14px 24px;}
+.cook-side-close{display:none;padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#eef2f7;font-size:14px;font-weight:700;cursor:pointer}
+.cook-ingr-btn{display:block}
+.ci-section{font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.45);padding:16px 6px 6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ci-section .bowl-pill{font-size:11px;padding:3px 9px;border-radius:999px;font-weight:800;letter-spacing:0.6px}
+.ci-item{display:flex;align-items:flex-start;gap:12px;padding:11px 10px;border-radius:12px;cursor:pointer;border-left:4px solid transparent;margin:2px 0;transition:background .12s}
+.ci-item:hover{background:rgba(255,255,255,0.04)}
+.ci-item.b1{border-left-color:#f59e0b;background:rgba(245,158,11,0.07)}
+.ci-item.b2{border-left-color:#6366f1;background:rgba(99,102,241,0.08)}
+.ci-item.bs{border-left-color:#14b8a6;background:rgba(20,184,166,0.07)}
+.ci-item.b3{border-left-color:#22c55e;background:rgba(34,197,94,0.07)}
+.ci-item.hot{outline:2px solid #10b981;background:rgba(16,185,129,0.12)}
+.ci-item.checked .ci-text{text-decoration:line-through;color:rgba(255,255,255,0.3)}
+.ci-item.checked{opacity:.6}
+.ci-check{width:28px;height:28px;border-radius:8px;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;color:#07090f;flex-shrink:0;margin-top:1px}
+.ci-item.checked .ci-check{background:#10b981;border-color:#10b981}
+.ci-text{font-size:clamp(19px,1.5vw,23px);line-height:1.35;color:#eef2f7;font-weight:500;letter-spacing:-0.2px}
+.ci-text.hot{font-weight:700}
+.cook-scale-btn{padding:6px 11px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer}
+.cook-scale-btn.on{border-color:#10b981;background:rgba(16,185,129,0.15);color:#10b981;font-weight:800}
+.cook-step-scale-note{display:inline-block;margin-left:10px;font-size:12px;font-weight:800;color:#f59e0b;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);padding:3px 9px;border-radius:999px;letter-spacing:.5px}
+@media (min-width:1024px){
+  .cook-side{display:flex}
+  .cook-ingr-btn{display:none}
+}
+@media (max-width:1023px){
+  .cook-side.open{display:flex;position:fixed;inset:0;top:56px;width:auto;max-width:none;min-width:0;z-index:30;border-left:none}
+  .cook-side-close{display:inline-block;order:2;margin-left:auto}
+  .cook-scale-row{order:3;flex-basis:100%}
+}
+
+/* ── Stats row (restored) ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stats-row:has(> :nth-child(3):last-child){grid-template-columns:repeat(3,1fr)}
+.stat-box{background:linear-gradient(145deg,rgba(255,255,255,0.05),rgba(255,255,255,0.02));border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px 10px;text-align:center;min-width:0}
+.stat-icon{font-size:18px;line-height:1;margin-bottom:6px}
+.stat-val{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--text);line-height:1.1}
+.stat-label{font-size:11px;color:var(--dim);margin-top:3px;text-transform:uppercase;letter-spacing:0.6px}
+/* ── Nav labels ── */
+.tab-icon{font-size:16px}
+.tab-label{font-size:9px;line-height:1}
+/* ── Desktop layout ── */
+@media (min-width:1024px){
+  .page{padding:24px 32px 80px}
+  .tab-btn{flex-direction:row;gap:7px;padding:8px 13px;border-radius:12px}
+  .tab-icon{font-size:17px}
+  .tab-label{font-size:13px;font-weight:600;letter-spacing:-0.1px}
+  .tab-btn.active::after{display:none}
+  .nav-title{font-size:18px}
+  .nav-sub{font-size:11px}
+  .days-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .days-grid .day-card{margin-bottom:0}
+  .stat-val{font-size:26px}
+  .stat-box{padding:16px 14px}
+}
+@media (min-width:1500px){
+  .days-grid{grid-template-columns:repeat(7,1fr)}
+}
+@media (min-width:820px){
+  .vault-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .vault-grid .vault-card{margin-bottom:0}
+}
+@media (min-width:1200px){
+  .vault-grid{grid-template-columns:repeat(3,1fr)}
+}
+
+/* ── Restored component styles (lost in redesign) ── */
+.modal-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;position:relative}
+.modal-header>div:first-child{flex:1;min-width:0}
+.info-box{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:10px 14px;margin-bottom:8px;font-size:13px;line-height:1.55;color:var(--text2,#cbd5e1)}
+.info-box.green{background:rgba(16,185,129,0.07);border-color:rgba(16,185,129,0.25)}
+.info-box.amber{background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.25)}
+.info-box.purple{background:rgba(139,92,246,0.08);border-color:rgba(139,92,246,0.28)}
+.info-box.tip{background:rgba(251,191,36,0.06);border-color:rgba(251,191,36,0.2)}
+.info-label{font-weight:800;font-size:11px;letter-spacing:0.8px;margin-right:6px}
+.scale-row{display:flex;align-items:center;gap:10px;margin:4px 0 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px 12px}
+.scale-btn{width:34px;height:34px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:20px;font-weight:700;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+.scale-btn:hover{border-color:var(--green);color:var(--green)}
+.scale-display{font-size:16px;font-weight:800;min-width:60px;text-align:center;color:var(--text)}
+.recipe-tabs{display:flex;gap:4px;margin:14px 0 10px;background:rgba(255,255,255,0.05);padding:3px;border-radius:12px;border:1px solid rgba(255,255,255,0.07)}
+.recipe-tab{flex:1;padding:9px;border-radius:9px;border:none;background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer}
+.recipe-tab.active{background:var(--green);color:#07090f}
+.recipe-step{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.step-num{width:26px;height:26px;border-radius:50%;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:var(--green);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.grocery-cat{margin-bottom:18px}
+.grocery-cat h3{font-size:13px;font-weight:800;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin:0 0 8px}
+.cook-tip-box{margin-top:22px;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.25);border-radius:14px;padding:14px 18px}
+.cook-tip-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#fbbf24;margin-bottom:6px}
+.cook-tip-text{font-size:16px;line-height:1.5;color:#e5e7eb}
+.cook-done{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 24px;max-width:560px;margin:0 auto;min-height:60vh}
+.cook-done-emoji{font-size:72px;margin-bottom:12px}
+.cook-done-title{font-size:34px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px}
+.cook-done-sub{font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:8px}
+.cook-done-btn{width:100%;padding:14px;border-radius:14px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:15px;font-weight:700;cursor:pointer}
+.swap-card{background:var(--surface);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:14px;margin-bottom:10px}
+.swap-arrow{display:flex;gap:8px;align-items:center;font-size:13px;margin-bottom:8px;flex-wrap:wrap}
+.swap-from{color:var(--dim);text-decoration:line-through}
+.swap-to{color:var(--text);font-weight:600}
+@media (min-width:1024px){
+  .days-grid .day-card div[style*="white-space:nowrap"]{white-space:normal!important}
+}
+@media (min-width:1024px){
+  .grocery-cats{column-count:2;column-gap:20px}
+  .grocery-cat{break-inside:avoid;page-break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -588,15 +702,15 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
     <div class="sync-status offline" id="syncStatus">Dinners · Lunches · Grab-and-Go</div>
   </div>
   <div class="nav-tabs">
-    <button class="tab-btn active" onclick="showTab('plan')" title="Plan"><span style="font-size:16px">📅</span><span style="font-size:9px;line-height:1">Plan</span></button>
-    <button class="tab-btn" onclick="showTab('vault')" title="Recipe Vault"><span style="font-size:16px">🗄️</span><span style="font-size:9px;line-height:1">Vault</span></button>
-    <button class="tab-btn" onclick="showTab('grocery')" title="Grocery"><span style="font-size:16px">🛒</span><span style="font-size:9px;line-height:1">Shop</span></button>
-    <button class="tab-btn" onclick="showTab('sauces')" title="Sauces"><span style="font-size:16px">🫙</span><span style="font-size:9px;line-height:1">Sauces</span></button>
-    <button class="tab-btn" onclick="showTab('pantry')" title="Pantry"><span style="font-size:16px">🧄</span><span style="font-size:9px;line-height:1">Pantry</span></button>
-    <button class="tab-btn" onclick="showTab('history')" title="History"><span style="font-size:16px">📖</span><span style="font-size:9px;line-height:1">History</span></button>
-    <button class="tab-btn" onclick="showTab('prep')" title="Prep Order"><span style="font-size:16px">🔪</span><span style="font-size:9px;line-height:1">Prep</span></button>
-    <button class="tab-btn" onclick="showTab('eatout')" title="Eat Out"><span style="font-size:16px">🍔</span><span style="font-size:9px;line-height:1">Eat Out</span></button>
-    <button class="tab-btn" onclick="showTab('settings')" title="Settings"><span style="font-size:16px">⚙️</span><span style="font-size:9px;line-height:1">More</span></button>
+    <button class="tab-btn active" onclick="showTab('plan')" title="Plan"><span class="tab-icon">📅</span><span class="tab-label">Plan</span></button>
+    <button class="tab-btn" onclick="showTab('vault')" title="Recipe Vault"><span class="tab-icon">🗄️</span><span class="tab-label">Vault</span></button>
+    <button class="tab-btn" onclick="showTab('grocery')" title="Grocery"><span class="tab-icon">🛒</span><span class="tab-label">Shop</span></button>
+    <button class="tab-btn" onclick="showTab('sauces')" title="Sauces"><span class="tab-icon">🫙</span><span class="tab-label">Sauces</span></button>
+    <button class="tab-btn" onclick="showTab('pantry')" title="Pantry"><span class="tab-icon">🧄</span><span class="tab-label">Pantry</span></button>
+    <button class="tab-btn" onclick="showTab('history')" title="History"><span class="tab-icon">📖</span><span class="tab-label">History</span></button>
+    <button class="tab-btn" onclick="showTab('prep')" title="Prep Order"><span class="tab-icon">🔪</span><span class="tab-label">Prep</span></button>
+    <button class="tab-btn" onclick="showTab('eatout')" title="Eat Out"><span class="tab-icon">🍔</span><span class="tab-label">Eat Out</span></button>
+    <button class="tab-btn" onclick="showTab('settings')" title="Settings"><span class="tab-icon">⚙️</span><span class="tab-label">More</span></button>
     <button class="tab-btn" onclick="showTab('cook')" style="background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:700">👨‍🍳 Cook</button>
   </div>
 </nav>
@@ -682,7 +796,7 @@ const DEFAULT_BREAKFASTS = [
       "Cook sausage in a skillet over medium heat, crumbling into small pieces until no pink. Set aside to cool slightly.",
       "Grease all 12 muffin cups generously — sides too.",
       "── MIX AND BAKE ──",
-      "In a large bowl, whisk together 10 eggs + ½ cup liquid egg whites.",
+      "Whisk together 10 eggs + ½ cup liquid egg whites in a large bowl.",
       "Add ¼ cup Fairlife milk, seasoning (Kinder's or Dan-O's). Whisk again.",
       "Stir in squeezed zucchini, chopped spinach, sausage crumbles, and ½ cup shredded cheddar.",
       "Pour evenly into the 12 muffin cups — about ¾ full each.",
@@ -1038,8 +1152,7 @@ const DEFAULT_BREAKFASTS = [
     ],
     instructions:[
       "Preheat oven to 375°F. Line a baking sheet with parchment paper.",
-      "In a bowl combine ½ cup Fit Flour per muffin + ½ cup Fage 5% Greek yogurt per muffin + pinch of salt + pinch of baking powder. Mix until a dough forms.",
-      "If too sticky add 1 tsp more Fit Flour at a time. If too dry add 1 tsp water at a time.",
+      "In a bowl combine ½ cup Fit Flour per muffin + ½ cup Fage 5% Greek yogurt per muffin + pinch of salt + pinch of baking powder. Mix until a dough forms. If too sticky add 1 tsp more Fit Flour at a time. If too dry add 1 tsp water at a time.",
       "Divide into 4-6 equal portions (for 4 larger muffins or 6 smaller ones).",
       "── ENGLISH MUFFIN (recommended — best for breakfast sandwiches) ──",
       "Press each portion into a flat disc about ¾ inch thick and 3-4 inches wide. This is the key shape — flat means it cooks evenly, fork-splits naturally, and toasts perfectly. No hole needed.",
@@ -1055,9 +1168,9 @@ const DEFAULT_BREAKFASTS = [
       "FORK SPLIT: Use a fork to split English muffins rather than a knife — creates the nooks and crannies that toast and hold toppings better.",
       "Toast in toaster or toaster oven before eating — transforms the texture.",
       "── TOPPING IDEAS ──",
-      "🍳 BREAKFAST SANDWICH (5-10 min): 1 chicken sausage patty and 1 fried egg and 1 slice cheddar on a fork-split English muffin. Use Applegate Naturals Chicken & Apple or Maple Patties (Costco/Kroger) or Al Fresco (Kroger). | 2 strips turkey bacon and 1 egg and 1 slice pepper jack | 1 egg and 2 oz smoked salmon and 1 tsp capers and red onion | Microwave 1 egg in a mug (crack egg, 30 sec, stir, 30 sec more) and 1 patty and 1 slice cheese — 3 min total",
-      "⚡ NO-COOK HIGH PROTEIN: 3 tbsp Fage 5% whipped with pinch of salt and zest of ½ lemon — spreads like cream cheese, 14g protein | 3 tbsp Good Culture cottage cheese blended smooth — 14g protein vs 2g in cream cheese | 2 oz smoked salmon and 2 tbsp whipped yogurt and 1 tsp capers and everything bagel seasoning | 1 tbsp almond butter and 1 tsp honey and ½ banana sliced (great for the girls)",
-      "🧈 ELEVATED SPREADS: ½ avocado mashed and squeeze of lemon and flaky salt and pinch of red pepper flakes | 2 tbsp ricotta and 1 tsp honey and 1 tbsp chopped walnuts | 2 tbsp hummus and 4 cucumber slices and red pepper flakes | Nothing Hidden Ranch (Sauces tab) drizzle and 2 oz turkey and tomato slice | 1 tbsp Primal Kitchen Chipotle Mayo and 2 oz turkey and handful spinach"
+      "🍳 BREAKFAST SANDWICH (5-10 min): 1 chicken sausage patty + 1 fried egg + 1 slice cheddar on a fork-split English muffin. Use Applegate Naturals Chicken & Apple or Maple Patties (Costco/Kroger) or Al Fresco (Kroger). | 2 strips turkey bacon + 1 egg + 1 slice pepper jack | 1 egg + 2 oz smoked salmon + 1 tsp capers + red onion | Microwave 1 egg in a mug (crack egg, 30 sec, stir, 30 sec more) + 1 patty + 1 slice cheese — 3 min total",
+      "⚡ NO-COOK HIGH PROTEIN: 3 tbsp Fage 5% whipped with pinch of salt + zest of ½ lemon — spreads like cream cheese, 14g protein | 3 tbsp Good Culture cottage cheese blended smooth — 14g protein vs 2g in cream cheese | 2 oz smoked salmon + 2 tbsp whipped yogurt + 1 tsp capers + everything bagel seasoning | 1 tbsp almond butter + 1 tsp honey + ½ banana sliced (great for the girls)",
+      "🧈 ELEVATED SPREADS: ½ avocado mashed + squeeze of lemon + flaky salt + pinch of red pepper flakes | 2 tbsp ricotta + 1 tsp honey + 1 tbsp chopped walnuts | 2 tbsp hummus + 4 cucumber slices + red pepper flakes | Nothing Hidden Ranch (Sauces tab) drizzle + 2 oz turkey + tomato slice | 1 tbsp Primal Kitchen Chipotle Mayo + 2 oz turkey + handful spinach"
     ],
     tips:"ENGLISH MUFFIN IS THE BEST SHAPE: Flat disc, ¾ inch thick, 3-4 inches wide. Cooks evenly without a hole, fork-splits naturally for better texture, perfect diameter for a breakfast sandwich patty. This is the move. | FORK SPLIT: Always fork-split not knife-cut — creates nooks and crannies that hold butter, toppings, and egg yolk. | GREEK YOGURT: Fage 0% is best — highest protein, right consistency. Full fat works too. | WET HANDS: Dough is sticky — wet hands make shaping effortless. | SCALE UP: Make 8-10 Sunday. Freeze individually between parchment. Toaster from frozen in 2 min. | THICKNESS MATTERS: ¾ inch is the sweet spot for English muffins — thinner and it dries out, thicker and the center stays gummy.",
     bagel_toppings:[
@@ -1838,8 +1951,7 @@ const DEFAULT_DINNERS = [
     instructions:[
       "── MISE EN PLACE ──",
       "Pat chicken thighs completely dry with paper towels.",
-      "In a bowl combine 2 tbsp avocado oil + 1 packet taco seasoning + 1 tsp chili powder + juice of 1 lime.",
-      "Add 1.5 lbs chicken thighs and toss to coat. Marinate 30 min minimum.",
+      "In a bowl combine 2 tbsp avocado oil + 1 packet taco seasoning + 1 tsp chili powder + juice of 1 lime. Add 1.5 lbs chicken thighs and toss to coat. Marinate 30 min minimum.",
       "Prepare your base: cook farro/quinoa per package, or microwave cauliflower rice. While warm, stir in grated zucchini.",
       "Warm 1 can black beans (drained, rinsed) in a small saucepan with a pinch of cumin and Dan-O's.",
       "Prep toppings: halve cherry tomatoes, thaw corn, slice avocado.",
@@ -2199,11 +2311,10 @@ const DEFAULT_DINNERS = [
       "── MISE EN PLACE ──",
       "Thinly slice 6 large yellow onions about ⅛ inch thick — uniform thickness means even cooking.",
       "Grate 1.5 cups Gruyère. Set aside.",
-      "🟡 BOWL 1 — ½ cup white wine + 4 cups beef broth + 1 tsp Worcestershire + 2 thyme sprigs + 2 bay leaves + 1 tsp black pepper.",
+      "🟡 BOWL 1 — Measure ½ cup white wine + 4 cups beef broth + 1 tsp Worcestershire + 2 thyme sprigs + 2 bay leaves + 1 tsp black pepper into one bowl. Everything goes in together.",
       "── CARAMELIZE THE ONIONS (60-75 min — the main event) ──",
-      "In a large Dutch oven over MEDIUM-LOW heat, melt 4 tbsp butter + 1 tbsp olive oil.",
-      "Add all 6 onions + 1 tsp salt + ¼ tsp baking soda. Stir to coat.",
-      "The baking soda is Kenji's trick — it raises the pH and cuts caramelization time from 90 min to 60 min. Cook low and slow — do not rush with higher heat.",
+      "Melt 4 tbsp butter + 1 tbsp olive oil in a large Dutch oven over MEDIUM-LOW heat.",
+      "Add all 6 onions + 1 tsp salt + ¼ tsp baking soda. Stir to coat. The baking soda is Kenji's trick — it raises the pH and cuts caramelization time from 90 min to 60 min. Cook low and slow — do not rush with higher heat.",
       "Stir every 5-10 min. Let them sit undisturbed between stirs to build fond on the bottom — scrape that fond up each time.",
       "If fond gets too dark before onions are done, add a splash of water and scrape up.",
       "After 45-60 min the onions should be deep mahogany, jammy, and reduced dramatically. This is the goal.",
@@ -2527,8 +2638,8 @@ const DEFAULT_DINNERS = [
       "── COOK ──",
       "Heat avocado oil in a cast iron or non-stick skillet over MEDIUM-HIGH heat.",
       "Add salmon SKIN SIDE UP first — sear 3-4 min until golden crust forms. Do not move it.",
-      "Flip to skin-side down. IMMEDIATELY turn heat DOWN to MEDIUM or MEDIUM-LOW. Pour the glaze (3 tbsp honey, 3 garlic cloves, 2 tbsp soy sauce, 1 tbsp vinegar, 1 tsp sesame oil) over the salmon.",
-      "Wait 30 seconds for pan to cool slightly, THEN pour the full glaze (3 tbsp honey, 3 cloves minced garlic, 2 tbsp soy sauce, 1 tbsp rice wine vinegar, 1 tsp sesame oil) over the salmon.",
+      "Flip to skin-side down. IMMEDIATELY turn heat DOWN to MEDIUM or MEDIUM-LOW. Pour the glaze (3 tbsp honey + 3 garlic cloves + 2 tbsp soy sauce + 1 tbsp vinegar + 1 tsp sesame oil) over the salmon.",
+      "Wait 30 seconds for pan to cool slightly, THEN pour the full glaze (3 tbsp honey + 3 cloves minced garlic + 2 tbsp soy sauce + 1 tbsp rice wine vinegar + 1 tsp sesame oil) over the salmon.",
       "The glaze should sizzle gently — not smoke or burn immediately. If it is smoking the heat is still too high.",
       "Spoon the glaze back over the top every 30-45 seconds as it thickens. Should take 3-4 min.",
       "Target internal temp: 125-130°F for medium (slightly silky center) or 145°F fully cooked. Pull at 125°F and rest 2 min.",
@@ -3021,8 +3132,7 @@ const DEFAULT_DINNERS = [
     ],
     instructions:[
       "── MISE EN PLACE ──",
-      "Blend the sauce: add 1 cup cottage cheese + ¼ cup grated Parmesan + 2 cloves garlic + ¼ cup Fairlife milk + 1 tsp Dan-O's + ¼ tsp pepper + pinch of nutmeg + zest of ½ lemon.",
-      "Blend 60-90 seconds until completely smooth. Set aside.",
+      "Blend the sauce: add 1 cup cottage cheese + ¼ cup grated Parmesan + 2 cloves garlic + ¼ cup Fairlife milk + 1 tsp Dan-O's + ¼ tsp pepper + pinch of nutmeg + zest of ½ lemon. Blend 60-90 seconds until completely smooth. Set aside.",
       "Slice chicken into strips. Pat completely dry. Season with Dan-O's, Kinder's, salt and pepper.",
       "── COOK PASTA ──",
       "Salt your pasta water generously (2 tsp kosher salt per quart) — it should taste like the sea.",
@@ -3033,7 +3143,7 @@ const DEFAULT_DINNERS = [
       "Flip and cook another 2-3 min. INTERNAL TEMP: 165°F. Remove and set aside.",
       "── BUILD THE SAUCE ──",
       "Reduce heat to LOW — this is critical. Cottage cheese sauce breaks if it gets too hot.",
-      "Reduce heat to LOW. Add the full blended sauce (1 cup cottage cheese, ¼ cup Parmesan, ¼ cup Fairlife milk) to the same pan.",
+      "Reduce heat to LOW. Add the full blended sauce (1 cup cottage cheese + ¼ cup Parmesan + ¼ cup Fairlife milk) to the same pan.",
       "Add ¼ cup pasta water and stir to loosen. The sauce should coat a spoon.",
       "Add drained pasta to the sauce. Toss to coat. Add reserved pasta water 1-2 tbsp at a time until sauce is silky and coats every strand — not too thick, not watery.",
       "Add spinach and stir until just wilted.",
@@ -3104,8 +3214,7 @@ const DEFAULT_DINNERS = [
       "── MISE EN PLACE ──",
       "Preheat oven to 425°F.",
       "🥔 BOWL 1 — Cube 2 medium russet potatoes. Toss with 1 tbsp avocado oil, ½ tsp garlic powder, ½ tsp paprika, ½ tsp salt.",
-      "🫙 BOWL 2 — ½ cup Greek yogurt + 1 tbsp mayo + 1 tbsp lemon juice + 1 tsp garlic powder + 1 tsp dill + 1 tbsp green onions + salt.",
-      "Mix Bowl 2 together and refrigerate.",
+      "🫙 BOWL 2 — Mix ½ cup Greek yogurt + 1 tbsp mayo + 1 tbsp lemon juice + 1 tsp garlic powder + 1 tsp dill + 1 tbsp green onions + salt. Refrigerate.",
       "── ROAST POTATOES ──",
       "🟢 Spread Bowl 1 potatoes on a sheet pan in a single layer — do not crowd.",
       "🟢 Roast at 425°F for 25-30 min, flipping halfway, until golden and crispy.",
@@ -3274,7 +3383,7 @@ const DEFAULT_DINNERS = [
       "Butterfly and pound 2 chicken breasts into 4 thin cutlets (¼ inch) between plastic wrap. Season both sides generously with salt and pepper.",
       "Dredge each cutlet in flour, shaking off the excess. Have all sauce ingredients measured and ready — this dish moves fast.",
       "── SEAR THE CHICKEN ──",
-      "In a large skillet over MEDIUM-HIGH heat, heat 2 tbsp olive oil + 1 tbsp butter until shimmering.",
+      "Heat 2 tbsp olive oil + 1 tbsp butter in a large skillet over MEDIUM-HIGH heat until shimmering.",
       "Add chicken cutlets in a single layer — do not crowd. Sear 3-4 min per side until golden brown. INTERNAL TEMP: 165°F.",
       "Remove chicken to a plate. Tent with foil.",
       "── BUILD THE PAN SAUCE ──",
@@ -3367,8 +3476,7 @@ const DEFAULT_DINNERS = [
     instructions:[
       "── MISE EN PLACE ──",
       "Bring a large pot of well-salted water to a boil.",
-      "In a bowl, whisk together 4 eggs + 2 yolks.",
-      "Add grated Pecorino and Parmesan. Whisk until smooth and creamy. Season with black pepper. Set aside.",
+      "Whisk together 4 eggs + 2 yolks in a bowl. Add grated Pecorino and Parmesan. Whisk until smooth and creamy. Season with black pepper. Set aside.",
       "Cut guanciale into lardons (small strips). Room temperature eggs are critical — cold eggs will scramble.",
       "── RENDER THE GUANCIALE ──",
       "Add guanciale to a cold pan. Turn heat to MEDIUM. Render slowly 8-10 min until the fat is translucent and the meat is crispy. Remove from heat.",
@@ -3378,7 +3486,7 @@ const DEFAULT_DINNERS = [
       "This is where Carbonara succeeds or fails. Move fast.",
       "Add hot drained pasta to the guanciale pan OFF HEAT. Toss to coat in the rendered fat.",
       "Add a splash of pasta water to cool the pan slightly. The pan should be hot but not sizzling.",
-      "Pour the full egg and cheese mixture (4 eggs, 2 yolks, 100g Pecorino, 50g Parmesan) over the pasta OFF HEAT. Toss constantly and vigorously — the pasta heat cooks the eggs into a creamy sauce.",
+      "Pour the full egg and cheese mixture (4 eggs + 2 yolks + 100g Pecorino + 50g Parmesan) over the pasta OFF HEAT. Toss constantly and vigorously — the pasta heat cooks the eggs into a creamy sauce.",
       "Add pasta water a splash at a time to achieve a silky, flowing sauce that coats every strand. It should never be dry or clumpy.",
       "ACID FINISH: extra crack of black pepper. Extra Pecorino. Serve immediately.",
       "Note: Carbonara waits for no one — eat the moment it is ready."
@@ -3418,7 +3526,7 @@ const DEFAULT_DINNERS = [
       "Cook pasta in heavily salted water until al dente. Reserve 1 cup pasta water before draining.",
       "Pat shrimp completely dry. Season with salt and pepper. Slice garlic thin.",
       "── COOK THE SHRIMP ──",
-      "In a large skillet over MEDIUM-HIGH, heat 2 tbsp olive oil + 2 tbsp butter until butter foams.",
+      "Heat 2 tbsp olive oil + 2 tbsp butter in a large skillet over MEDIUM-HIGH until butter foams.",
       "Add shrimp in a single layer. Sear 90 seconds per side until pink and just cooked through. Remove immediately — shrimp overcook in seconds.",
       "── BUILD THE SAUCE ──",
       "Reduce heat to MEDIUM. Add remaining 2 tbsp butter. Add sliced garlic and red pepper flakes. Cook 2 min until garlic is softened but not brown.",
@@ -3593,8 +3701,7 @@ const DEFAULT_DINNERS = [
     ],
     instructions:[
       "── MISE EN PLACE ──",
-      "Cook sushi rice first — it needs 30 min to cool to room temperature. Season with 2 tbsp rice wine vinegar + 1 tsp sugar + ½ tsp salt while still warm.",
-      "Fan to cool.",
+      "Cook sushi rice first — it needs 30 min to cool to room temperature. Season with 2 tbsp rice wine vinegar + 1 tsp sugar + ½ tsp salt while still warm. Fan to cool.",
       "🫙 BOWL 1 — Mix 3 tbsp soy sauce + 1 tbsp sesame oil + 1 tsp rice vinegar + 1 tsp honey + grated ginger + minced garlic + sriracha + green onions + sesame seeds.",
       "🫙 BOWL 2 — Mix 3 tbsp Kewpie mayo + 1 tbsp sriracha + 1 tsp sesame oil + 1 tsp lime juice until smooth.",
       "── PREPARE THE TUNA ──",
@@ -3714,7 +3821,7 @@ const DEFAULT_DINNERS = [
     ],
     instructions:[
       "── MAKE THE DOUGH ──",
-      "In a large bowl, whisk 2 tsp baking powder + ½ tsp kosher salt into 1¾ cups flour.",
+      "Whisk 2 tsp baking powder + ½ tsp kosher salt into 1¾ cups flour in a large bowl.",
       "Add 1 cup Fage 5% Greek yogurt. Stir until a shaggy dough forms.",
       "Turn out onto a lightly floured surface. Knead 2-3 min until smooth. If sticky add 1 tbsp flour at a time. If dry add 1 tsp water at a time. Dough should be soft and slightly tacky but not sticky.",
       "── REST ──",
@@ -3727,8 +3834,7 @@ const DEFAULT_DINNERS = [
       "Add one naan at a time. Cook 1-2 min until bubbles form on top and the bottom has deep golden-brown char spots.",
       "Flip and cook 1 min more. Dark char spots are correct and desirable — they are flavor. A pale naan is an undercooked naan.",
       "── GARLIC FINISH ──",
-      "Mix 2 tbsp olive oil + 2 cloves minced garlic.",
-      "Brush over each hot naan immediately out of the pan.",
+      "Mix 2 tbsp olive oil + 2 cloves minced garlic. Brush over each hot naan immediately out of the pan.",
       "Sprinkle with fresh parsley or cilantro.",
       "Stack finished naan in a clean kitchen towel — they steam each other and stay soft. Serve immediately.",
       "ACID FINISH: a squeeze of lemon over the finished naan brightens everything."
@@ -3841,8 +3947,7 @@ const DEFAULT_DINNERS = [
       "Remove from heat. Spread mushrooms on a plate to cool completely — 10-15 min. Warm mushrooms will partially cook the meat when mixed, ruining the texture.",
       "── MIX THE BURGERS ──",
       "TURKEY VERSION: Combine 1 lb ground turkey + cooled mushrooms + 2 tsp Worcestershire + 1 tsp garlic powder + 1 tsp onion powder + 1 tsp smoked paprika + ½ tsp pepper + 1 tsp salt + 1 tsp Dijon.",
-      "BEEF VERSION: Combine 12 oz ground beef + cooled mushrooms + 1 tsp Worcestershire + 1 tsp garlic powder + ½ tsp onion powder + 1 tsp salt + ½ tsp pepper.",
-      "Less seasoning needed — beef already has flavor.",
+      "BEEF VERSION: Combine 12 oz ground beef + cooled mushrooms + 1 tsp Worcestershire + 1 tsp garlic powder + ½ tsp onion powder + 1 tsp salt + ½ tsp pepper. Less seasoning needed — beef already has flavor.",
       "Mix gently until just combined — do not overmix. Beef especially — overworked beef = dense tough patties.",
       "TASTE TEST: Cook a small piece fully (165°F) before forming all patties. Adjust seasoning.",
       "Form into 4 patties ¾ inch thick. Press a thumb indent in the center of each — prevents doming.",
@@ -3911,8 +4016,7 @@ const DEFAULT_DINNERS = [
     ],
     instructions:[
       "── NIGHT BEFORE — BRINE ──",
-      "Heat 4 cups water in a pot with ¼ cup kosher salt + ¼ cup brown sugar + garlic + herbs + peppercorns + bay leaf.",
-      "Stir until dissolved.",
+      "Heat 4 cups water in a pot with ¼ cup kosher salt + ¼ cup brown sugar + garlic + herbs + peppercorns + bay leaf. Stir until dissolved.",
       "Remove from heat. Add 4 cups ice water to cool completely — the brine must be cold before the turkey goes in.",
       "Submerge turkey breast completely in brine in a large zip-lock bag or container. Refrigerate overnight — 12-24 hours. Do not exceed 24 hours or it gets too salty.",
       "── MORNING OF — DRY ──",
@@ -3977,16 +4081,13 @@ const DEFAULT_DINNERS = [
     ],
     instructions:[
       "START ONIONS FIRST — they take the longest.",
-      "Thinly slice 4 yellow onions.",
-      "In a large skillet over MEDIUM-LOW heat, melt 3 tbsp butter + 1 tbsp olive oil.",
-      "Add onions + 0.5 tsp salt. Stir to coat.",
-      "Cook low and slow 45-60 min stirring every 5-10 min until deep mahogany and jammy.",
+      "Thinly slice 4 yellow onions. Melt 3 tbsp butter + 1 tbsp olive oil in a large skillet over MEDIUM-LOW heat.",
+      "Add onions + 0.5 tsp salt. Stir to coat. Cook low and slow 45-60 min stirring every 5-10 min until deep mahogany and jammy.",
       "NOTE: If also making French Onion Soup — start with 10 total onions in a large pot. Split the fully caramelized batch. Half to the soup, half stays here for sandwiches.",
       "── MAKE THE AU JUS ──",
       "In a small saucepan add 1 clove minced garlic over MEDIUM heat. Cook 60 seconds.",
       "Add a splash of white wine — scrape up any fond. Simmer 2 min until reduced.",
-      "Add 1.5 cups beef broth + 1 tsp Worcestershire + 1 thyme sprig.",
-      "Simmer 10-15 min until slightly reduced. Season with salt and pepper. Remove thyme. Keep warm.",
+      "Add 1.5 cups beef broth + 1 tsp Worcestershire + 1 thyme sprig. Simmer 10-15 min until slightly reduced. Season with salt and pepper. Remove thyme. Keep warm.",
       "── PREP THE STEAK ──",
       "Slice leftover steak as thin as possible against the grain — cold steak slices more cleanly.",
       "Warm steak slices in a hot skillet 30-60 seconds just to take the chill off. Or dip directly into the hot au jus for 30 seconds.",
@@ -3995,8 +4096,7 @@ const DEFAULT_DINNERS = [
       "Toast cut-side down in a dry skillet until golden — 2-3 min.",
       "Optional: quick 2-3 second dip in the au jus right before assembling. Not a soak — just flavor.",
       "── MAKE THE SAUCE ──",
-      "Mix 3 tbsp Kewpie mayo + 1 tsp Dijon + 1 tsp horseradish.",
-      "Set aside.",
+      "Mix 3 tbsp Kewpie mayo + 1 tsp Dijon + 1 tsp horseradish. Set aside.",
       "── ASSEMBLE ──",
       "Spread sauce on both sides of toasted baguette.",
       "Layer caramelized onions generously on the bottom half.",
@@ -4054,15 +4154,13 @@ const DEFAULT_DINNERS = [
     instructions:[
       "── STEP 1 — START THE ONIONS (do this first, everything else builds around them) ──",
       "Thinly slice all 10 yellow onions about ⅛ inch thick.",
-      "In your largest Dutch oven over MEDIUM-LOW heat, melt 5 tbsp butter + 2 tbsp olive oil.",
-      "Add all 10 onions + 1.5 tsp salt + ½ tsp baking soda. Stir to coat.",
-      "Baking soda is Kenji's trick — raises the pH and cuts caramelization from 90 min to 60 min. Large batch — looks enormous, cooks down dramatically.",
+      "Melt 5 tbsp butter + 2 tbsp olive oil in your largest Dutch oven over MEDIUM-LOW heat.",
+      "Add all 10 onions + 1.5 tsp salt + ½ tsp baking soda. Stir to coat. Baking soda is Kenji's trick — raises the pH and cuts caramelization from 90 min to 60 min. Large batch — looks enormous, cooks down dramatically.",
       "Cook low and slow 60 min stirring every 8-10 min. Do not rush. Goal: deep mahogany, jammy, reduced to about 2 cups total.",
       "── STEP 2 — WHILE ONIONS COOK, PREP EVERYTHING ELSE ──",
-      "🟡 BOWL 1 (soup liquids): ½ cup white wine + 4 cups beef broth + 1 tsp Worcestershire + 2 thyme sprigs + 2 bay leaves + 1 tsp black pepper.",
-      "🔵 BOWL 2 (au jus liquids): 1.5 cups beef broth + 1 tsp Worcestershire + splash of wine + 1 thyme sprig.",
-      "🫙 BOWL 3 (sandwich sauce): 3 tbsp Kewpie mayo + 1 tsp Dijon + 1 tsp horseradish.",
-      "Mix Bowl 3 together and refrigerate.",
+      "🟡 BOWL 1 (soup liquids): Measure ½ cup white wine + 4 cups beef broth + 1 tsp Worcestershire + 1 tsp black pepper into one bowl. Add 2 thyme sprigs and 2 bay leaves alongside.",
+      "🔵 BOWL 2 (au jus liquids): Measure 1.5 cups beef broth + 1 tsp Worcestershire + splash of wine into a second bowl. Add 1 thyme sprig alongside.",
+      "🫙 BOWL 3 (sandwich sauce): Mix 3 tbsp Kewpie mayo + 1 tsp Dijon + 1 tsp horseradish. Refrigerate.",
       "Grate 1.5 cups Gruyere for the soup topping. Set aside.",
       "Mince 3 cloves garlic total — 2 cloves for the soup, 1 clove for the au jus. Keep separate.",
       "Slice leftover steak as thin as possible against the grain — cold steak slices more cleanly.",
@@ -4078,8 +4176,7 @@ const DEFAULT_DINNERS = [
       "── STEP 5 — MAKE THE AU JUS (parallel while soup simmers) ──",
       "In a small saucepan add 1 clove minced garlic over MEDIUM heat. Cook 60 seconds.",
       "Add a splash of white wine. Simmer 2 min until reduced.",
-      "Pour in 🔵 BOWL 2 all at once — 1.5 cups beef broth + 1 tsp Worcestershire + 1 thyme sprig.",
-      "Simmer 10-15 min until slightly reduced. Season with salt and pepper. Remove thyme. Keep warm.",
+      "Pour in 🔵 BOWL 2 all at once — 1.5 cups beef broth + 1 tsp Worcestershire + 1 thyme sprig. Simmer 10-15 min until slightly reduced. Season with salt and pepper. Remove thyme. Keep warm.",
       "── STEP 6 — TOAST THE BREAD (for both dishes) ──",
       "Slice sourdough or baguette for both the soup AND the sandwiches.",
       "Toast all bread cut-side down in a buttered skillet until deep golden — 2-3 min. Set aside.",
@@ -4102,6 +4199,101 @@ const DEFAULT_DINNERS = [
     ],
     tips:"START ONIONS FIRST: Everything else is built around the 60 min caramelization. The onions are the foundation of both dishes. | THE SPLIT: Split the onions when they are fully done — jammy and mahogany. Half to the Dutch oven for soup, half to a separate skillet for sandwiches on LOW heat. | PARALLEL COOKING: While the soup simmers (20-25 min) you can make the au jus, warm the steak, toast the bread, and assemble the sandwiches. The timing works out perfectly. | BROIL THE SOUP LAST: Assemble and broil the soup after the sandwiches are done — they take 2 min under the broiler and you want everything hitting the table at the same time. | COLD STEAK SLICES THINNER: Leftover refrigerator-cold steak slices more cleanly paper-thin. Use your sharpest knife against the grain.",
     kidNote:"Adults only — this is a full adults night dinner. Feed the girls before you start cooking, this takes 90 min and is worth doing right without distraction.",
+    active:true
+  }
+  ,{
+    id:"dinner45",
+    name:"Best Broccoli Cheddar Soup",
+    emoji:"🥦",
+    audience:"family",
+    day:"Saturday",
+    calories:480,
+    protein:22,
+    activeTime:"30 min",
+    prepTime:"15 min prep + 40 min cook",
+    hiddenVeg:"Both carrots grated fine disappear completely. Broccoli stems peeled and diced add volume nobody notices.",
+    leftoverNote:"Keeps 4 days refrigerated. Reheat GENTLY on low — never boil or the cheese breaks. Add a splash of milk to loosen. Does not freeze well (cream and cheese separate).",
+    source:"Synthesized from the top-rated versions — Panera copycat technique with sharp cheddar + Gruyere, Dijon, and a partial blend",
+    description:"Better than Panera. Sharp cheddar + Gruyere grated from blocks, fresh broccoli, Dijon for depth, blended about two-thirds for a creamy base with small broccoli pieces. Pot stays neutral for the girls — bold toppings go on adult bowls only. Perfect brisk fall Saturday soup.",
+    ingredients:[
+      "--- 🧀 THE CHEESE (grate first, bring to room temp) ---",
+      "10 oz sharp white cheddar block — grate yourself, NEVER pre-shredded",
+      "4 oz Gruyere block — grate yourself",
+      "2 oz cream cheese, softened (optional — adds body, skip to simplify)",
+      "--- 🧅 AROMATICS (Bowl 1 — prep together) ---",
+      "1 large yellow onion, diced small",
+      "2 large carrots, both grated fine on box grater (invisible in the soup)",
+      "3 cloves garlic, minced",
+      "--- 🫙 SEASONING BOWL (Bowl 2 — mix together) ---",
+      "1 tsp Dijon mustard",
+      "1 tsp Worcestershire sauce",
+      "1 pinch nutmeg",
+      "--- THE BASE ---",
+      "4 tbsp unsalted butter",
+      "¼ cup all-purpose flour or Fit Flour",
+      "3 cups low-sodium chicken broth (Kettle & Fire preferred) — plus 1 extra cup held back to thin if needed",
+      "1 cup whole milk or Fairlife 2%",
+      "1 cup heavy cream",
+      "5 cups fresh broccoli — small florets plus peeled, diced stems (about 2 heads)",
+      "Kosher salt and black pepper — season at the END only",
+      "Squeeze of lemon to finish",
+      "--- 🍷 ADULT BOWL TOPPINGS ONLY ---",
+      "Smoked paprika dusting",
+      "Coarse cracked black pepper",
+      "Hot sauce (Cholula or Frank's) — a few dashes",
+      "Crumbled turkey bacon or crispy shallots (optional)",
+      "--- 👧 KID BOWL TOPPINGS ---",
+      "Extra grated sharp cheddar on top — lots",
+      "Bowl of Parmesan on the table (Lucy's move)",
+      "Goldfish or oyster crackers to float",
+      "--- 🥖 SOURDOUGH DIPPING STRIPS ---",
+      "1 sourdough loaf (Publix bakery)",
+      "3 tbsp butter, melted",
+      "1 clove garlic, grated (optional)",
+      "Pinch of flaky salt"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Grate 10 oz sharp cheddar + 4 oz Gruyere on the large holes of a box grater. Set aside at ROOM TEMPERATURE — cold cheese seizes and turns grainy. This is the single most important step.",
+      "🧅 BOWL 1 — Dice 1 large onion small. Grate 2 carrots fine. Mince 3 cloves garlic. Keep together.",
+      "🫙 BOWL 2 — Mix 1 tsp Dijon + 1 tsp Worcestershire + 1 pinch nutmeg. Everything goes in together.",
+      "Cut 2 heads broccoli into SMALL florets (bite-sized for the girls). Peel the tough outer layer off the stems and dice them small — they go in too.",
+      "Measure 3 cups broth + 1 cup milk + 1 cup cream. Keep 1 extra cup broth nearby to thin at the end if needed.",
+      "── BUILD THE BASE ──",
+      "Melt 4 tbsp butter in a large Dutch oven over MEDIUM heat.",
+      "Add Bowl 1 (onion + grated carrots + garlic) with a pinch of salt. Cook 6-8 min, stirring occasionally, until onion is soft and just turning golden. The carrots disappear.",
+      "Sprinkle ¼ cup flour over everything. Stir constantly 2 min until it smells slightly nutty — this cooks out the raw flour taste. Do not rush.",
+      "Pour in 3 cups broth SLOWLY while stirring constantly — this prevents lumps. Then add 1 cup milk + 1 cup cream.",
+      "Pour in Bowl 2 (Dijon + Worcestershire + nutmeg). Stir to combine.",
+      "Bring to a gentle simmer over MEDIUM — small bubbles, not a rolling boil.",
+      "── COOK THE BROCCOLI ──",
+      "Add all 5 cups broccoli including the diced stems. Simmer 12-15 min until very tender — florets should break apart easily when pressed with a spoon.",
+      "── BLEND ──",
+      "Turn off the heat. Blend about TWO-THIRDS of the soup with an immersion blender — 15-20 seconds. Creamy base, small broccoli pieces remain. Smaller chunks = safer for the girls.",
+      "No immersion blender: ladle half into a regular blender, fill no more than HALFWAY, vent the lid with a towel (hot soup expands). Blend smooth, return to pot. Repeat with a bit more if you want it smoother.",
+      "── ADD CHEESE — OFF HEAT ──",
+      "Heat stays OFF or on the lowest setting from here. Boiling after cheese = greasy, grainy, broken soup.",
+      "If using cream cheese, add 2 oz now and stir until melted.",
+      "Add grated cheese one large handful at a time, stirring each handful in completely before adding the next. Takes 2-3 min. Patience here = silky soup.",
+      "── FINISH ──",
+      "NOW taste and season with salt and pepper. Cheese, Worcestershire and Dijon all brought salt — this is why you waited.",
+      "Too thick: stir in the reserved broth a splash at a time. Too thin: simmer on LOW uncovered 5 min — never boil.",
+      "ACID FINISH: tiny squeeze of lemon stirred in — brightens everything, undetectable.",
+      "── KID BOWLS ──",
+      "Ladle the girls' bowls first before any adult toppings. Top with extra grated cheddar. Set out Parmesan and Goldfish crackers.",
+      "If Lucy balks at the chunks: pour her bowl into a tall cup, immersion blend 5 seconds, pour back. Smooth soup, done.",
+      "── ADULT BOWLS ──",
+      "Dust with smoked paprika, crack black pepper over, add a few dashes of hot sauce. Turkey bacon crumbles if you went there.",
+      "── SOURDOUGH STRIPS (make while soup simmers) ──",
+      "Preheat oven to 425°F. Line a sheet pan with parchment.",
+      "Slice sourdough into ¾-inch thick slices, then cut each slice into 1-inch wide strips — finger-length, like breadsticks.",
+      "Melt 3 tbsp butter. Grate 1 clove garlic into it if you want garlic strips (skip for the girls — do half plain, half garlic).",
+      "Brush strips on both sides with the butter. Arrange in a single layer, not touching.",
+      "Bake 425°F for 8-10 min, flip once halfway, until deep golden and crisp on the outside but still a little soft inside.",
+      "Sprinkle with flaky salt the moment they come out. Serve in a basket alongside the soup for dipping."
+    ],
+    tips:"CHEESE IS EVERYTHING: Blocks only, grated yourself, at room temperature. Pre-shredded cheese is coated in anti-caking starch that makes soup grainy and keeps it from melting smooth. | NEVER BOIL AFTER CHEESE: The number one way broccoli cheddar soup fails. Off heat, handful at a time, stir until each melts. | 3 CUPS BROTH FIRST: Six cups of liquid against ¼ cup flour runs thin. Start with 3, hold the 4th, adjust at the end. | SALT LAST: Cheese + Worcestershire + Dijon all carry salt. Taste after the cheese is in. | BLEND TWO-THIRDS: More blended than the usual half — creamy with small pieces, which keeps the girls happy. | POT STAYS NEUTRAL: Smoked paprika, cracked pepper, hot sauce, bacon all go on adult bowls only. The pot itself is mild and kid-friendly. | BLENDER SAFETY: Regular blender — no more than half full, towel over the vented lid, two batches. | SOURDOUGH STRIPS over bread bowls: less intimidating for kids, less waste, better crust-to-soup ratio. Do half plain for the girls, half garlic for the adults.",
+    kidNote:"Lucy asked for this one — big win. The pot is deliberately mild: no paprika, no pepper, no hot sauce until the adult bowls. Carrots grated invisible, broccoli chunks small from the two-thirds blend. Extra cheddar on top, Parmesan on the table, Goldfish to float. Plain sourdough strips for dipping. If chunks are still a problem, blend her bowl smooth in a cup — 5 seconds.",
     active:true
   }
 ];
@@ -4979,6 +5171,12 @@ async function initSupabase() {
 
 
 function applySwaps(ingredients) {
+  // Disabled: recipes are authored with their intended ingredients. The 💪 Macro / 🍷 Max Enjoyment
+  // toggle in the recipe modal (originalIngredients) is now the only swap mechanism.
+  if (!ingredients || !Array.isArray(ingredients)) return [];
+  return ingredients.slice();
+}
+function _legacyApplySwaps(ingredients) {
   if (!ingredients || !Array.isArray(ingredients) || !ingredients.length) return [];
   return ingredients.map(ing => {
     if (typeof ing !== "string") return ing;
@@ -5041,7 +5239,7 @@ async function loadFromSupabase() {
         if (plan.cookHistory) state.cookHistory = plan.cookHistory;
         if (plan.groceryNotes) state.groceryNotes = plan.groceryNotes;
       setSyncStatus("saved");
-    }
+    } else { setSyncStatus("saved"); }
   } catch(e) { console.error("Load error:", e); setSyncStatus("offline"); }
 }
 
@@ -5103,9 +5301,9 @@ function setSyncStatus(status) {
   const el = document.getElementById("syncStatus");
   if (!el) return;
   if (status === "saving") { el.className = "sync-status saving"; el.textContent = "Saving…"; }
-  else if (status === "saved") { el.className = "sync-status saved"; el.textContent = "✓ Synced — shared with wife"; }
-  else if (status === "loading") { el.className = "sync-status saving"; el.textContent = "Loading…"; }
-  else { el.className = "sync-status offline"; el.textContent = supabase ? "Sync error — using local" : "Local only — add Supabase to share"; }
+  else if (status === "saved") { el.className = "sync-status saved"; const t = new Date(); el.textContent = "✓ Synced with MK · " + t.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}); }
+  else if (status === "loading") { el.className = "sync-status saving"; el.textContent = "Connecting to shared plan…"; }
+  else { el.className = "sync-status offline"; el.textContent = supabase ? "⚠️ Sync error · saved on this device" : "Not syncing · set up in ⚙️ to share with MK"; }
 }
 
 function showTab(tab) {
@@ -5238,24 +5436,56 @@ function closeModalForce() {
   document.getElementById("modal").style.display = "none";
 }
 
+// Scale numeric amounts in a text string. Handles "1", "1.5", "½", "1 ½", "1/2".
+// When requireUnit is true (step text), only scales numbers followed by a cooking unit — never °F, minutes, or step numbers.
+const FRAC_MAP = {"½":0.5,"¼":0.25,"¾":0.75,"⅓":1/3,"⅔":2/3,"⅛":0.125,"⅜":0.375,"⅝":0.625,"⅞":0.875};
+function fmtAmount(n) {
+  if (!isFinite(n)) return String(n);
+  const whole = Math.floor(n + 1e-9), frac = n - whole;
+  const fr = [[0.125,"⅛"],[0.25,"¼"],[1/3,"⅓"],[0.375,"⅜"],[0.5,"½"],[0.625,"⅝"],[2/3,"⅔"],[0.75,"¾"],[0.875,"⅞"]];
+  let best = null;
+  for (const [v,ch] of fr) if (Math.abs(frac - v) < 0.04) { best = ch; break; }
+  if (frac < 0.04) return String(whole);
+  if (best) return (whole ? whole + " " : "") + best;
+  return (Math.round(n*10)/10).toString();
+}
+function scaleAmountsInText(text, scale, requireUnit) {
+  if (!text || !scale || scale === 1) return text;
+  const UNIT = "(?:cups?|tbsp|tsp|tablespoons?|teaspoons?|oz|ounces?|lbs?|pounds?|g|grams?|kg|ml|l|cloves?|large|medium|small|heads?|cans?|slices?|eggs?|onions?|pieces?|bunch|stalks?|sprigs?|strips?|sheets?|handfuls?|pinch|pinches|dash|dashes|packages?|pkg|jars?|fillets?|breasts?|thighs?|patties|patty|loa(?:f|ves)|lemons?|limes?|carrots?|potatoes?|tomatoes?|peppers?)";
+  const NUM = "(\\d+(?:\\.\\d+)?)?\\s?([½¼¾⅓⅔⅛⅜⅝⅞])|(\\d+)\\s*/\\s*(\\d+)|(\\d+(?:\\.\\d+)?)";
+  const re = new RegExp("(^|[^\\w°/.])(?:" + NUM + ")(?=(\\s?-\\s?\\d+(?:\\.\\d+)?)?(\\s*" + (requireUnit ? UNIT + "\\b" : "") + "))", "g");
+  return text.replace(re, (m, pre, wholeF, fracCh, numA, denA, plain, range, unitPart, offset, str) => {
+    // skip temperatures / times / percentages
+    const after = str.slice(offset + m.length, offset + m.length + 16).replace(/^\s?[-–]\s?\d+(?:\.\d+)?/, "");
+    if (/^\s*(°|degrees|%|min|minute|hour|hr|sec|second|x\b|×|-?inch|")/i.test(after)) return m;
+    let val;
+    if (fracCh !== undefined) val = (wholeF ? parseFloat(wholeF) : 0) + FRAC_MAP[fracCh];
+    else if (numA !== undefined) {
+      const a = parseFloat(numA), d = parseFloat(denA);
+      if (![2,3,4,8].includes(d) || a >= d) return m; // a ratio like 93/7 or 80/20, not a fraction
+      val = a / d;
+    }
+    else val = parseFloat(plain);
+    if (!isFinite(val)) return m;
+    return pre + fmtAmount(val * scale);
+  });
+}
+
 function viewRecipe(section, id) {
   const list = section === "breakfast" ? state.breakfasts : section === "lunch" ? state.lunches : section === "dessert" ? state.desserts : state.dinners;
   const item = list.find(x => x.id === id);
   if (!item) return;
 
   const scale = scaleFactors[item.id] || 1;
-  function scaleIngr(ing) {
-    return ing.replace(/(\d+(\.\d+)?)/g, (m) => {
-      const n = parseFloat(m) * scale;
-      return n % 1 === 0 ? String(n) : n.toFixed(1).replace(/\.0$/, "");
-    });
-  }
+  const enjoyMode = !!(window.recipeEnjoyMode && window.recipeEnjoyMode[item.id]) && !!(item.originalIngredients && item.originalIngredients.length);
+  const shownIngredients = enjoyMode ? item.originalIngredients : (item.ingredients || []);
+  function scaleIngr(ing) { return scaleAmountsInText(ing, scale); }
   const scaleHtml = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 12px">
     <span style="font-size:13px;color:var(--dim);margin-right:4px">Servings:</span>
     ${[0.5,1,1.5,2,3].map(f => `<button onclick="scaleFactors['${item.id}']=${f};viewRecipe('${section}','${item.id}')" style="padding:5px 10px;border-radius:8px;border:1px solid ${scale===f?'var(--green)':'rgba(255,255,255,0.12)'};background:${scale===f?'rgba(16,185,129,0.15)':'transparent'};color:${scale===f?'var(--green)':'var(--muted)'};font-size:13px;font-weight:${scale===f?'700':'400'};cursor:pointer">${f===0.5?'½':f===1.5?'1½':f}x</button>`).join("")}
   </div>`;
   // scaleHtml injected above
-  const ingrHtml = (item.ingredients || []).map(ing => {
+  const ingrHtml = shownIngredients.map(ing => {
     if (ing.startsWith("---")) return `<div class="ingredient-section">${esc(ing.replace(/---/g,"").trim())}</div>`;
     return `<div class="ingredient-item"><span class="ingredient-bullet">●</span><span>${esc(scale===1?ing:scaleIngr(ing))}</span></div>`;
   }).join("");
@@ -5278,6 +5508,8 @@ function viewRecipe(section, id) {
         <div style="font-size:28px;margin-bottom:4px">${item.emoji}</div>
         <div class="modal-title">${esc(item.name)}</div>
         <div style="color:var(--dim);font-size:13px;margin-top:4px;margin-bottom:10px">${esc(item.description)}</div>
+        ${item.audience ? `<div style="margin-bottom:8px"><span class="tag ${item.audience==='adults'?'tag-amber':'tag-pink'}">${item.audience==='adults'?'🍷 Adults night':'👨‍👩‍👧‍👧 Family'}</span></div>` : ''}
+        ${item.kidNote ? `<div class="info-box" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.07);margin-bottom:10px"><span class="info-label" style="color:#f472b6">👧 KIDS:</span>${esc(item.kidNote)}</div>` : ''}
         <button onclick="window.chatContext=arguments[0];openChatAssistant(arguments[0]);renderChatMessages()" onmousedown="(function(){const allR=[...state.dinners,...state.breakfasts,...state.lunches,...state.desserts];window.chatContext=allR.find(r=>r&&r.id==='${item.id}');})()" style="width:100%;margin-top:8px;padding:10px;border-radius:12px;border:1px solid rgba(16,185,129,0.3);background:transparent;color:var(--green);font-weight:600;font-size:14px;cursor:pointer">
         👨‍🍳 Ask About This Recipe
       </button>
@@ -5995,7 +6227,7 @@ function renderPlan() {
     }).join("");
 
     return `
-      <div style="background:linear-gradient(145deg,rgba(255,255,255,0.045),rgba(255,255,255,0.02));border-radius:16px;margin-bottom:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);position:relative;">
+      <div class="day-card" style="background:linear-gradient(145deg,rgba(255,255,255,0.045),rgba(255,255,255,0.02));border-radius:16px;margin-bottom:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);position:relative;">
         <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.05);position:relative;">
           <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--green);margin-bottom:3px;opacity:0.8">${{Sunday:"BATCH DAY",Monday:"WEEKDAY",Tuesday:"WEEKDAY",Wednesday:"MID-WEEK",Thursday:"WEEKDAY",Friday:"FRIDAY",Saturday:"WEEKEND"}[day] || "WEEKDAY"}</div>
           <div style="font-size:15px;font-weight:800;letter-spacing:-0.3px;color:var(--text)">${day}</div>
@@ -6090,7 +6322,7 @@ function renderPlan() {
       <div style="font-size:13px;color:var(--dim)">Tap + Add on any day, or browse the 🗄️ Vault to pick recipes</div>
     </div>`}
 
-    ${daysHtml}
+    <div class="days-grid">${daysHtml}</div>
     <div style="height:20px"></div>
   `;
 }
@@ -6234,8 +6466,8 @@ function renderVault() {
     const isFav = (state.ratings[r.id]||{}).favorite;
 
     return `
-      <div style="background:var(--surface);border-radius:14px;margin-bottom:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)" onclick="viewRecipeById('${r.id}')">
-        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer">
+      <div class="vault-card" style="background:var(--surface);border-radius:14px;margin-bottom:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)" onclick="viewRecipeById('${r.id}')">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;height:100%;box-sizing:border-box">
           <span style="font-size:26px;flex-shrink:0">${r.emoji||"🍽️"}</span>
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px">
@@ -6262,7 +6494,7 @@ function renderVault() {
     return `
       <div style="margin-bottom:20px">
         <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">${title} (${recipes.length})</div>
-        ${recipes.map(vaultCard).join("")}
+        <div class="vault-grid">${recipes.map(vaultCard).join("")}</div>
       </div>`;
   }
 
@@ -6323,6 +6555,73 @@ function toggleFavorite(recipeId) {
 }
 
 
+// ── Grocery list builders (restored + rebuilt: list now comes from THIS WEEK'S planned meals) ──
+const GROCERY_DATA = [
+  { cat:"🥩 Protein & Seafood", items:["Boneless skinless chicken breasts (Costco)","Chicken thighs","Salmon fillets","93/7 ground turkey","85/15 ground beef","Chicken sausage patties (Amylu or Applegate)","Deli turkey, sliced","Rotisserie chicken"] },
+  { cat:"🥛 Dairy & Eggs",       items:["Eggs","Fairlife 2% milk","Fage 5% Greek yogurt","Good Culture cottage cheese","Shredded sharp cheddar","Shredded mozzarella","Parmesan (wedge)","Butter","Heavy cream"] },
+  { cat:"🥦 Produce",            items:["Yellow onions","Garlic","Lemons","Limes","Baby spinach","Broccoli","Carrots","Cherry tomatoes","Avocados","Bananas","Fresh thyme","Flat-leaf parsley","Green onions","Fresh ginger"] },
+  { cat:"🌾 Pantry & Grains",    items:["Brami or Barilla protein pasta","Jasmine rice","Rolled oats","Fit Flour","Panko","Avocado oil","Olive oil","Low-sodium chicken broth","Beef broth"] },
+  { cat:"🥫 Canned & Jarred",    items:["Rao's or Frik & Frak marinara","Diced tomatoes","Cannellini beans","Soy sauce","Hoisin","Sesame oil","Honey","Dijon mustard"] },
+  { cat:"🧂 Seasonings",         items:["Kinder's The Blend","Kinder's Lemon Pepper","Italian seasoning","Garlic powder","Smoked paprika","Red pepper flakes","Kosher salt","Black pepper"] },
+];
+
+function categorizeGroceryItem(itemText) {
+  const lower = (itemText || "").toLowerCase();
+  // Order matters: more specific sections first
+  const keywords = {
+    "Spices & Seasonings": ["seasoning","spice blend","kinder","burlap","diaspora","spicewalla","penzeys","dan-o","chili powder","paprika","cumin","italian seasoning","garlic powder","onion powder","oregano","red pepper flakes","kosher salt","black pepper","cayenne","curry powder","everything bagel"],
+    "Frozen": ["frozen","cauliflower rice","ice cream"],
+    "Condiments": ["mustard","ketchup","mayo","salsa","dressing","ranch","buffalo","bbq","sriracha","cholula","frank's","primal kitchen","newman","pesto","ponzu","worcestershire","fish sauce","oyster sauce","gochujang"],
+    "Bread & Grains": ["bread","tortilla","baguette","wrap","pita","bun","roll","sourdough","naan","english muffin","bagel","oat","farro","quinoa","pasta","spaghetti","fettuccine","penne","rice","brami","barilla","flour","panko","breadcrumb","noodle"],
+    "Dairy & Eggs": ["milk","yogurt","cheese","butter","cream","feta","parmesan","mozzarella","provolone","cheddar","gruy","cottage","fairlife","fage","egg"],
+    "Pantry": ["oil","vinegar","broth","stock","bean","diced tomato","crushed tomato","tomato paste","honey","maple","peanut butter","coconut aminos","hoisin","soy sauce","sesame","vanilla","chocolate","chip","rotel","water chestnut","hummus","tahini","sugar","swerve","baking soda","baking powder","cornstarch","wine","sherry","chickpea","lentil"],
+    "Proteins": ["chicken","turkey","salmon","beef","tenderloin","shrimp","sausage","bacon","tuna","ahi","cod","pork","steak","fish","ground","rotisserie","deli"],
+    "Produce": ["tomato","lettuce","spinach","zucchini","carrot","onion","shallot","garlic","cucumber","arugula","greens","banana","lemon","lime","avocado","bell pepper","jalape","mushroom","corn","potato","parsley","thyme","rosemary","dill","basil","ginger","berry","berries","cabbage","celery","broccoli","scallion","green onion","cilantro","kale","mango","pineapple","apple","grape","orange","leek","asparagus","sweet potato"],
+  };
+  for (const [section, words] of Object.entries(keywords)) {
+    if (words.some(w => lower.includes(w))) return section;
+  }
+  return "Other";
+}
+
+// Recipes assigned to a day in this week's plan (deduped), across all sections
+function getPlannedRecipes() {
+  const all = [...(state.dinners||[]), ...(state.breakfasts||[]), ...(state.lunches||[]), ...(state.desserts||[])];
+  const seen = new Set();
+  const out = [];
+  Object.values(state.weekPlan || {}).forEach(a => {
+    if (!a || !a.recipeId || seen.has(a.recipeId)) return;
+    const r = all.find(x => x.id === a.recipeId);
+    if (r) { seen.add(r.id); out.push(r); }
+  });
+  return out;
+}
+
+function buildSmartGroceryList() {
+  const planned = getPlannedRecipes();
+  const raw = [];
+  planned.forEach(r => {
+    (r.ingredients || []).forEach(ing => {
+      const text = (typeof ing === "string" ? ing : (ing && ing.text) || "").trim();
+      if (!text || text.startsWith("---") || text.startsWith("Option ")) return;
+      // skip "to taste"/"for serving" style non-purchases
+      if (/\b(to taste|as needed|for serving|for the table|on the table|season at the end)\b/i.test(text) && !/^\s*\d/.test(text)) return;
+      if (/^(kosher salt|salt|black pepper|pepper|salt (and|&) (black )?pepper|water|ice)\b/i.test(text) && !/^\s*\d/.test(text)) return;
+      raw.push({ text, source: r.name });
+    });
+  });
+  const seen = new Map();
+  raw.forEach(({text, source}) => {
+    const key = (typeof getIngredientKey === "function" ? getIngredientKey(text) : "") ||
+      text.toLowerCase().replace(/^[\d\s\/½¼¾⅓⅔⅛.,-]+(tbsp|tsp|cup|cups|oz|lb|lbs|g|cloves?|large|small|medium|can|cans|bunch)?\s*/i, "").split(/[,(]/)[0].trim();
+    if (!seen.has(key)) seen.set(key, { text, sources: [source] });
+    else if (!seen.get(key).sources.includes(source)) seen.get(key).sources.push(source);
+  });
+  const items = [...seen.values()];
+  // Single category; renderGrocery regroups by store section via categorizeGroceryItem
+  return items.length ? [{ cat: "📅 This week", items }] : [];
+}
+
 function renderGrocery() {
   const el = document.getElementById("page-grocery");
   const useSmartList = !state.useStaticGrocery;
@@ -6374,7 +6673,10 @@ function renderGrocery() {
         <div style="font-size:20px;font-weight:700">🛒 This Week's Groceries</div>
         <div style="color:var(--dim);font-size:13px">${checkedCount} checked · ${displayCats.reduce((a,c)=>a+c.items.length,0)} items · ${esc(state.store)}${state.alexaSyncTime ? " · 🔵 Alexa synced " + state.alexaSyncTime : ""}</div>
       </div>
-      <button onclick="clearGrocery()" style="padding:7px 12px;border-radius:10px;border:1.5px solid var(--dim);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">Clear</button>
+      <div style="display:flex;gap:6px">
+        <button onclick="checkStaples()" title="Check off common pantry staples you probably already have" style="padding:7px 12px;border-radius:10px;border:1.5px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);color:var(--green);font-size:12px;font-weight:700;cursor:pointer">✓ I have the staples</button>
+        <button onclick="clearGrocery()" style="padding:7px 12px;border-radius:10px;border:1.5px solid var(--dim);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">Clear</button>
+      </div>
     </div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <button onclick="copyListForClaude()" style="flex:1;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-weight:700;font-size:14px;cursor:pointer">📋 Copy for Claude</button>
@@ -6391,7 +6693,12 @@ function renderGrocery() {
       <span style="font-size:10px;font-weight:400;color:#64748b">reads your Gmail for Alexa list email</span>
     </button>
     <div id="alexa-sync-status" style="display:none;font-size:12px;margin-bottom:10px;padding:8px 12px;border-radius:8px"></div>
-    ${cats}
+    ${(useSmartList && !cats) ? `<div style="text-align:center;padding:40px 20px;border:1.5px dashed rgba(255,255,255,0.15);border-radius:16px;margin-bottom:14px">
+        <div style="font-size:40px;margin-bottom:10px">🗓️</div>
+        <div style="font-size:17px;font-weight:700;margin-bottom:6px">Nothing planned yet</div>
+        <div style="color:var(--dim);font-size:14px;margin-bottom:16px">Add meals to this week on the Plan tab and your shopping list builds itself — grouped by store section, deduped across recipes.</div>
+        <button onclick="showTab('plan')" style="padding:12px 22px;border-radius:12px;border:none;background:var(--green);color:#0a0f1a;font-weight:700;font-size:14px;cursor:pointer">Go to Plan →</button>
+      </div>` : `<div class="grocery-cats">${cats}</div>`}
     <div style="background:rgba(0,168,232,0.06);border:2px solid rgba(0,168,232,0.25);border-radius:14px;padding:14px 16px;margin-top:14px;margin-bottom:10px">
       <div style="font-size:13px;font-weight:700;color:#00a8e8;margin-bottom:8px">📋 Before you open Instacart:</div>
       <div style="display:flex;flex-direction:column;gap:8px">
@@ -6401,6 +6708,22 @@ function renderGrocery() {
 
 
   `;
+}
+
+const STAPLES_RE = /\b(kosher salt|sea salt|flaky salt|salt|black pepper|pepper|olive oil|avocado oil|vegetable oil|canola oil|cooking spray|butter|all-purpose flour|flour|sugar|brown sugar|honey|garlic powder|onion powder|smoked paprika|paprika|cumin|chili powder|italian seasoning|oregano|red pepper flakes|cayenne|cinnamon|nutmeg|vanilla|baking soda|baking powder|cornstarch|soy sauce|worcestershire|dijon|mustard|ketchup|mayo|mayonnaise|hot sauce|cholula|frank's|vinegar|chicken broth|beef broth|stock)\b/i;
+function checkStaples() {
+  const items = document.querySelectorAll("#page-grocery .grocery-item");
+  let n = 0;
+  items.forEach(el => {
+    const txt = (el.querySelector("span") || {}).textContent || "";
+    const key = (el.getAttribute("onclick") || "").match(/toggleGrocery\('([^']+)'/);
+    if (!key) return;
+    if (STAPLES_RE.test(txt) && !state.grocery[key[1]]) { state.grocery[key[1]] = true; n++; }
+  });
+  scheduleSave();
+  renderGrocery();
+  const st = document.getElementById("copy-claude-status");
+  if (st) { st.style.display = "block"; st.textContent = n ? "✓ Checked off " + n + " pantry staple" + (n>1?"s":"") + " — uncheck anything you're actually out of" : "No unchecked staples found"; setTimeout(() => { if (st) st.style.display = "none"; }, 4000); }
 }
 
 function toggleGrocery(key, el) {
@@ -6985,7 +7308,7 @@ function buildRatingHtml(id, section) {
     var noteStr = note ? '<div style="font-size:12px;color:var(--muted);font-style:italic">"' + esc(note) + '"</div>' : "";
     summaryHtml = '<div class="rating-summary">'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
-      + '<span style="font-size:16px">' + starStr + '</span>' + dateStr
+      + '<span class="tab-icon">' + starStr + '</span>' + dateStr
       + '</div>' + chipsStr + noteStr + '</div>';
   }
 
@@ -7548,7 +7871,7 @@ function generatePrepOrder() {
   const stepsHtml = orderedSteps.map(s => {
     const recipesHtml = (s.recipes || []).map(r => `
       <div style="display:flex;align-items:center;gap:8px;padding:5px 0">
-        <span style="font-size:16px">${r.emoji||"🍽️"}</span>
+        <span class="tab-icon">${r.emoji||"🍽️"}</span>
         <div>
           <div style="font-size:14px;color:var(--text);font-weight:600">${esc(r.name)}</div>
           <div style="font-size:12px;color:var(--dim)">${r.activeTime||""} active${r.prepTime ? " · " + r.prepTime : ""}</div>
@@ -9196,7 +9519,7 @@ function resetPantry() {
   renderPantry();
 }
 
-let cookState = { recipe:null, step:0, mode:"steps", checkedIngr:{}, timer:{seconds:0,running:false,interval:null,_original:0} };
+let cookState = { recipe:null, step:0, mode:"steps", showIngr:false, checkedIngr:{}, timer:{seconds:0,running:false,interval:null,_original:0} };
 
 function getAllRecipes() {
   return [...state.dinners.map(r=>({...r,section:"dinner"})),...state.breakfasts.map(r=>({...r,section:"breakfast"})),...state.lunches.map(r=>({...r,section:"lunch"})),...state.desserts.map(r=>({...r,section:"dessert"}))].filter(r=>r.instructions&&r.instructions.length>0);
@@ -9280,7 +9603,7 @@ function startCooking(section,id) {
   const list=section==="breakfast"?state.breakfasts:section==="lunch"?state.lunches:section==="dessert"?state.desserts:state.dinners;
   const recipe=list&&list.find(r=>r&&r.id===id);
   if(!recipe) return;
-  cookState={recipe,step:0,mode:"steps",checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};
+  cookState={recipe,step:0,mode:"steps",showIngr:false,checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};
   // Show cook overlay
   const overlay=document.getElementById("cook-overlay");
   if(overlay){
@@ -9289,6 +9612,62 @@ function startCooking(section,id) {
     if(titleEl) titleEl.textContent=recipe.emoji+" "+recipe.name;
     renderCookScreen();
   }
+}
+
+const COOK_STOP = new Set(["large","small","medium","fresh","chopped","diced","minced","grated","sliced","block","blocks","cups","tbsp","tsp","cloves","clove","about","optional","plus","extra","your","yourself","never","with","from","into","over","held","back","thin","needed","both","fine","each","half","whole","unsalted","salted","softened","melted","drained","divided","finely","roughly","thinly","peeled","ground","leaves","taste","serving","dusting","table","bowl","pinch","dash","dashes","squeeze","handful","preferred","style","brand","kettle","fire","publix","costco","kroger","bakery","only","very","more","less","like","that","this","then","them","they","than","plain","simple","simplify","adds","body","skip","move","float","heads","head","pieces","piece","slices","slice","person","serving","makes","wash"]);
+function ingrKeywords(ing) {
+  const name = ing.replace(/^[\d\s\/½¼¾⅓⅔⅛⅜⅝⅞.\-–]+(?:cups?|tbsp|tsp|oz|lbs?|g|kg|ml|cloves?|large|medium|small|cans?|slices?|bunch|heads?|stalks?|inch|inches|pkg|package|pounds?|strips?|pieces?|handful|pinch|dash|sprigs?|sheets?)?\s*/i, "")
+    .split(/[,—–(]/)[0].toLowerCase();
+  return name.split(/[^a-z']+/).filter(w => w.length > 3 && !COOK_STOP.has(w));
+}
+function ingrBowlClass(sectionText) {
+  const t = (sectionText || "").toLowerCase();
+  if (/🟡|bowl 1\b/.test(t)) return "b1";
+  if (/🔵|bowl 2\b/.test(t)) return "b2";
+  if (/🟢|bowl 3\b/.test(t)) return "b3";
+  if (/🫙|sauce|glaze|dressing|marinade|seasoning bowl/.test(t)) return "bs";
+  return "";
+}
+function bowlPill(cls, sectionText) {
+  if (!cls) return "";
+  const m = (sectionText||"").match(/bowl\s*\d/i);
+  const label = m ? m[0].toUpperCase() : (cls==="bs" ? "SAUCE" : "");
+  if (!label) return "";
+  const col = cls==="b1" ? ["#fbbf24","rgba(245,158,11,0.18)"] : cls==="b2" ? ["#818cf8","rgba(99,102,241,0.18)"] : cls==="b3" ? ["#4ade80","rgba(34,197,94,0.18)"] : ["#2dd4bf","rgba(20,184,166,0.18)"];
+  return `<span class="bowl-pill" style="color:${col[0]};background:${col[1]}">${cls==="b1"?"🟡 ":cls==="b2"?"🔵 ":cls==="b3"?"🟢 ":"🫙 "}${label}</span>`;
+}
+function renderCookIngrPanel(recipe, stepText, scale) {
+  const ingrs = recipe.ingredients || [];
+  const stepLower = (stepText || "").toLowerCase();
+  let section = "", cls = "";
+  const rows = ingrs.map((ing, i) => {
+    if (!ing) return "";
+    if (ing.startsWith("---")) {
+      section = ing.replace(/---/g, "").trim();
+      cls = ingrBowlClass(section);
+      return `<div class="ci-section">${esc(section)}${bowlPill(cls, section)}</div>`;
+    }
+    const checked = cookState.checkedIngr[i] ? "checked" : "";
+    const kws = ingrKeywords(ing);
+    // main noun = last keyword; highlight when it appears, or when 2+ of the ingredient's words appear
+    const mainNoun = kws[kws.length-1];
+    const hits = kws.filter(w => stepLower.includes(w)).length;
+    const hot = kws.length && ((mainNoun && stepLower.includes(mainNoun)) || hits >= 2) ? "hot" : "";
+    const txt = scale === 1 ? ing : scaleAmountsInText(ing, scale);
+    return `<div class="ci-item ${cls} ${checked} ${hot}" onclick="toggleCookIngr(${i},this)"><div class="ci-check">${checked ? "✓" : ""}</div><div class="ci-text ${hot}">${esc(txt)}</div></div>`;
+  }).join("");
+  const scaleBtns = [0.5,1,1.5,2].map(f => `<button class="cook-scale-btn ${scale===f?'on':''}" onclick="scaleFactors['${recipe.id}']=${f};renderCookScreen()">${f===0.5?'½':f===1.5?'1½':f}×</button>`).join("");
+  return `<div class="cook-side ${cookState.showIngr ? "open" : ""}" id="cook-side">
+    <div class="cook-side-head">
+      <div class="cook-side-title">🧾 Ingredients</div>
+      <div class="cook-scale-row"><span style="font-size:11px;color:var(--dim);margin-right:2px">Scale</span>${scaleBtns}</div>
+      <button class="cook-side-close" onclick="cookState.showIngr=false;renderCookScreen()">✕ Close</button>
+    </div>
+    <div class="cook-side-body">
+      <div style="font-size:12px;color:rgba(255,255,255,0.4);padding:8px 6px 0">Highlighted = used in this step · tap to check off</div>
+      ${rows}
+    </div>
+  </div>`;
 }
 
 function renderCookScreen() {
@@ -9327,15 +9706,9 @@ function renderCookScreen() {
       <button onclick="scheduleRatingReminder('${recipe.id}','${esc(recipe.name)}','${recipe.section||'dinner'}')" style="width:100%;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-weight:700;font-size:15px;cursor:pointer;margin-bottom:10px">✅ Set 8am rating reminder</button>
       <button class="cook-done-btn" onclick="exitCook()">← Back to recipes</button>
     </div>`;
-  } else if(mode==="ingredients") {
-    const items=ingrs.map((ing,i)=>{
-      if(ing.startsWith("---"))return`<div class="cook-ingr-section">${esc(ing.replace(/---/g,"").trim())}</div>`;
-      const checked=cookState.checkedIngr[i]?"checked":"";
-      return`<div class="cook-ingr-item ${checked}" onclick="toggleCookIngr(${i},this)"><div class="cook-ingr-check">${checked?"✓":""}</div><div class="cook-ingr-text">${esc(ing)}</div></div>`;
-    }).join("");
-    body=`<div class="cook-ingr-view">${items}</div>`;
   } else {
-    const stepText=steps[step]||"";
+    const cookScale=scaleFactors[recipe.id]||1;
+    const stepText=cookScale===1?(steps[step]||""):scaleAmountsInText(steps[step]||"",cookScale,true);
     // Find which section this step belongs to
     let sectionHeader="";
     let realIdx=0;
@@ -9369,11 +9742,12 @@ function renderCookScreen() {
     }
     const tipHtml=(step===total-1&&recipe.tips)?`<div class="cook-tip-box"><div class="cook-tip-label">💡 Pro tip</div><div class="cook-tip-text">${esc(recipe.tips)}</div></div>`:"";
     const hvHtml=(step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"";
-    body=`<div style="position:fixed;inset:0;top:56px;display:flex;flex-direction:column;background:#07090f;">
+    const scaleNote=cookScale!==1?'<span class="cook-step-scale-note">'+(cookScale===0.5?'½':cookScale===1.5?'1½':cookScale)+'× RECIPE</span>':'';
+    body=`<div class="cook-layout"><div class="cook-main">
 
   <!-- TOP: progress + step info -->
   <div style="padding:16px 24px 12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)">
-    ${sectionHeader ? '<div style="font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#10b981;margin-bottom:6px">' + esc(sectionHeader) + '</div>' : ''}
+    ${sectionHeader ? '<div style="font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#10b981;margin-bottom:6px">' + esc(sectionHeader) + scaleNote + '</div>' : (scaleNote?'<div style="margin-bottom:6px">'+scaleNote+'</div>':'')}
     <div style="display:flex;align-items:center;gap:14px">
       <div style="font-size:13px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);flex-shrink:0">Step ${step+1} / ${total}</div>
       <div style="flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden">
@@ -9433,6 +9807,10 @@ function renderCookScreen() {
 
   <!-- BOTTOM: big chunky nav buttons -->
   <div style="flex-shrink:0;padding:16px 20px 24px;display:flex;gap:10px;background:rgba(7,9,15,0.95);border-top:1px solid rgba(255,255,255,0.08)">
+    <button class="cook-ingr-btn" onclick="cookState.showIngr=true;renderCookScreen()"
+      style="flex:1;padding:20px 0;font-size:15px;font-weight:800;border-radius:16px;border:2px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.1);color:#10b981;cursor:pointer;line-height:1.2">
+      🧾<br>Ingredients
+    </button>
     <button onclick="cookPrev()" ${step===0?'disabled':''}
       style="flex:1;padding:20px 0;font-size:20px;font-weight:800;border-radius:16px;border:2px solid ${step===0?'rgba(255,255,255,0.08)':'rgba(255,255,255,0.18)'};background:${step===0?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.08)'};color:${step===0?'rgba(255,255,255,0.2)':'#eef2f7'};cursor:${step===0?'not-allowed':'pointer'};">
       ← Prev
@@ -9442,12 +9820,14 @@ function renderCookScreen() {
       ${step===total-1?'Done! 🎉':'Next →'}
     </button>
   </div>
-</div>`;
+</div>${renderCookIngrPanel(recipe, steps[step]||"", cookScale)}</div>`;
   }
   const cookEl = document.getElementById("cook-overlay-content");
   if(cookEl) {
     cookEl.innerHTML=`<div style="min-height:calc(100vh - 56px);display:flex;flex-direction:column;">${body}</div>`;
     cookEl.scrollTop=0;
+    const hot=cookEl.querySelector(".cook-side-body .ci-item.hot");
+    if(hot){try{hot.scrollIntoView({block:"center"});}catch(e){}}
   }
 }
 
@@ -9474,9 +9854,9 @@ function toggleTimer(){
 function resetTimer(secs){clearInterval(cookState.timer.interval);cookState.timer={seconds:secs,_original:secs,running:false,interval:null};renderCookScreen();}
 function cookNext(){clearInterval(cookState.timer.interval);cookState.timer={seconds:0,running:false,interval:null,_original:0};cookState.step=Math.min(cookState.step+1,cookState.recipe.instructions.length);renderCookScreen();}
 function cookPrev(){clearInterval(cookState.timer.interval);cookState.timer={seconds:0,running:false,interval:null,_original:0};cookState.step=Math.max(cookState.step-1,0);renderCookScreen();}
-function setCookMode(mode){cookState.mode=mode;renderCookScreen();}
-function toggleCookIngr(i,el){cookState.checkedIngr[i]=!cookState.checkedIngr[i];el.classList.toggle("checked",cookState.checkedIngr[i]);el.querySelector(".cook-ingr-check").textContent=cookState.checkedIngr[i]?"✓":"";}
-function exitCook(){clearInterval(cookState.timer.interval);cookState={recipe:null,step:0,mode:"steps",checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};renderCookHome();}
+function setCookMode(mode){cookState.showIngr=(mode==="ingredients");renderCookScreen();}
+function toggleCookIngr(i,el){cookState.checkedIngr[i]=!cookState.checkedIngr[i];el.classList.toggle("checked",cookState.checkedIngr[i]);const c=el.querySelector(".ci-check,.cook-ingr-check");if(c)c.textContent=cookState.checkedIngr[i]?"✓":"";}
+function exitCook(){if(cookState&&cookState.timer)clearInterval(cookState.timer.interval);closeCookMode();cookState={recipe:null,step:0,mode:"steps",showIngr:false,checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};renderCookHome();}
 
 async function exportToPaprika() {
   // Build grocery list from week plan assignments only
@@ -10027,24 +10407,4 @@ init().catch(function(e) {
 }
 </style>
 </body>
-</html  ,{
-    id:"sp_danos_spicy",
-    name:"Dan-O's Spicy Seasoning",
-    emoji:"🌶️",
-    priority:true,
-    buy:"Publix ✅ · Amazon · Walmart · Target",
-    recipes:["Slow Cooker Turkey Chili","Slow Cooker Chicken Tacos","Chicken Burrito Bowls","Sheet Pan Chicken Fajitas","Buffalo Chicken Bowls","Kenji's Ground Turkey Tacos"],
-    howToUse:"Use anywhere you'd use Dan-O's Original but want extra heat. Same herbs and spices as Original with added kick. Turkey Chili: swap the Dan-O's Original for Spicy for adults. Tacos and Burrito Bowls: adds heat without needing separate hot sauce. Great on anything where you want the Dan-O's flavor profile with more fire.",
-    note:"Same all-purpose herb base as Original but with heat built in. Great for adults — use Original for the kids' portions and Spicy for yours. Zero calories, zero sugar, all natural."
-  }
-  ,{
-    id:"sp_danos_sea",
-    name:"Dan-O's Sea-Soning",
-    emoji:"🐟",
-    priority:true,
-    buy:"Publix ✅ · Amazon · danosseasoning.com",
-    recipes:["Sheet Pan Salmon with Roasted Veg","Honey Garlic Salmon","Tuna Avocado Bowl","Shakshuka","Savory Weekend Scramble","Greek Chicken Bowls"],
-    howToUse:"Sheet Pan Salmon: coat fillets before roasting instead of or alongside Herbes de Provence. Honey Garlic Salmon: season the fillet before searing. Tuna Avocado Bowl: sprinkle on the tuna before mixing — replaces Dan-O's Original perfectly. Shakshuka: season the eggs and sauce. Any seafood recipe: 1:1 swap for Dan-O's Original when cooking fish or shellfish.",
-    note:"Over 12 herbs and spices blended specifically for seafood. Use tonight on your salmon fillet — one shake before the cast iron sear. Pairs perfectly with lemon and honey garlic glaze. This is the move for fish going forward."
-  }
->
+</html>
