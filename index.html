@@ -694,6 +694,7 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
   .grocery-cats{column-count:2;column-gap:20px}
   .grocery-cat{break-inside:avoid;page-break-inside:avoid}
 }
+@keyframes cookPulse{0%,100%{opacity:1}50%{opacity:0.55}}
 </style>
 </head>
 <body>
@@ -734,7 +735,7 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
 <div id="page-eatout" class="page"></div>
 <div id="cook-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:#0a0f1a;flex-direction:column;overflow-y:auto;">
   <div style="position:sticky;top:0;z-index:10;background:#0a0f1a;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:12px">
-    <button onclick="closeCookMode()" style="padding:8px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s">← Back</button>
+    <button onclick="exitCook()" style="padding:8px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s">← Back</button>
     <div style="font-size:16px;font-weight:800;color:var(--text);letter-spacing:-0.3px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="cook-overlay-title">Cook Mode</div>
     <button onclick="openCookChat()" style="padding:8px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#07090f;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0">👨‍🍳 Ask</button>
   </div>
@@ -9768,7 +9769,7 @@ function startCooking(section,id) {
   const list=section==="breakfast"?state.breakfasts:section==="lunch"?state.lunches:section==="dessert"?state.desserts:state.dinners;
   const recipe=list&&list.find(r=>r&&r.id===id);
   if(!recipe) return;
-  cookState={recipe,step:0,mode:"steps",showIngr:false,checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};
+  cookState={recipe,step:0,mode:"steps",showIngr:false,checkedIngr:{},timers:{},timer:{seconds:0,running:false,interval:null,_original:0}};
   // Show cook overlay
   const overlay=document.getElementById("cook-overlay");
   if(overlay){
@@ -9894,16 +9895,17 @@ function renderCookScreen() {
     if(timerMatch){
       const num=parseInt(timerMatch[1]),unit=timerMatch[2].toLowerCase();
       let secs=unit.startsWith("h")?num*3600:unit.startsWith("m")?num*60:num;
-      if(!cookState.timer.running&&cookState.timer.seconds===0){cookState.timer.seconds=secs;cookState.timer._original=secs;}
-      const t=cookState.timer,disp=formatTimer(t.seconds),cls=t.running?"running":(t.seconds===0&&t._original>0?"done":"");
+      cookState.timers=cookState.timers||{};
+      if(!cookState.timers[step]) cookState.timers[step]={seconds:secs,_original:secs,running:false,interval:null,endsAt:0,done:false};
+      const t=cookState.timers[step],disp=formatTimer(t.seconds),cls=t.running?"running":(t.seconds===0&&t._original>0?"done":"");
       timerHtml=`
         <div style="margin-top:24px;display:flex;align-items:center;gap:14px;padding:20px 24px;background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:16px;">
           <div id="cook-timer-display" style="font-size:52px;font-weight:800;letter-spacing:-2px;color:${cls==='done'?'#f59e0b':cls==='running'?'#10b981':'var(--text)'};font-variant-numeric:tabular-nums;min-width:130px;">${disp}</div>
           <div style="display:flex;flex-direction:column;gap:8px;flex:1;">
-            <button onclick="toggleTimer()" style="padding:12px 20px;font-size:18px;font-weight:700;border-radius:12px;border:none;background:${t.running?'rgba(239,68,68,0.15)':'linear-gradient(135deg,#10b981,#059669)'};color:${t.running?'#f87171':'#07090f'};cursor:pointer;letter-spacing:-0.2px;">
+            <button onclick="toggleTimer(${step})" style="padding:12px 20px;font-size:18px;font-weight:700;border-radius:12px;border:none;background:${t.running?'rgba(239,68,68,0.15)':'linear-gradient(135deg,#10b981,#059669)'};color:${t.running?'#f87171':'#07090f'};cursor:pointer;letter-spacing:-0.2px;">
               ${t.running?"⏸ Pause":"▶ Start"}
             </button>
-            <button onclick="resetTimer(${secs})" style="padding:10px 20px;font-size:15px;font-weight:600;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);cursor:pointer;">
+            <button onclick="resetTimer(${step},${secs})" style="padding:10px 20px;font-size:15px;font-weight:600;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);cursor:pointer;">
               ⟳ Reset
             </button>
           </div>
@@ -9915,6 +9917,7 @@ function renderCookScreen() {
     const scaleNote=cookScale!==1?'<span class="cook-step-scale-note">'+(cookScale===0.5?'½':cookScale===1.5?'1½':cookScale)+'× RECIPE</span>':'';
     body=`<div class="cook-layout"><div class="cook-main">
 
+  ${renderTimerStrip(step)}
   <!-- TOP: progress + step info -->
   <div style="padding:16px 24px 12px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,0.06)">
     ${sectionHeader ? '<div style="font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:#10b981;margin-bottom:6px">' + esc(sectionHeader) + scaleNote + '</div>' : (scaleNote?'<div style="margin-bottom:6px">'+scaleNote+'</div>':'')}
@@ -10021,30 +10024,40 @@ function renderCookScreen() {
 
 function formatTimer(s){const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60;return h>0?h+":"+String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0"):String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0");}
 
-function toggleTimer(){
-  const t=cookState.timer;
-  if(t.running){clearInterval(t.interval);t.running=false;}
-  else{
-    if(t.seconds<=0)return; t.running=true;
-    t.interval=setInterval(()=>{
-      t.seconds--;
-      const el=document.getElementById("cook-timer-display");
-      if(el){el.textContent=formatTimer(t.seconds);el.className="cook-timer-display "+(t.seconds>0?"running":"done");}
-      if(t.seconds<=0){
-        clearInterval(t.interval);t.running=false;
-        try{const ctx=new(window.AudioContext||window.webkitAudioContext)();[0,300,600].forEach(d=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.setValueAtTime(0.3,ctx.currentTime+d/1000);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d/1000+0.3);o.start(ctx.currentTime+d/1000);o.stop(ctx.currentTime+d/1000+0.3);});}catch(e){}
-      }
-    },1000);
-  }
+function renderTimerStrip(currentStep){
+  const timers=cookState.timers||{};
+  const pills=Object.keys(timers).map(Number).filter(i=>i!==currentStep&&(timers[i].running||timers[i].done)).sort((a,b)=>a-b);
+  if(!pills.length) return '<div id="cook-timer-strip"></div>';
+  return '<div id="cook-timer-strip" style="display:flex;gap:10px;flex-wrap:wrap;padding:12px 24px 0;flex-shrink:0">'+pills.map(i=>{
+    const t=timers[i];
+    const done=t.done;
+    return '<button onclick="cookState.step='+i+';renderCookScreen()" style="display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:999px;border:2px solid '+(done?'rgba(245,158,11,0.6)':'rgba(16,185,129,0.4)')+';background:'+(done?'rgba(245,158,11,0.15)':'rgba(16,185,129,0.08)')+';color:'+(done?'#fbbf24':'#34d399')+';font-weight:800;font-size:17px;cursor:pointer;'+(done?'animation:cookPulse 1s infinite;':'')+'">'+
+      '<span>⏱ Step '+(i+1)+'</span><span id="cook-timer-pill-'+i+'" style="font-variant-numeric:tabular-nums">'+(done?'DONE':formatTimer(t.seconds))+'</span>'+
+      (done?'<span onclick="event.stopPropagation();dismissTimer('+i+')" style="margin-left:4px;opacity:0.7">✕</span>':'')+'</button>';
+  }).join('')+'</div>';
+}
+function dismissTimer(i){ if(cookState.timers&&cookState.timers[i]){ cookState.timers[i].done=false; } renderCookScreen(); }
+function timerBeep(){ try{const ctx=new(window.AudioContext||window.webkitAudioContext)();[0,300,600].forEach(d=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.setValueAtTime(0.3,ctx.currentTime+d/1000);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d/1000+0.3);o.start(ctx.currentTime+d/1000);o.stop(ctx.currentTime+d/1000+0.3);});}catch(e){} }
+function toggleTimer(stepIdx){
+  if(stepIdx===undefined) stepIdx=cookState.step;
+  const t=cookState.timers&&cookState.timers[stepIdx]; if(!t) return;
+  if(t.running){ clearInterval(t.interval); t.running=false; t.seconds=Math.max(0,Math.round((t.endsAt-Date.now())/1000)); renderCookScreen(); return; }
+  if(t.seconds<=0) return;
+  t.running=true; t.done=false; t.endsAt=Date.now()+t.seconds*1000;
+  t.interval=setInterval(()=>{
+    t.seconds=Math.max(0,Math.round((t.endsAt-Date.now())/1000));
+    if(cookState.step===stepIdx){ const el=document.getElementById("cook-timer-display"); if(el){ el.textContent=formatTimer(t.seconds); } }
+    const pill=document.getElementById("cook-timer-pill-"+stepIdx); if(pill) pill.textContent=formatTimer(t.seconds);
+    if(t.seconds<=0){ clearInterval(t.interval); t.running=false; t.done=true; timerBeep(); if(cookState.step!==stepIdx||true) renderCookScreen(); }
+  },500);
   renderCookScreen();
 }
-
-function resetTimer(secs){clearInterval(cookState.timer.interval);cookState.timer={seconds:secs,_original:secs,running:false,interval:null};renderCookScreen();}
-function cookNext(){clearInterval(cookState.timer.interval);cookState.timer={seconds:0,running:false,interval:null,_original:0};cookState.step=Math.min(cookState.step+1,cookState.recipe.instructions.length);renderCookScreen();}
-function cookPrev(){clearInterval(cookState.timer.interval);cookState.timer={seconds:0,running:false,interval:null,_original:0};cookState.step=Math.max(cookState.step-1,0);renderCookScreen();}
+function resetTimer(stepIdx,secs){ if(typeof secs==="undefined"){secs=stepIdx;stepIdx=cookState.step;} const t=cookState.timers&&cookState.timers[stepIdx]; if(t&&t.interval) clearInterval(t.interval); cookState.timers[stepIdx]={seconds:secs,_original:secs,running:false,interval:null,endsAt:0,done:false}; renderCookScreen(); }
+function cookNext(){ cookState.step=Math.min(cookState.step+1,cookState.recipe.instructions.length); renderCookScreen(); }
+function cookPrev(){ cookState.step=Math.max(cookState.step-1,0); renderCookScreen(); }
 function setCookMode(mode){cookState.showIngr=(mode==="ingredients");renderCookScreen();}
 function toggleCookIngr(i,el){cookState.checkedIngr[i]=!cookState.checkedIngr[i];el.classList.toggle("checked",cookState.checkedIngr[i]);const c=el.querySelector(".ci-check,.cook-ingr-check");if(c)c.textContent=cookState.checkedIngr[i]?"✓":"";}
-function exitCook(){if(cookState&&cookState.timer)clearInterval(cookState.timer.interval);closeCookMode();cookState={recipe:null,step:0,mode:"steps",showIngr:false,checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};renderCookHome();}
+function exitCook(){if(cookState&&cookState.timers&&Object.values(cookState.timers).some(t=>t&&t.running)&&!confirm("A timer is still running. Leave cook mode anyway?")) return; if(cookState&&cookState.timers)Object.values(cookState.timers).forEach(t=>t&&t.interval&&clearInterval(t.interval));if(cookState&&cookState.timer)clearInterval(cookState.timer.interval);closeCookMode();cookState={recipe:null,step:0,mode:"steps",showIngr:false,checkedIngr:{},timer:{seconds:0,running:false,interval:null,_original:0}};renderCookHome();}
 
 async function exportToPaprika() {
   // Build grocery list from week plan assignments only
