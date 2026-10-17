@@ -778,6 +778,7 @@ window.addEventListener("unhandledrejection", function(e) {
 const DEFAULT_BREAKFASTS = [
   {
     id:"b1", name:"Egg & Turkey Sausage Muffin Cups", calories:280, protein:24, emoji:"🥚", kidFriendly:false,
+    kidNote:"Kid-safe by design — mild, cheesy, hand-held. Skip the Pizza Party! topping on their half if they're spice-shy. 20 seconds in the microwave from the fridge. Serve with ketchup for dipping if that's what gets it eaten.",
     equipment:["Muffin tin (12-cup), greased","Medium skillet","Whisk + large measuring cup","2 prep bowls"],
     prepNote:"Make Sunday. Grab 2-3 on your way out. Reheat 45 sec. Keeps 5 days.",
     description:"Andrew's grab-and-go — batch of 12, ready all week",
@@ -816,6 +817,7 @@ const DEFAULT_BREAKFASTS = [
   },
   {
     id:"b2", name:"PB Banana Overnight Oats (Kids)", calories:320, protein:12, emoji:"🫙", kidFriendly:true,
+    kidNote:"Built for the girls. The spinach puree is optional if the green tint is a dealbreaker — the protein is already in the Fairlife and PB. Let them add their own banana slices in the morning.",
     equipment:["2 mason jars with lids"],
     prepNote:"Make 2 jars Sunday night. Hand to kids straight from the fridge.",
     description:"Two jars ready for the girls — no morning effort required",
@@ -1298,6 +1300,7 @@ const DEFAULT_BREAKFASTS = [
 const DEFAULT_LUNCHES = [
   {
     id:"l1", name:"Rotisserie Chicken Grain Bowls", calories:480, protein:42, emoji:"🍗", kidFriendly:true,
+    kidNote:"Deconstruct for the girls: chicken, grains, tomatoes and cucumber in separate piles on the plate with ranch for dipping. Skip the greens and dressing for them. Hummus on a cracker if they'll go for it.",
     equipment:["Box grater","Large bowl"],
     prepNote:"Pull chicken Sunday. Assemble in 3 min — no cooking.",
     description:"Built from Sunday's roast chicken — zero effort, just assemble",
@@ -1332,6 +1335,7 @@ const DEFAULT_LUNCHES = [
   },
   {
     id:"l2", name:"Tomato Soup & Turkey Melts", calories:460, protein:34, emoji:"🍅", kidFriendly:true,
+    kidNote:"This IS the kid lunch. Skip the pesto on their sandwiches (plain turkey + cheese), cut into triangles or strips for dipping into the soup. Splash of Fairlife in the soup makes it creamy and milder.",
     equipment:["Small saucepan with lid","Nonstick skillet","Spatula","1 prep bowl"],
     prepNote:"15 min total. Good for kids too on a school lunch day.",
     description:"Rao's or Frik & Frak jarred soup + proper grilled melt — minimal effort, always a hit",
@@ -1567,6 +1571,8 @@ const DEFAULT_LUNCHES = [
 const DESSERT_LIBRARY = [
   {
     id:"d-bark", name:"Frozen Yogurt Bark", calories:160, protein:12,
+    equipment:["Large sheet pan + parchment","Mixing bowl","Microwave-safe bowl for chocolate"],
+    kidNote:"The girls can do the toppings and the chocolate swirl. Break into small pieces for them — straight from the freezer, it's basically a healthy ice cream bar.",
     emoji:"🍫", kidFriendly:true,
     prepNote:"Make Sunday. Freeze 4+ hours. Break into pieces — lives in freezer all week.",
     description:"Creamy frozen Greek yogurt with PB + dark chocolate swirl. Feels like a real treat.",
@@ -1586,9 +1592,9 @@ const DESSERT_LIBRARY = [
     ],
     instructions:[
       "Line a large baking sheet with parchment paper.",
-      "Mix Greek yogurt, peanut butter, honey and vanilla until smooth.",
+      "Mix 2 cups Greek yogurt + 2 tbsp peanut butter + 2 tbsp honey + 1 tsp vanilla until smooth.",
       "Spread onto parchment in an even ¼-inch layer.",
-      "Melt chocolate chips in microwave in 30-second bursts, stirring between each.",
+      "Melt the ½ cup chocolate chips in the microwave in 30-second bursts, stirring between each.",
       "Drizzle or dollop chocolate over yogurt. Swirl with a toothpick.",
       "Scatter your chosen toppings over the top.",
       "Freeze flat for at least 4 hours or overnight.",
@@ -1598,6 +1604,8 @@ const DESSERT_LIBRARY = [
   },
   {
     id:"d-mousse", name:"Cottage Cheese Chocolate Mousse", calories:185, protein:22,
+    equipment:["Blender or food processor","4 small cups or glasses"],
+    kidNote:"Tastes like chocolate pudding. Don't tell them it's cottage cheese until after. Lucy can top hers with a mountain of berries.",
     emoji:"🍮", kidFriendly:true,
     prepNote:"Blends in 5 min. Chill 30 min for best texture. Makes 4 cups — lasts 4 days in fridge.",
     description:"Silky chocolate mousse from blended Good Culture cottage cheese. Kids can't tell. Dietitian-created, widely loved.",
@@ -1615,7 +1623,7 @@ const DESSERT_LIBRARY = [
     ],
     instructions:[
       "Drain any excess liquid from cottage cheese — pour it off or blot with paper towel.",
-      "Add cottage cheese, cocoa powder, honey, vanilla and salt to a blender or food processor.",
+      "Add 2 cups cottage cheese + 3 tbsp cocoa powder + 3 tbsp honey + 1 tsp vanilla + 1 pinch salt to a blender or food processor.",
       "Blend on high for 60-90 seconds, scraping down sides, until completely smooth. No curds should remain.",
       "Taste and adjust — add more honey for sweeter, more cocoa for richer.",
       "Spoon into 4 cups or glasses.",
@@ -1626,6 +1634,8 @@ const DESSERT_LIBRARY = [
   },
   {
     id:"d-cookiedough", name:"No-Bake Protein Cookie Dough", calories:195, protein:14,
+    equipment:["Mixing bowl","Spatula"],
+    kidNote:"Kids roll the balls — that's the whole activity. Serve 2-3 balls each; it's filling.",
     emoji:"🍪", kidFriendly:true,
     prepNote:"Ready in 10 min. Chill 1 hour for scoopable texture. Keeps in fridge 5 days.",
     description:"Edible, safe-to-eat raw cookie dough — Greek yogurt + PB base, chocolate chips. Kids go absolutely wild for this one.",
@@ -1642,9 +1652,9 @@ const DESSERT_LIBRARY = [
       "Pinch of salt",
     ],
     instructions:[
-      "Mix Greek yogurt, peanut butter, maple syrup and vanilla together in a bowl until smooth.",
-      "Stir in almond flour and salt — the dough will thicken as you mix.",
-      "Fold in mini chocolate chips.",
+      "Mix 1 cup Greek yogurt + ½ cup peanut butter + 2 tbsp maple syrup + 1 tsp vanilla together in a bowl until smooth.",
+      "Stir in 1 cup almond flour + 1 pinch salt — the dough will thicken as you mix.",
+      "Fold in the ½ cup mini chocolate chips.",
       "Taste and adjust sweetness with extra maple syrup if needed.",
       "Chill in the fridge for at least 1 hour — it firms up into a scoopable dough.",
       "Serve with a spoon or roll into balls. Kids can help roll them.",
@@ -1653,6 +1663,8 @@ const DESSERT_LIBRARY = [
   },
   {
     id:"d-bites", name:"Frozen PB Chocolate Yogurt Bites", calories:140, protein:10,
+    equipment:["Mini muffin tin (or parchment-lined tray)","Microwave-safe bowl for chocolate"],
+    kidNote:"Let the girls dip the frozen bites in chocolate (messy, worth it). Two or three each is a dessert.",
     emoji:"🫐", kidFriendly:true,
     prepNote:"Pipe into mini cups or spoon onto parchment. Freeze 2 hours. Lives in freezer all week.",
     description:"Bite-sized frozen yogurt pops — peanut butter base dipped in dark chocolate. Kids pop them like candy.",
@@ -1668,10 +1680,10 @@ const DESSERT_LIBRARY = [
       "1 tsp coconut oil (mixed into chocolate to thin it for dipping)",
     ],
     instructions:[
-      "Mix yogurt, peanut butter, honey and vanilla until smooth.",
+      "Mix 1½ cups Greek yogurt + 3 tbsp peanut butter + 2 tbsp honey + 1 tsp vanilla until smooth.",
       "Spoon or pipe into mini muffin tin cups, or drop tablespoon-sized dollops onto parchment-lined tray.",
       "Freeze 2 hours until solid.",
-      "Melt chocolate with coconut oil in microwave in 30-second bursts.",
+      "Melt the ½ cup chocolate chips + 1 tsp coconut oil in the microwave in 30-second bursts.",
       "Dip or drizzle frozen yogurt bites with chocolate. Return to freezer 15 min to set.",
       "Store in a zip bag in the freezer. Serve straight from frozen.",
     ],
@@ -1679,6 +1691,8 @@ const DESSERT_LIBRARY = [
   },
   {
     id:"d-parfait", name:"Strawberry Shortcake Protein Parfait", calories:210, protein:18,
+    equipment:["4 glasses or bowls","Zip-lock bag for crushing crackers"],
+    kidNote:"Let them build their own layers in a clear glass — they eat what they build. Skip the whipped cream or let it be the reward layer.",
     emoji:"🍓", kidFriendly:true,
     prepNote:"Assemble right before serving — takes 5 min. No advance prep needed.",
     description:"Layered Greek yogurt, fresh strawberries and crunchy graham cracker. Tastes like strawberry shortcake, genuinely high protein.",
@@ -1695,9 +1709,9 @@ const DESSERT_LIBRARY = [
       "Optional: light whipped cream on top",
     ],
     instructions:[
-      "Mix Greek yogurt with honey and vanilla until smooth and sweet. Taste and adjust.",
-      "Optional: toss sliced strawberries with 1 tsp sugar and let sit 10 min — they release juice and get saucier.",
-      "Crush graham crackers in a zip-lock bag.",
+      "Mix 2 cups Greek yogurt + 2 tbsp honey + 1 tsp vanilla until smooth and sweet. Taste and adjust.",
+      "Optional: toss the 2 cups sliced strawberries with 1 tsp sugar and let sit 10 min — they release juice and get saucier.",
+      "Crush the 4 graham cracker sheets in a zip-lock bag.",
       "Layer in glasses or bowls: graham cracker crumbs → yogurt → strawberries → repeat.",
       "Top with a dollop of whipped cream if using. Serve immediately.",
     ],
@@ -1708,7 +1722,8 @@ const DEFAULT_DESSERT = [DESSERT_LIBRARY[0]];
 
 const DEFAULT_DINNERS = [
   {
-    id:"d1", day:"Sunday", emoji:"🍗", calories:560, protein:48,
+    id:"d1", day:"Sunday", emoji:"🍗", calories:560, protein:48, audience:"family",
+    kidNote:"Pull a few thighs and potatoes off the pan BEFORE the balsamic-y veg get tossed together if the girls are picky about sauce. Potatoes and carrots are the sure things — serve with ketchup or ranch for dipping. Shred extra chicken for lunch tacos.",
     equipment:["Large rimmed sheet pan (or two)","Instant-read thermometer","Tongs","3 prep bowls"],
     activeTime:"15 min", totalTime:"50 min",
     name:"Sheet Pan Roast Chicken Thighs & Veg",
@@ -1746,14 +1761,15 @@ const DEFAULT_DINNERS = [
       "Add the chicken to 🟡 Bowl 1. Pour 🔵 Bowl 2 (oil + balsamic) over everything and toss until well coated.",
       "Sprinkle the 🫙 Spice Cup over everything and toss again until evenly coated.",
       "Spread in a single layer on sheet pan(s), chicken skin-side up. Don't overlap.",
-      "Roast 35-40 min until vegetables are fork-tender and chicken hits 165°F internal.",
+      "Roast 35-40 min until vegetables are fork-tender and chicken hits 165°F internal. Rest 5 min on the pan before serving.",
       "Optional: broil 1-2 min at the end for extra crispy skin — watch closely.",
       "Pull and shred remaining chicken while still warm. Store in an airtight container in the fridge."
     ],
     tips:"ACID FINISH: Squeeze fresh lemon juice over everything right when it comes out of the oven — before serving. It wakes up all the roasted flavors dramatically. | MAILLARD / CRISPY SKIN: Patting the chicken completely dry is non-negotiable. Moisture is the enemy of browning — any water on the skin steams instead of sears. Dry chicken = golden crispy skin. | SINGLE LAYER: Don't crowd the vegetables on the pan or they'll steam instead of caramelize. Use two pans if needed. | RESTING: The 5 min rest after cooking lets juices redistribute — cutting immediately makes them run out onto the board."
   },
   {
-    id:"d2", day:"Tuesday", emoji:"🥬", calories:380, protein:40,
+    id:"d2", day:"Tuesday", emoji:"🥬", calories:380, protein:40, audience:"family",
+    kidNote:"Lettuce cups are a hard sell for a 5-year-old — serve the filling over rice as a 'chicken rice bowl' for the girls, lettuce for the adults. Skip the sriracha in the pot; it goes on adult plates only. Water chestnuts are the fun crunchy part — let them pick those out.",
     equipment:["Large skillet (12-inch)","Box grater","Instant-read thermometer","Colander (water chestnuts)","4 prep bowls"],
     activeTime:"20 min", totalTime:"20 min",
     name:"PF Chang's Chicken Lettuce Cups",
@@ -1807,7 +1823,8 @@ const DEFAULT_DINNERS = [
     tips:"INTERNAL TEMP: Ground chicken/turkey must reach 165°F. At HIGH heat this happens in 6-8 min. | PAT DRY: Pat the ground meat dry before browning if it looks wet — excess moisture causes steaming not browning. | FOND: After browning the meat, scrape up any fond before adding the sauce. | ACID BALANCE: The rice wine vinegar is your acid here — taste the filling before serving and if it tastes flat, add another small splash of vinegar. It cuts through the richness of the hoisin. | MAILLARD: Same rule as ground turkey in Bolognese — leave it undisturbed 3 min to brown before breaking up. Browned turkey has dramatically more flavor than grey steamed turkey. | SALT CHECK: Hoisin is already salty — taste before adding any extra salt. | SAUCE TRICK: Mix the sauce in a small bowl before it goes in the pan so it coats everything evenly the moment it hits the heat."
   },
   {
-    id:"d3", day:"Thursday", emoji:"🍝", calories:490, protein:44,
+    id:"d3", day:"Thursday", emoji:"🍝", calories:490, protein:44, audience:"family",
+    kidNote:"The veg is invisible — this is the easiest hidden-veg win in the vault. Plain buttered Brami on the side for anyone who rejects red sauce that night. Parmesan bowl on the table (Lucy's move). Sauce freezes in 2-cup portions for emergency dinners.",
     equipment:["Large Dutch oven or deep skillet","Large pot (pasta)","Colander","Box grater","4 prep bowls"],
     activeTime:"15 min", totalTime:"35 min",
     name:"Turkey Bolognese with Hidden Veg",
@@ -1835,7 +1852,7 @@ const DEFAULT_DINNERS = [
       "1 tsp Italian seasoning (or Burlap & Barrel Herbes de Provence for deeper, more aromatic flavor)",
       "Salt & pepper",
       "--- SERVING ---",
-      "12 oz Brami protein pasta (cook per package — al dente, rinse after draining)",
+      "12 oz Brami protein pasta (cook per package — al dente, do not rinse)",
       "Reduced-fat Parmesan to finish",
       "🫙 Swap the red sauce some weeks: Cottage Cheese Alfredo from Sauces tab for a white version"
     ],
@@ -1854,7 +1871,9 @@ const DEFAULT_DINNERS = [
       "Add 🟢 Bowl 3 (zucchini + carrot). Stir and cook 3-4 min — it looks like a lot but cooks way down.",
       "Pour in 🟣 Bowl 4 (marinara + tomatoes + seasoning). Stir to combine.",
       "Reduce heat to low. Simmer UNCOVERED 15 min — the veg melts into the sauce. Taste and adjust salt.",
-      "While sauce simmers: bring a pot of well-salted water to boil. Cook Brami pasta al dente per package. Rinse after draining.",
+      "── WHILE THE SAUCE SIMMERS: PASTA ──",
+      "PASTA — Bring a large pot of well-salted water to a boil. Cook 12 oz Brami pasta al dente per package. Drain — do not rinse, the starch helps the sauce cling. Check the sauce.",
+      "── SERVE ──",
       "Serve pasta topped with sauce. Finish with a generous grating of Parmesan."
     ],
     tips:"TEMP: Ground turkey must reach 165°F — no pink remaining. The 20-30 min simmer in the tomato sauce fully cooks it through. | FOND: After browning the turkey, scrape up all the brown bits before adding the wine or tomatoes — that fond is concentrated flavor. | ACID FINISH: Right before serving, squeeze half a lemon or a splash of red wine vinegar into the sauce and stir. It brightens the whole dish and makes it taste restaurant-quality — don't skip this step. | MAILLARD: The undisturbed browning on the turkey is critical — resist stirring for the full 3-4 min to build a crust that adds deep flavor. | PASTA WATER: Salt your pasta water until it tastes like the sea — this is the only chance to season the pasta itself, not just the sauce. Reserve a cup before draining in case the sauce needs loosening. | DOUBLE BATCH: Make double sauce and freeze half — future Thursday dinner in 10 min."
@@ -1907,7 +1926,7 @@ const DEFAULT_DINNERS = [
       "Transfer to a bowl. Add zest + juice of 1 lemon + 3-4 tbsp olive oil + 1 pinch red pepper flakes + ¼ tsp salt. Stir. Set aside — flavor improves as it sits. Halve 1 lemon for charring.",
       "── COOK THE SKEWERS ──",
       "Heat a cast iron skillet or grill pan over HIGH heat until smoking hot — this is critical for the crust.",
-      "Add skewers in a single layer — don't crowd the pan. Cook UNDISTURBED 2 min per side. 2 min side 1, flip, 2 min side 2, flip to remaining sides — total about 8 min for medium.",
+      "Add skewers in a single layer — don't crowd the pan. Cook UNDISTURBED 2 min per side. 2 min side 1, flip, 2 min side 2, flip to remaining sides — total about 8 min for medium. Internal temp: 130°F medium-rare, 140°F medium.",
       "While skewers cook: place lemon halves cut-side DOWN in the same hot pan. Let char 2-3 min until deeply caramelized and golden — this concentrates the juice and adds smoky sweetness.",
       "── FINISH AND SERVE ──",
       "Rest skewers 3 min — do not skip this step or juices run out when cut.",
@@ -2077,7 +2096,7 @@ const DEFAULT_DINNERS = [
       "Brush each fillet with the 2 tbsp avocado oil. Sprinkle the 🫙 Salmon Spice Cup evenly over the 4 fillets.",
       "Lay the lemon rounds on top of each fillet.",
       "── ROAST ──",
-      "Roast at 425°F for 12-15 min depending on thickness. Salmon is done when it flakes easily with a fork and is opaque throughout.",
+      "Roast at 425°F for 12-15 min depending on thickness. Pull at 125-130°F internal for silky salmon (145°F if you want it fully firm) — it flakes easily with a fork.",
       "Do NOT flip the salmon — it cooks perfectly skin-side down the whole time.",
       "── FINISH ──",
       "ACID FINISH: Squeeze the remaining lemon half over everything the moment it comes out of the oven. This step is essential.",
@@ -2138,7 +2157,7 @@ const DEFAULT_DINNERS = [
       "── COOK THE CHICKEN ──",
       "Heat cast iron skillet over HIGH heat until smoking.",
       "Add marinated chicken UNDISTURBED — cook 4-5 min until deeply golden.",
-      "Flip — cook another 4 min. Rest 5 min then slice.",
+      "Flip — cook another 4 min until 165°F internal. Rest 5 min then slice.",
       "── ASSEMBLE ──",
       "Base of grains, then greens, sliced chicken, cherry tomatoes, cucumber, red onion.",
       "Add a generous dollop of hummus and crumbled feta.",
@@ -2198,7 +2217,7 @@ const DEFAULT_DINNERS = [
       "🟡 BOWL 1 (veg) — 1 small onion, diced + 3 cloves garlic, minced + 1 small zucchini, grated + 2 carrots, grated. One bowl.",
       "🔵 BOWL 2 (cans + broth) — 1 can (14oz) diced tomatoes + 1 can (14oz) crushed tomatoes + 1 can kidney beans, drained and rinsed + 1 can black beans, drained and rinsed + 1 cup chicken bone broth. One big bowl (or just open everything and line it up).",
       "🫙 SPICE CUP — 2 tsp Low & Slow chili powder + 1 tsp taco seasoning + 1 tsp cumin + 1 tsp smoked paprika + ½ tsp Dan-O's. Mix.",
-      "Brown 1.5 lbs ground turkey — this step is worth it: heat a dry skillet over HIGH heat, add turkey in one layer, UNDISTURBED 3-4 min to brown, then break up. Cook until no pink. Drain any excess liquid.",
+      "Brown 1.5 lbs ground turkey — this step is worth it: heat a dry skillet over HIGH heat, add turkey in one layer, UNDISTURBED 3-4 min to brown, then break up. Cook until no pink — 165°F. Drain any excess liquid.",
       "── SLOW COOKER (dump and go) ──",
       "Add the browned turkey to the slow cooker.",
       "Add 🟡 Bowl 1 (onion + garlic + zucchini + carrot).",
@@ -2278,7 +2297,9 @@ const DEFAULT_DINNERS = [
       "ACID FINISH: squeeze of fresh lemon or a splash of red wine vinegar over the carved slices right before serving. Brightens the richness dramatically.",
       "Slice against the grain into medallions.",
       "── FRENCH DIP FROM LEFTOVERS ──",
-      "Mise for the dip: thinly slice 1 large onion. 🟡 BOWL 1 (wine) — ½ cup dry red wine. 🔵 BOWL 2 (jus) — 2 cups beef stock + 1 tsp Worcestershire. Set 1 tbsp butter by the stove.",
+      "FRENCH DIP MISE — Thinly slice 1 large onion into a bowl. Set 1 tbsp butter by the stove.",
+      "🟡 BOWL 1 (wine) — ½ cup dry red wine. Goes in alone to deglaze.",
+      "🔵 BOWL 2 (jus) — 2 cups beef stock + 1 tsp Worcestershire. Goes in together after the wine.",
       "Caramelize the sliced onion in the 1 tbsp butter over medium-low heat 30-40 min — low and slow, gentle browning between stirs. Do not rush this.",
       "Pour in 🟡 Bowl 1 (½ cup red wine), scrape up all the fond from the bottom. Reduce 2 min.",
       "Pour in 🔵 Bowl 2 (stock + Worcestershire). Simmer uncovered 8-10 min. Season with a pinch of salt and pepper.",
@@ -2334,7 +2355,7 @@ const DEFAULT_DINNERS = [
       "ACID CHECK: taste the sauce — if it tastes flat, a tiny pinch of sugar balances any excess acidity from the tomatoes.",
       "── COOK THE PASTA ──",
       "Salt your pasta water generously — 2 tsp kosher salt per quart of water. It should taste like the sea.",
-      "Cook Brami pasta al dente per package. Reserve 1 cup pasta water before draining. Rinse after draining.",
+      "Cook Brami pasta al dente per package. Reserve 1 cup pasta water before draining. Do not rinse — the starch helps the sauce cling.",
       "Toss pasta in the sauce. Add pasta water 1 tbsp at a time if needed to loosen — it should coat every strand.",
       "── FINISH ──",
       "ACID FINISH: a tiny squeeze of lemon right before serving brightens everything.",
@@ -2678,7 +2699,7 @@ const DEFAULT_DINNERS = [
       "Spread in a SINGLE LAYER — don't pile everything up or it steams instead of roasts.",
       "Use two pans if needed.",
       "── ROAST ──",
-      "Roast at 425°F for 20-25 min until chicken is cooked through and peppers have some char.",
+      "Roast at 425°F for 20-25 min until chicken is 165°F internal and peppers have some char.",
       "Switch to broil for the last 3-4 min for extra char on the peppers — this makes a huge difference.",
       "── SERVE ──",
       "ACID FINISH: squeeze of fresh lime over everything right out of the oven.",
@@ -2929,7 +2950,9 @@ const DEFAULT_DINNERS = [
       "Sear meatballs in batches — don't crowd the pan. Brown on all sides, about 2 min per side. They don't need to be cooked through yet.",
       "Remove meatballs. Add the 2 tbsp butter from 🔵 Bowl 2 to the same pan, then the minced garlic — cook 1 min.",
       "Pour in the jar of marinara. Scrape up all the fond from the meatball sear.",
-      "Return meatballs to the sauce. Simmer covered 10-12 min until cooked through.",
+      "Return meatballs to the sauce. Simmer covered 10-12 min until cooked through — 165°F in the center of the biggest one.",
+      "── WHILE THE MEATBALLS SIMMER: PASTA ──",
+      "PASTA — Bring a large pot of well-salted water to a boil. Cook 12 oz Brami pasta al dente per package. Drain — do not rinse. Check the meatballs.",
       "── FINISH ──",
       "ACID FINISH: a tiny splash of red wine vinegar stirred into the sauce brightens everything.",
       "Serve over 12 oz cooked Brami pasta with torn fresh basil and grated Parmesan.",
@@ -3060,7 +3083,7 @@ const DEFAULT_DINNERS = [
       "Add 🔵 Bowl 2 (garlic + zucchini + carrot). Cook 2 min.",
       "Add the 1 tbsp tomato paste. Stir and cook 2 min — let it caramelize slightly.",
       "Add the 🫙 Spice Cup. Stir constantly 1 min to bloom in the fat.",
-      "Pour in the ½ cup bone broth. Scrape up all the fond. Simmer uncovered 3-4 min until mostly absorbed.",
+      "Pour in the ½ cup bone broth. Scrape up all the fond. Simmer uncovered 3-4 min until mostly absorbed. Turkey should read 165°F — no pink.",
       "Taste and adjust salt generously.",
       "── SERVE ──",
       "ACID FINISH: squeeze of lime right before serving.",
@@ -3199,6 +3222,8 @@ const DEFAULT_DINNERS = [
       "Sear chicken 2-3 min per side until golden crust forms — do not skip this step, it sets the breading and adds flavor.",
       "Transfer seared chicken to prepared baking sheet.",
       "INTERNAL TEMP TARGET: 165°F. Bake at 425°F for 15-18 min until almost there.",
+      "── WHILE THE CHICKEN BAKES: PASTA ──",
+      "PASTA — Bring a large pot of well-salted water to a boil. Cook 12 oz Brami pasta al dente per package. Drain — do not rinse. Toss with a spoonful of the extra marinara. Check the chicken.",
       "── TOP AND FINISH ──",
       "Spoon the 🫙 Sauce Bowl marinara generously over each breast.",
       "Top with the 🧀 Cheese Bowl.",
@@ -3260,8 +3285,8 @@ const DEFAULT_DINNERS = [
       "Set out 2 cups baby spinach in a bowl and grate extra Parmesan for the table. Chop a handful of parsley or basil. Cut a lemon wedge for the finish.",
       "── COOK PASTA ──",
       "Salt your pasta water generously (2 tsp kosher salt per quart) — it should taste like the sea.",
-      "Cook Brami pasta al dente per package (usually 6-8 min). IMPORTANT: scoop out 1 cup pasta water before draining. Rinse after draining.",
-      "── COOK CHICKEN ──",
+      "Cook Brami pasta al dente per package (usually 6-8 min). IMPORTANT: scoop out 1 cup pasta water before draining. Do not rinse.",
+      "── WHILE THE PASTA COOKS: CHICKEN ──",
       "Heat the 1 tbsp avocado oil in a large skillet over MEDIUM-HIGH heat until shimmering.",
       "Add chicken strips in a single layer — cook undisturbed 3-4 min until golden. Do not crowd the pan.",
       "Flip and cook another 2-3 min. INTERNAL TEMP: 165°F. Remove and set aside.",
@@ -3682,8 +3707,9 @@ const DEFAULT_DINNERS = [
       "🔵 BOWL 2 (wine) — ¾ cup dry white wine. Goes in alone.",
       "🟢 BOWL 3 (lemon) — Juice of 1 large lemon + zest of 1 lemon. Goes in together near the end.",
       "Chop ½ cup parsley. Cut extra lemon wedges for the table.",
-      "Start a large pot of heavily salted water. Cook 400g linguine until al dente — time it so it finishes as the sauce does. Reserve 1 cup pasta water in a measuring cup before draining.",
+      "Bring a large pot of heavily salted water to a boil — do not add the pasta yet.",
       "── COOK THE SHRIMP ──",
+      "PASTA GOES IN NOW — drop 400g linguine into the boiling water, then start the shrimp. Pasta and sauce finish together. Reserve 1 cup pasta water in a measuring cup before draining.",
       "Heat the 2 tbsp olive oil + 2 tbsp of the butter in a large skillet over MEDIUM-HIGH until the butter foams.",
       "Add the shrimp in a single layer. Sear 90 seconds per side until pink and just cooked through. Remove to a plate immediately — shrimp overcook in seconds.",
       "── BUILD THE SAUCE ──",
@@ -3738,6 +3764,7 @@ const DEFAULT_DINNERS = [
       "🫙 MARINADE BOWL — ½ Asian pear, grated on a box grater + 4 cloves garlic, minced + 1 inch ginger, grated + 4 tbsp soy sauce + 2 tbsp sesame oil + 2 tbsp brown sugar + 1 tbsp mirin + 1 tsp black pepper. Whisk together in a large bowl.",
       "Add 1.5 lbs thinly sliced beef + 3 green onions cut in 1 inch pieces to the 🫙 Marinade Bowl. Toss to coat thoroughly.",
       "Marinate minimum 2 hours — overnight is significantly better. The pear enzymes genuinely transform the texture.",
+      "RICE — Cook 2 cups jasmine rice first, lid on (no peeking). The beef cooks in minutes and waits for nothing.",
       "── COOK ──",
       "Get your pan or grill as hot as possible. Cast iron or outdoor grill is ideal.",
       "Working in small batches — do NOT crowd the pan. Crowding steams instead of searing.",
@@ -6627,7 +6654,7 @@ function renderVault() {
   const allRecipes = [...state.dinners,...state.breakfasts,...state.lunches,...state.desserts].filter(r=>r&&r.id);
   const audienceFilter = state.vaultAudience || "all";
   const filtered = filterBySearch(allRecipes).filter(r => {
-    if (audienceFilter !== "all" && r.audience && r.audience !== audienceFilter) return false;
+    if (audienceFilter !== "all" && (r.audience||"family") !== audienceFilter) return false;
     return true;
   });
 
