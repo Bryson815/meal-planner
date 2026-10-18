@@ -8131,7 +8131,7 @@ function renderSmartPlanModal(mode) {
       const i = d.timeline.indexOf(t);
       let dinnerHtml = `<div style="color:var(--dim);font-size:13px">— no dinner (eat out / leftovers)</div>`;
       if (t.dinner && t.dinner.leftoverOf) { const src = byIdAll(t.dinner.leftoverOf); dinnerHtml = `<div style="font-size:14px;font-weight:700;color:#cbd5e1">🔁 Leftovers: ${esc(src ? src.name : "")}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div>`; }
-      else if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r) dinnerHtml = `<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="spPeek('${r.id}')" title="Tap to see the full recipe"><span style="font-size:20px">${r.emoji || "🍽️"}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text);text-decoration:underline dotted rgba(255,255,255,0.25);text-underline-offset:3px">${esc(r.name)}${r.quick ? ' <span style="font-size:10px;background:rgba(245,158,11,0.15);color:#fbbf24;border-radius:999px;padding:1px 6px;font-weight:800">⚡</span>' : ""}${(r.audience === "adults") ? ' <span style="font-size:10px;background:rgba(244,114,182,0.15);color:#f472b6;border-radius:999px;padding:1px 6px;font-weight:800">🍷</span>' : ""}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${involvementLine(r)}</div></div></div>`; }
+      else if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r) dinnerHtml = `<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="spPeek('${r.id}')" title="Tap to see the full recipe"><span style="font-size:20px">${r.emoji || "🍽️"}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text);text-decoration:underline dotted rgba(255,255,255,0.25);text-underline-offset:3px">${esc(r.name)}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${involvementLine(r)}</div>${recipeChips(r)}</div></div>`; }
       const subRow = (icon, label, color, bg, r, extra) => r ? `<div onclick="spPeek('${r.id}')" title="Tap to see the full recipe" style="display:flex;align-items:center;gap:8px;margin-top:6px;padding:6px 10px;border-radius:9px;background:${bg};border:1px solid ${color}33;cursor:pointer;min-width:0"><span style="font-size:10px;font-weight:800;letter-spacing:0.6px;color:${color};flex-shrink:0">${icon} ${label}</span><span style="font-size:13px;font-weight:600;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)}</span><span style="font-size:11px;color:var(--dim);flex-shrink:0;margin-left:auto">⏱ ${esc(r.activeTime||"")}${extra||""}</span></div>` : "";
       const sideR = t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side];
       const sides = [
@@ -8421,10 +8421,9 @@ function renderPlan() {
               <div style="display:flex;align-items:center;gap:6px;min-width:0">
                 <div class="plan-recipe-name" style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:-0.1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25">${esc(recipe.name)}</div>
                 ${recipe.protein ? '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--green);flex-shrink:0">'+recipe.protein+'g</span>' : ""}
-                ${recipe.quick ? '<span title="Quick" style="font-size:10px;font-weight:800;padding:1px 5px;border-radius:20px;background:rgba(245,158,11,0.12);color:#fbbf24;flex-shrink:0">⚡</span>' : ""}
-                ${recipe.audience==="adults" ? '<span title="Adults night" style="font-size:10px;font-weight:800;padding:1px 5px;border-radius:20px;background:rgba(244,114,182,0.12);color:#f472b6;flex-shrink:0">🍷</span>' : ""}
               </div>
-              <div style="font-size:11px;color:var(--dim);margin-top:1px">${esc(timeLabel(recipe,true))}</div>
+              <div style="font-size:11px;color:var(--dim);margin-top:1px">${esc(timeLabel(recipe,true))}${entry.stretch?' · <span style="color:#86efac">🌱 stretch night</span>':''}</div>
+              ${recipeChips(recipe,{noHistory:true,mt:4})}
             </div>
             <div class="slot-actions" style="display:flex;gap:4px;flex-shrink:0">
               <button onclick="openPlanMove('${day}','${slot.key}')" title="Move to another day" style="padding:3px 8px;border-radius:6px;border:1px solid ${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.12)"};background:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.12)":"transparent"};color:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"#34d399":"var(--dim)"};font-size:11px;cursor:pointer;padding:3px 6px">⇄</button>
@@ -8586,8 +8585,10 @@ function filterDayPicker(query) {
       <span style="font-size:22px">${r.emoji||"🍽️"}</span>
       <div style="flex:1;min-width:0">
         <div style="font-size:14px;font-weight:600;color:var(--text)">${esc(r.name)}</div>
-        <div style="font-size:12px;color:var(--dim)">${r.calories||""}cal · ${r.protein||""}g protein${assigned?" · ✅ "+assigned[0]:""}</div>
+        <div style="font-size:12px;color:var(--dim)">⏱ ${esc(timeLabel(r,true))} · ${r.protein||"?"}g protein${r.calories?" · "+r.calories+" cal":""}${assigned?" · ✅ "+assigned[0].replace("_"," "):""}</div>
+        ${recipeChips(r)}
       </div>
+      <button onclick="event.stopPropagation();spPeek('${r.id}')" title="Preview the recipe" style="flex-shrink:0;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">👁 View</button>
     </div>`;
   }
 
@@ -8620,6 +8621,41 @@ function showCookMode(recipeId) {
 }
 
 
+
+// ── Shared "what am I choosing" chips: kids comfort, audience, speed, your rating, kid wins, last made ──
+function recipeChips(r, o) {
+  if (!r) return "";
+  o = o || {};
+  const chip = (txt, fg, bg, title) => `<span title="${title||""}" style="display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:${bg};color:${fg};white-space:nowrap;line-height:1.3">${txt}</span>`;
+  const out = [];
+  const isDinner = (state.dinners || []).some(d => d.id === r.id);
+  const aud = r.audience || "family";
+  if (aud === "adults") out.push(chip("🍷 Adults", "#f472b6", "rgba(244,114,182,0.12)", "Adults night — kids eat something else"));
+  else if (isDinner && r.kidTier) {
+    const kc = kidComfort(r), lvl = householdLevel();
+    const safe = kc >= lvl, stretch = !safe && kc >= lvl - 2;
+    const fg = safe ? "#fbbf24" : stretch ? "#86efac" : "#94a3b8";
+    const bg = safe ? "rgba(251,191,36,0.12)" : stretch ? "rgba(134,239,172,0.10)" : "rgba(148,163,184,0.10)";
+    out.push(chip("Kids " + kidStars(kc), fg, bg, safe ? "Kid comfort — safe bet for the girls" : stretch ? "Kid comfort — a stretch night" : "Kid comfort — a reach for now"));
+  }
+  if (r.quick) out.push(chip("⚡ Quick", "#fbbf24", "rgba(245,158,11,0.12)", "Weeknight-fast"));
+  const rt = (state.ratings || {})[r.id] || {};
+  if (rt.favorite) out.push(chip("❤️ Fav", "#fb7185", "rgba(251,113,133,0.12)", "Marked favorite"));
+  else if (rt.stars) out.push(chip("⭐ " + rt.stars, "#fde047", "rgba(253,224,71,0.10)", "Your rating"));
+  if (isDinner && aud !== "adults") {
+    const w = typeof kidWins === "function" ? kidWins(r.id) : { Livia: 0, Lucy: 0 };
+    const who = [w.Livia ? "Liv" : "", w.Lucy ? "Lucy" : ""].filter(Boolean);
+    if ((rt.chips || []).includes("Kids refused 😬")) out.push(chip("😬 refused", "#fca5a5", "rgba(239,68,68,0.10)", "The girls refused this last time"));
+    else if (who.length) out.push(chip("✓ " + who.join(" + "), "#86efac", "rgba(16,185,129,0.10)", "Ate it before"));
+  }
+  if (r.leftoverDays) out.push(chip("🔁 leftovers", "#a5b4fc", "rgba(99,102,241,0.12)", "Makes a second night (keeps " + r.leftoverDays + " days)"));
+  if (!o.noHistory) {
+    const ds = daysSinceCooked(r.id);
+    if (ds >= 999) { if ((state.cookHistory || []).length >= 5) out.push(chip("🆕 never made", "#94a3b8", "rgba(148,163,184,0.10)", "Not in your cook history yet")); }
+    else out.push(chip(ds === 0 ? "made today" : ds < 14 ? "made " + ds + "d ago" : ds < 60 ? "made " + Math.round(ds / 7) + "w ago" : "made " + Math.round(ds / 30) + "mo ago", ds < 14 ? "#fca5a5" : "#94a3b8", "rgba(148,163,184,0.08)", "Last cooked"));
+  }
+  return out.length ? `<div class="recipe-chips" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:${o.mt == null ? 5 : o.mt}px">${out.join("")}</div>` : "";
+}
 function involvementLine(r){ if(!r) return ""; const ing=(r.ingredients||[]).filter(x=>x&&!String(x).startsWith("---")).length; const st=(r.instructions||[]).filter(x=>x&&!String(x).startsWith("──")).length; return "⏱ "+esc(timeLabel(r,true))+" · "+ing+" ingredients · "+st+" steps"; }
 function spPeek(id){ viewRecipeById(id); const m=document.getElementById("modal"); if(m){ m.style.zIndex="650"; m.dataset.peek="1"; } }
 function viewRecipeById(recipeId) {
@@ -8674,16 +8710,13 @@ function renderVault() {
           <span class="vc-emoji" style="font-size:26px;flex-shrink:0">${r.emoji||"🍽️"}</span>
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:2px">
-              <div class="vc-name" style="font-size:15px;font-weight:600;color:var(--text)">${esc(r.name)}${r.quick?' <span style="font-size:12px" title="Quick">⚡</span>':''}</div>
-              ${isFav?"<span style='font-size:14px'>⭐</span>":""}
+              <div class="vc-name" style="font-size:15px;font-weight:600;color:var(--text)">${esc(r.name)}</div>
             </div>
-            <div style="font-size:12px;color:var(--dim)">${r.audience==="adults"?'<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(245,158,11,0.12);color:#fbbf24;margin-right:4px">🍷</span>':r.audience==="family"?'<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(99,102,241,0.1);color:#818cf8;margin-right:4px">&#128106;</span>':""}${r.calories||""}cal · ${r.protein||""}g protein · ⏱ ${esc(timeLabel(r,true))}</div>
+            <div style="font-size:12px;color:var(--dim)">${r.calories||""}cal · ${r.protein||""}g protein · ⏱ ${esc(timeLabel(r,true))}</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-              ${stars?`<span style="font-size:11px;color:var(--amber)">${stars}</span>`:""}
-              ${cookCount?`<span style="font-size:11px;color:var(--dim)">Made ${cookCount}x</span>`:""}
-              ${(r.audience||"family")!=="adults"&&r.kidTier?`<span title="Kid comfort (5 = surest bet)" style="font-size:11px;color:#fbbf24">Kids ${kidStars(kidComfort(r))}</span>`:""}
-              ${kidWinsBadge(r.id)?`<span style="font-size:11px;color:#f472b6">${kidWinsBadge(r.id)}</span>`:""}
-              ${assignedDay?`<span style="font-size:11px;color:var(--green)">✅ ${assignedDay[0]}</span>`:""}
+              ${recipeChips(r,{mt:0})}
+              ${cookCount?`<span style="font-size:11px;color:var(--dim);align-self:center">Made ${cookCount}x</span>`:""}
+              ${assignedDay?`<span style="font-size:11px;color:var(--green)">✅ ${assignedDay[0].replace("_"," ")}</span>`:""}
               ${(function(){ const hits=useUpUnplanned().filter(it=>useUpRecipeMatch(it,r).score>0).map(it=>it.text); return hits.length?`<span style="font-size:11px;color:#86efac;background:rgba(16,185,129,0.12);padding:1px 7px;border-radius:999px">🥡 uses: ${esc(hits.join(", "))}</span>`:""; })()}
             </div>
           </div>
