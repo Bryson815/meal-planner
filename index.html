@@ -6951,11 +6951,13 @@ function openModal(html) {
 }
 function closeModal(e) {
   if (!e || e.target === document.getElementById("modal")) {
+    const _m=document.getElementById("modal"); if(_m&&_m.dataset.peek){ _m.style.zIndex=""; delete _m.dataset.peek; }
     document.getElementById("modal").style.display = "none";
     document.body.classList.remove("modal-open");
   }
 }
 function closeModalForce() {
+  const _m=document.getElementById("modal"); if(_m&&_m.dataset.peek){ _m.style.zIndex=""; delete _m.dataset.peek; }
   document.getElementById("modal").style.display = "none";
   document.body.classList.remove("modal-open");
 }
@@ -7890,7 +7892,7 @@ function renderSmartPlanModal(mode) {
       const i = d.timeline.indexOf(t);
       let dinnerHtml = `<div style="color:var(--dim);font-size:13px">— no dinner (eat out / leftovers)</div>`;
       if (t.dinner && t.dinner.leftoverOf) { const src = byIdAll(t.dinner.leftoverOf); dinnerHtml = `<div style="font-size:14px;font-weight:700;color:#cbd5e1">🔁 Leftovers: ${esc(src ? src.name : "")}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div>`; }
-      else if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r) dinnerHtml = `<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">${r.emoji || "🍽️"}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text)">${esc(r.name)}${r.quick ? ' <span style="font-size:10px;background:rgba(245,158,11,0.15);color:#fbbf24;border-radius:999px;padding:1px 6px;font-weight:800">⚡</span>' : ""}${(r.audience === "adults") ? ' <span style="font-size:10px;background:rgba(244,114,182,0.15);color:#f472b6;border-radius:999px;padding:1px 6px;font-weight:800">🍷</span>' : ""}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div></div></div>`; }
+      else if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r) dinnerHtml = `<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="spPeek('${r.id}')" title="Tap to see the full recipe"><span style="font-size:20px">${r.emoji || "🍽️"}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text);text-decoration:underline dotted rgba(255,255,255,0.25);text-underline-offset:3px">${esc(r.name)}${r.quick ? ' <span style="font-size:10px;background:rgba(245,158,11,0.15);color:#fbbf24;border-radius:999px;padding:1px 6px;font-weight:800">⚡</span>' : ""}${(r.audience === "adults") ? ' <span style="font-size:10px;background:rgba(244,114,182,0.15);color:#f472b6;border-radius:999px;padding:1px 6px;font-weight:800">🍷</span>' : ""}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${involvementLine(r)}</div></div></div>`; }
       const sides = [t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side] ? "🥦 + " + SIDES_BY_ID[t.dinner.side].name : "", t.breakfast ? "🌅 Breakfast: " + ((byIdAll(t.breakfast.recipeId) || {}).name || "") : "", t.lunch ? "☀️ Adult lunch: " + ((byIdAll(t.lunch.recipeId) || {}).name || "") + (t.lunch.reason && /leftover/.test(t.lunch.reason) ? " 🔁" : "") : ""].filter(Boolean).join(" · ");
       return `<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px">
         <div style="width:38px;flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--green);padding-top:3px">${t.day.slice(0, 3).toUpperCase()}</div>
@@ -7903,7 +7905,7 @@ function renderSmartPlanModal(mode) {
   };
   box.innerHTML = `
     <div style="font-size:18px;font-weight:800;margin-bottom:2px">Here's the plan</div>
-    <div style="color:var(--dim);font-size:13px;margin-bottom:12px">↻ re-picks a night · → move moves or swaps it. Nothing is saved until you accept.</div>
+    <div style="color:var(--dim);font-size:13px;margin-bottom:12px">Tap a recipe to see the full card · ↻ re-picks a night · → move moves or swaps it. Nothing is saved until you accept.</div>
     <div style="max-height:52vh;overflow-y:auto;padding-right:4px">${weekHtml(0)}${d.opts.nextWeek ? weekHtml(1) : ""}</div>
     <div style="display:flex;gap:8px;margin-top:12px">
       <button onclick="renderSmartPlanModal('options')" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:14px;cursor:pointer">← Options</button>
@@ -8274,6 +8276,9 @@ function showCookMode(recipeId) {
   startCooking(section, recipeId);
 }
 
+
+function involvementLine(r){ if(!r) return ""; const ing=(r.ingredients||[]).filter(x=>x&&!String(x).startsWith("---")).length; const st=(r.instructions||[]).filter(x=>x&&!String(x).startsWith("──")).length; return "⏱ "+esc(timeLabel(r,true))+" · "+ing+" ingredients · "+st+" steps"; }
+function spPeek(id){ viewRecipeById(id); const m=document.getElementById("modal"); if(m){ m.style.zIndex="650"; m.dataset.peek="1"; } }
 function viewRecipeById(recipeId) {
   const section = state.dinners.some(r=>r&&r.id===recipeId) ? "dinner" : state.breakfasts.some(r=>r&&r.id===recipeId) ? "breakfast" : state.lunches.some(r=>r&&r.id===recipeId) ? "lunch" : "dessert";
   viewRecipe(section, recipeId);
