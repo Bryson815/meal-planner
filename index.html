@@ -1828,7 +1828,7 @@ const DEFAULT_LUNCHES = [
     active:true
   },
   {
-    id:"lunch8", quick:true,
+    id:"lunch8", quick:true, kidsLunch:true,
     name:"Homemade Pizza Lunchables",
     emoji:"🍕",
     audience:"family",
@@ -7764,7 +7764,7 @@ function smartPlan(opts) {
   const weeks = opts.nextWeek ? 2 : 1;
   const dinners = (state.dinners || []).filter(r => r && r.id && isActive(r.id));
   const breakfasts = (state.breakfasts || []).filter(r => r && r.id && isActive(r.id));
-  const lunches = (state.lunches || []).filter(r => r && r.id && isActive(r.id));
+  const lunches = (state.lunches || []).filter(r => r && r.id && isActive(r.id) && !r.kidsLunch && !/\(side\)/i.test(r.name || ""));
   const byId = {}; [...dinners, ...breakfasts, ...lunches].forEach(r => byId[r.id] = r);
   const keyCache = {}; const keysOf = r => keyCache[r.id] || (keyCache[r.id] = recipeKeySet(r));
 
@@ -8072,10 +8072,18 @@ function renderSmartPlanModal(mode) {
       let dinnerHtml = `<div style="color:var(--dim);font-size:13px">— no dinner (eat out / leftovers)</div>`;
       if (t.dinner && t.dinner.leftoverOf) { const src = byIdAll(t.dinner.leftoverOf); dinnerHtml = `<div style="font-size:14px;font-weight:700;color:#cbd5e1">🔁 Leftovers: ${esc(src ? src.name : "")}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div>`; }
       else if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r) dinnerHtml = `<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="spPeek('${r.id}')" title="Tap to see the full recipe"><span style="font-size:20px">${r.emoji || "🍽️"}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text);text-decoration:underline dotted rgba(255,255,255,0.25);text-underline-offset:3px">${esc(r.name)}${r.quick ? ' <span style="font-size:10px;background:rgba(245,158,11,0.15);color:#fbbf24;border-radius:999px;padding:1px 6px;font-weight:800">⚡</span>' : ""}${(r.audience === "adults") ? ' <span style="font-size:10px;background:rgba(244,114,182,0.15);color:#f472b6;border-radius:999px;padding:1px 6px;font-weight:800">🍷</span>' : ""}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${involvementLine(r)}</div></div></div>`; }
-      const sides = [t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side] ? "🥦 + " + SIDES_BY_ID[t.dinner.side].name : "", t.breakfast ? "🥚 Your batch: " + ((byIdAll(t.breakfast.recipeId) || {}).name || "") : "", t.breakfast2 ? "🫙 MK's jar: " + ((byIdAll(t.breakfast2.recipeId) || {}).name || "") : "", t.breakfast3 ? "🥣 Girls' make-ahead: " + ((byIdAll(t.breakfast3.recipeId) || {}).name || "") : "", t.lunch ? "☀️ Adult lunch: " + ((byIdAll(t.lunch.recipeId) || {}).name || "") + (t.lunch.reason && /leftover/.test(t.lunch.reason) ? " 🔁" : "") : ""].filter(Boolean).join(" · ");
+      const subRow = (icon, label, color, bg, r, extra) => r ? `<div onclick="spPeek('${r.id}')" title="Tap to see the full recipe" style="display:flex;align-items:center;gap:8px;margin-top:6px;padding:6px 10px;border-radius:9px;background:${bg};border:1px solid ${color}33;cursor:pointer;min-width:0"><span style="font-size:10px;font-weight:800;letter-spacing:0.6px;color:${color};flex-shrink:0">${icon} ${label}</span><span style="font-size:13px;font-weight:600;color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)}</span><span style="font-size:11px;color:var(--dim);flex-shrink:0;margin-left:auto">⏱ ${esc(r.activeTime||"")}${extra||""}</span></div>` : "";
+      const sideR = t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side];
+      const sides = [
+        sideR ? `<div style="font-size:12px;color:#86efac;margin-top:5px">🥦 + ${esc(sideR.name)}</div>` : "",
+        subRow("☀️", "ADULT LUNCH", "#34d399", "rgba(16,185,129,0.08)", t.lunch && byIdAll(t.lunch.recipeId), (t.lunch && t.lunch.reason && /leftover/.test(t.lunch.reason)) ? " · 🔁 leftovers" : ""),
+        subRow("🥚", "YOUR BATCH", "#fbbf24", "rgba(245,158,11,0.08)", t.breakfast && byIdAll(t.breakfast.recipeId), ""),
+        subRow("🫙", "MK'S JAR", "#c084fc", "rgba(168,85,247,0.08)", t.breakfast2 && byIdAll(t.breakfast2.recipeId), ""),
+        subRow("🥣", "GIRLS", "#f472b6", "rgba(244,114,182,0.08)", t.breakfast3 && byIdAll(t.breakfast3.recipeId), "")
+      ].filter(Boolean).join("");
       return `<div class="sp-row" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px">
         <div style="width:38px;flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--green);padding-top:3px">${t.day.slice(0, 3).toUpperCase()}</div>
-        <div style="flex:1;min-width:0">${dinnerHtml}${sides ? `<div style="font-size:12px;color:#94a3b8;margin-top:4px">${esc(sides)}</div>` : ""}</div>
+        <div style="flex:1;min-width:0">${dinnerHtml}${sides}</div>
         ${t.dinner ? `<div class="sp-row-actions" style="display:flex;gap:4px;flex-shrink:0">${t.dinner.recipeId ? `<button onclick="swapSmartPlanSlot(${i})" title="Pick something else" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">↻ swap</button>` : ""}<button onclick="spOpenMove(${i})" title="Move to another day" style="padding:6px 10px;border-radius:8px;border:1px solid ${spMoveOpen===i?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.14)"};background:${spMoveOpen===i?"rgba(16,185,129,0.12)":"transparent"};color:${spMoveOpen===i?"#34d399":"var(--muted)"};font-size:12px;cursor:pointer">→ move</button></div>` : ""}
       </div>
       ${spMoveOpen===i ? `<div style="margin:-2px 0 8px 48px;padding:8px 10px;border-radius:10px;background:rgba(16,185,129,0.06);border:1px dashed rgba(16,185,129,0.35)"><div style="font-size:11px;color:var(--dim);margin-bottom:6px">Move to… (a taken day swaps)</div>${[0,1].filter(ww => ww===0 || d.opts.nextWeek).map(ww => `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px"><span style="font-size:10px;font-weight:800;letter-spacing:0.8px;color:${ww===0?"#34d399":"#818cf8"};width:34px">${ww===0?"THIS":"NEXT"}</span>${PLAN_DAYS.map((dd, k) => { const j = ww*7+k; const tt = d.timeline[j]; const taken = tt && tt.dinner; return `<button onclick="spMoveTo(${i},${j})" ${j===i?"disabled":""} style="padding:6px 0;width:40px;border-radius:8px;border:1.5px solid ${j===i?"rgba(16,185,129,0.6)":taken?"rgba(255,255,255,0.22)":"rgba(255,255,255,0.1)"};background:${j===i?"rgba(16,185,129,0.15)":"transparent"};color:${j===i?"#34d399":taken?"var(--text)":"var(--dim)"};font-size:11px;font-weight:800;cursor:pointer">${dd.slice(0,3)}${taken&&j!==i?"<span style=\"display:block;font-size:8px;font-weight:600;color:var(--dim)\">swap</span>":""}</button>`; }).join("")}</div>`).join("")}</div>` : ""}`;
@@ -10263,7 +10271,7 @@ function normalizeIngredient(text) {
   if (t.startsWith("---") || t.startsWith("🫙") || t.startsWith("//")) return null;
   // Extract the core ingredient name (remove quantities and measurements)
   return t
-    .replace(/^[\d½¼¾⅓⅔]+\s*(cup|tbsp|tsp|oz|lb|lbs|g|kg|ml|l|clove|cloves|head|heads|bunch|can|jar|bag|carton|slice|slices|piece|pieces|sprig|sprigs|pinch|dash|handful|packet|strip|strips|fillet|fillets|sheet|pound|ounce|tablespoon|teaspoon)s?\s*(of\s+)?/gi, "")
+    .replace(/^[\d½¼¾⅓⅔]+\s*(cup|tbsp|tsp|oz|lb|lbs|g|kg|ml|l|clove|cloves|head|heads|bunch|can|jar|bag|carton|slice|slices|piece|pieces|sprig|sprigs|pinch|dash|handful|packet|strip|strips|fillet|fillets|sheet|pound|ounce|tablespoon|teaspoon)s?\b\s*(of\s+)?/gi, "")
     .replace(/\([^)]*\)/g, "") // remove parenthetical notes
     .replace(/,.*$/, "") // remove everything after comma
     .replace(/\s+/g, " ")
