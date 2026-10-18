@@ -7920,7 +7920,8 @@ function smartPlan(opts) {
 // ── Cook-night defaults (persisted) ──
 function planDefaultsGet() {
   const d = state.planDefaults && Array.isArray(state.planDefaults.cookDays) ? state.planDefaults : { cookDays:["Monday","Tuesday","Wednesday","Thursday","Saturday"], adultDays:["Saturday"], quickDays:["Tuesday","Thursday"] };
-  state.planDefaults = { cookDays: d.cookDays.slice(), adultDays: (d.adultDays||[]).slice(), quickDays: (d.quickDays||[]).slice() };
+  const prefs = d.prefs || {};
+  state.planDefaults = { cookDays: d.cookDays.slice(), adultDays: (d.adultDays||[]).slice(), quickDays: (d.quickDays||[]).slice(), prefs: Object.assign({ bkAndrew:true, bkMk:true, bkKids:true, lunches:2, nextWeek:true, keep:true }, prefs) };
   return state.planDefaults;
 }
 function togglePlanDay(kind, day) {
@@ -7985,6 +7986,12 @@ let smartPlanDraft = null;
 function showAutoplanOptions() { renderSmartPlanModal("options"); const m = document.getElementById("autoplan-modal"); if (m) m.style.display = "flex"; document.body.classList.add("sheet-open"); }
 function closeAutoplanModal() { const m = document.getElementById("autoplan-modal"); if (m) m.style.display = "none"; document.body.classList.remove("sheet-open"); }
 function spOpt(name, fallback) { const el = document.getElementById("sp-" + name); if (!el) return fallback; if (el.type === "checkbox") return el.checked; const v = parseInt(el.textContent || el.value); return isNaN(v) ? fallback : v; }
+
+function spSavePref(id, val) {
+  const map = { "sp-bk-andrew":"bkAndrew", "sp-bk-mk":"bkMk", "sp-bk-kids":"bkKids", "sp-lunches":"lunches", "sp-next":"nextWeek", "sp-keep":"keep" };
+  const k = map[id]; if (!k) return;
+  const pd = planDefaultsGet(); pd.prefs[k] = val; scheduleSave();
+}
 function runSmartPlan() {
   const pd = planDefaultsGet();
   const opts = { cookDays: pd.cookDays.slice(), adultDays: pd.adultDays.slice(), quickDays: pd.quickDays.slice(), bkAndrew: spOpt("bk-andrew", true), bkMk: spOpt("bk-mk", true), bkKids: spOpt("bk-kids", true), breakfasts: 0, lunches: spOpt("lunches", 2), nextWeek: spOpt("next", true), keepExisting: spOpt("keep", true) };
@@ -8030,14 +8037,15 @@ function rollNextWeek() {
   scheduleSave(); renderPlan();
 }
 function stepperHtml(id, val, min, max, color) {
-  return `<div style="display:flex;align-items:center;gap:6px"><button onclick="(function(e){const el=document.getElementById('${id}');el.textContent=Math.max(${min},parseInt(el.textContent)-1)})()" style="width:30px;height:30px;border-radius:8px;border:1px solid ${color}55;background:transparent;color:${color};font-weight:800;cursor:pointer">−</button><span id="${id}" style="min-width:22px;text-align:center;font-weight:800;color:var(--text);font-size:15px">${val}</span><button onclick="(function(e){const el=document.getElementById('${id}');el.textContent=Math.min(${max},parseInt(el.textContent)+1)})()" style="width:30px;height:30px;border-radius:8px;border:1px solid ${color}55;background:transparent;color:${color};font-weight:800;cursor:pointer">+</button></div>`;
+  return `<div style="display:flex;align-items:center;gap:6px"><button onclick="(function(e){const el=document.getElementById('${id}');el.textContent=Math.max(${min},parseInt(el.textContent)-1);spSavePref('${id}',parseInt(el.textContent))})()" style="width:30px;height:30px;border-radius:8px;border:1px solid ${color}55;background:transparent;color:${color};font-weight:800;cursor:pointer">−</button><span id="${id}" style="min-width:22px;text-align:center;font-weight:800;color:var(--text);font-size:15px">${val}</span><button onclick="(function(e){const el=document.getElementById('${id}');el.textContent=Math.min(${max},parseInt(el.textContent)+1);spSavePref('${id}',parseInt(el.textContent))})()" style="width:30px;height:30px;border-radius:8px;border:1px solid ${color}55;background:transparent;color:${color};font-weight:800;cursor:pointer">+</button></div>`;
 }
 function renderSmartPlanModal(mode) {
   const m = document.getElementById("autoplan-modal"); if (!m) return;
   const box = m.querySelector(".sp-box"); if (!box) return;
   if (mode === "options") {
     const row = (icon, label, ctrl, bg) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:${bg};border-radius:12px;margin-bottom:8px"><div style="display:flex;align-items:center;gap:8px"><span>${icon}</span><span style="font-size:14px;font-weight:600;color:var(--text)">${label}</span></div>${ctrl}</div>`;
-    const toggle = (id, label, on) => `<label style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.04);border-radius:12px;margin-bottom:8px;cursor:pointer"><span style="font-size:14px;font-weight:600;color:var(--text)">${label}</span><input type="checkbox" id="${id}" ${on ? "checked" : ""} style="width:20px;height:20px;accent-color:#10b981"></label>`;
+    const prefs = planDefaultsGet().prefs;
+    const toggle = (id, label, on) => `<label style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(255,255,255,0.04);border-radius:12px;margin-bottom:8px;cursor:pointer"><span style="font-size:14px;font-weight:600;color:var(--text)">${label}</span><input type="checkbox" id="${id}" ${on ? "checked" : ""} onchange="spSavePref('${id}', this.checked)" style="width:20px;height:20px;accent-color:#10b981"></label>`;
     box.innerHTML = `
       <div style="font-size:18px;font-weight:800;margin-bottom:2px">✨ Plan my week</div>
       <div style="color:var(--dim);font-size:13px;margin-bottom:14px">Builds around leftovers and shared ingredients. You'll see the plan before anything is saved.</div>
@@ -8046,12 +8054,12 @@ function renderSmartPlanModal(mode) {
              + block("🍷", "Adults night(s)", pd.adultDays.length ? pd.adultDays.map(d=>d.slice(0,3)).join(", ") : "none", "adult", pd.adultDays, "#f472b6", true, "rgba(244,114,182,0.08)")
              + block("⚡", "Quick nights", pd.quickDays.length ? pd.quickDays.map(d=>d.slice(0,3)).join(", ") : "none", "quick", pd.quickDays, "#fbbf24", true, "rgba(245,158,11,0.08)"); })()}
       <div style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--dim);margin:6px 2px 4px">🌅 BREAKFASTS — all land on Sunday as a batch</div>
-      ${toggle("sp-bk-andrew", "🥚 Andrew's Sunday batch (grab-and-go, 20g+ protein)", true)}
-      ${toggle("sp-bk-mk", "🫙 A gentle jar for MK (small, mild, already made)", true)}
-      ${toggle("sp-bk-kids", "🥣 Girls' weekday upgrade (cereal stays — one make-ahead beside it)", true)}
-      ${row("☀️", "Adult lunches <span style=\"font-weight:400;color:var(--dim);font-size:12px\">(kids\' lunchboxes live in 🍱 Lunchbox)</span>", stepperHtml("sp-lunches", 2, 0, 5, "#34d399"), "rgba(16,185,129,0.08)")}
-      ${toggle("sp-next", "Plan next week too (leftovers carry over)", true)}
-      ${toggle("sp-keep", "Keep what I've already placed", true)}
+      ${toggle("sp-bk-andrew", "🥚 Andrew's Sunday batch (grab-and-go, 20g+ protein)", prefs.bkAndrew)}
+      ${toggle("sp-bk-mk", "🫙 A gentle jar for MK (small, mild, already made)", prefs.bkMk)}
+      ${toggle("sp-bk-kids", "🥣 Girls' weekday upgrade (cereal stays — one make-ahead beside it)", prefs.bkKids)}
+      ${row("☀️", "Adult lunches <span style=\"font-weight:400;color:var(--dim);font-size:12px\">(kids\' lunchboxes live in 🍱 Lunchbox)</span>", stepperHtml("sp-lunches", prefs.lunches, 0, 5, "#34d399"), "rgba(16,185,129,0.08)")}
+      ${toggle("sp-next", "Plan next week too (leftovers carry over)", prefs.nextWeek)}
+      ${toggle("sp-keep", "Keep what I've already placed", prefs.keep)}
       <button onclick="runSmartPlan()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-weight:800;font-size:15px;cursor:pointer;margin:6px 0 8px">Preview the plan →</button>
       <button onclick="closeAutoplanModal()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);font-size:14px;cursor:pointer">Cancel</button>`;
     return;
