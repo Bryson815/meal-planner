@@ -8069,7 +8069,7 @@ function acceptSmartPlan() {
   const nextW = keep ? normalizePlan(Object.assign({}, state.nextWeekPlan || {})) : {};
   smartPlanDraft.timeline.forEach(t => {
     const plan = t.week === 0 ? thisW : nextW;
-    if (t.dinner) planSet(plan, t.day, "dinner", t.dinner.leftoverOf ? { leftoverOf: t.dinner.leftoverOf, section: "dinner" } : Object.assign({ recipeId: t.dinner.recipeId, section: "dinner" }, t.dinner.side ? { side: t.dinner.side } : {}));
+    if (t.dinner) planSet(plan, t.day, "dinner", t.dinner.leftoverOf ? { leftoverOf: t.dinner.leftoverOf, section: "dinner" } : Object.assign({ recipeId: t.dinner.recipeId, section: "dinner" }, t.dinner.side ? { side: t.dinner.side } : {}, t.stretch ? { stretch: true } : {}));
     if (t.breakfast) planSet(plan, t.day, "breakfast", { recipeId: t.breakfast.recipeId, section: "breakfast" });
     if (t.breakfast2) planSet(plan, t.day, "breakfast2", { recipeId: t.breakfast2.recipeId, section: "breakfast" });
     if (t.breakfast3) planSet(plan, t.day, "breakfast3", { recipeId: t.breakfast3.recipeId, section: "breakfast" });
@@ -8365,7 +8365,7 @@ function renderPlan() {
       <span title="Goal: about 2 vegetable servings per dinner">🥦 Veg servings <b style="color:var(--text)">${vegN}</b> <span style="opacity:0.55">(${cooked.length*2}+)</span> ${chk(vegN>=cooked.length*2)}</span>
       <span title="Goal: at least one vegetable-forward dinner">🌿 Veg-forward <b style="color:var(--text)">${vegFwdN}</b> <span style="opacity:0.55">(1+)</span> ${chk(vegFwdN>=1)}</span>
       <span title="Goal: 35g+ average protein per dinner">🍗 Protein avg <b style="color:var(--text)">${avgProt}g</b> ${chk(avgProt>=35)}</span>
-      ${(function(){ const st = smartPlanDraft.timeline.filter(t => t.week === 0 && t.stretch && t.dinner && t.dinner.recipeId).map(t => (byIdAll(t.dinner.recipeId)||{}).name).filter(Boolean); return `<span title="One night a week reaches one rung below the girls' comfort level">🌱 Stretch: <b style="color:var(--text)">${st.length ? esc(st.join(", ")) : "none"}</b></span>`; })()}
+      ${(function(){ const ap = activePlan() || {}; const st = PLAN_DAYS.map(d => { const e = planGet(ap, d, "dinner"); return e && e.stretch && e.recipeId ? ((byIdAll(e.recipeId)||{}).name || "") + " (" + d.slice(0,3) + ")" : ""; }).filter(Boolean); return `<span title="One night a week reaches one rung below the girls' comfort level">🌱 Stretch: <b style="color:var(--text)">${st.length ? esc(st.join(", ")) : "none"}</b></span>`; })()}
     </div>` : "";
 
 
