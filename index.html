@@ -2117,7 +2117,7 @@ const DEFAULT_DESSERT = [DESSERT_LIBRARY[0]];
 
 const DEFAULT_DINNERS = [
   {
-    id:"d1", leftoverFor:["d2","l1"], day:"Sunday", emoji:"🍗", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true, calories:560, protein:48, audience:"family",
+    id:"d1", kidTier:4, leftoverFor:["d2","l1"], day:"Sunday", emoji:"🍗", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true, calories:560, protein:48, audience:"family",
     kidNote:"Pull a few thighs and potatoes off the pan BEFORE the balsamic-y veg get tossed together if the girls are picky about sauce. Potatoes and carrots are the sure things — serve with ketchup or ranch for dipping. Shred extra chicken for lunch tacos.",
     equipment:["Large rimmed sheet pan (or two)","Instant-read thermometer","Tongs","3 prep bowls"],
     activeTime:"15 min", totalTime:"50 min",
@@ -2163,7 +2163,7 @@ const DEFAULT_DINNERS = [
     tips:"ACID FINISH: Squeeze fresh lemon juice over everything right when it comes out of the oven — before serving. It wakes up all the roasted flavors dramatically. | MAILLARD / CRISPY SKIN: Patting the chicken completely dry is non-negotiable. Moisture is the enemy of browning — any water on the skin steams instead of sears. Dry chicken = golden crispy skin. | SINGLE LAYER: Don't crowd the vegetables on the pan or they'll steam instead of caramelize. Use two pans if needed. | RESTING: The 5 min rest after cooking lets juices redistribute — cutting immediately makes them run out onto the board."
   },
   {
-    id:"d2", usesLeftoversFrom:["d1"], day:"Tuesday", emoji:"🥬", proteinType:"chicken", vegServings:3, vegForward:true, noSide:true, calories:380, protein:40, audience:"family",
+    id:"d2", kidTier:3, usesLeftoversFrom:["d1"], day:"Tuesday", emoji:"🥬", proteinType:"chicken", vegServings:3, vegForward:true, noSide:true, calories:380, protein:40, audience:"family",
     kidNote:"Lettuce cups are a hard sell for a 5-year-old — serve the filling over rice as a 'chicken rice bowl' for the girls, lettuce for the adults. Skip the sriracha in the pot; it goes on adult plates only. Water chestnuts are the fun crunchy part — let them pick those out.",
     equipment:["Large skillet (12-inch)","Box grater","Instant-read thermometer","Colander (water chestnuts)","4 prep bowls"],
     activeTime:"20 min", totalTime:"20 min",
@@ -2219,7 +2219,7 @@ const DEFAULT_DINNERS = [
     tips:"INTERNAL TEMP: Ground chicken/turkey goes to 160°F — ground meat is where we hold the line. At HIGH heat this happens in 6-8 min. | PAT DRY: Pat the ground meat dry before browning if it looks wet — excess moisture causes steaming not browning. | FOND: After browning the meat, scrape up any fond before adding the sauce. | ACID BALANCE: The rice wine vinegar is your acid here — taste the filling before serving and if it tastes flat, add another small splash of vinegar. It cuts through the richness of the hoisin. | MAILLARD: Same rule as ground turkey in Bolognese — leave it undisturbed 3 min to brown before breaking up. Browned turkey has dramatically more flavor than grey steamed turkey. | SALT CHECK: Hoisin is already salty — taste before adding any extra salt. | SAUCE TRICK: Mix the sauce in a small bowl before it goes in the pan so it coats everything evenly the moment it hits the heat."
   },
   {
-    id:"d3", leftoverDays:4, day:"Thursday", emoji:"🍝", proteinType:"turkey", vegServings:3, vegForward:true, noSide:true, calories:490, protein:44, audience:"family",
+    id:"d3", kidTier:4, leftoverDays:4, day:"Thursday", emoji:"🍝", proteinType:"turkey", vegServings:3, vegForward:true, noSide:true, calories:490, protein:44, audience:"family",
     kidNote:"The veg is invisible — this is the easiest hidden-veg win in the vault. Plain buttered Brami on the side for anyone who rejects red sauce that night. Parmesan bowl on the table (Lucy's move). Sauce freezes in 2-cup portions for emergency dinners.",
     equipment:["Large Dutch oven or deep skillet","Large pot (pasta)","Colander","Box grater","4 prep bowls"],
     activeTime:"15 min", totalTime:"35 min",
@@ -2275,7 +2275,7 @@ const DEFAULT_DINNERS = [
     tips:"TEMP: Ground turkey goes to 160°F — ground meat is where we hold the line. The 20-30 min simmer in the tomato sauce fully cooks it through. | FOND: After browning the turkey, scrape up all the brown bits before adding the wine or tomatoes — that fond is concentrated flavor. | ACID FINISH: Right before serving, squeeze half a lemon or a splash of red wine vinegar into the sauce and stir. It brightens the whole dish and makes it taste restaurant-quality — don't skip this step. | MAILLARD: The undisturbed browning on the turkey is critical — resist stirring for the full 3-4 min to build a crust that adds deep flavor. | PASTA WATER: Salt your pasta water until it tastes like the sea — this is the only chance to season the pasta itself, not just the sauce. Reserve a cup before draining in case the sauce needs loosening. | DOUBLE BATCH: Make double sauce and freeze half — future Thursday dinner in 10 min."
   },
   ,{
-    id:"dinner4",
+    id:"dinner4", kidTier:3,
     audience:"family",
     name:"Italian Steak Skewers with Salsa Verde",
     emoji:"🥩", proteinType:"beef", vegServings:1,
@@ -2336,7 +2336,7 @@ const DEFAULT_DINNERS = [
   }
 
   ,{
-    id:"dinner5", leftoverFor:["dinner6"],
+    id:"dinner5", kidTier:4, leftoverFor:["dinner6"],
     audience:"family",
     name:"Slow Cooker Chicken Tacos",
     emoji:"🌮", proteinType:"chicken", vegServings:1,
@@ -2388,7 +2388,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner6", usesLeftoversFrom:["dinner5"],
+    id:"dinner6", kidTier:4, usesLeftoversFrom:["dinner5"],
     audience:"family",
     name:"Chicken Burrito Bowls",
     emoji:"🥣", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true,
@@ -2446,7 +2446,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner7", leftoverFor:["dinner39"],
+    id:"dinner7", kidTier:3, leftoverFor:["dinner39"],
     audience:"family",
     name:"Sheet Pan Salmon with Roasted Veg",
     emoji:"🐟", proteinType:"fish", vegServings:2, vegForward:true, noSide:true,
@@ -2504,7 +2504,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner8",
+    id:"dinner8", kidTier:3,
     audience:"family",
     name:"Greek Chicken Bowls",
     emoji:"🫒", proteinType:"chicken", vegServings:3, vegForward:true, noSide:true,
@@ -2565,7 +2565,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner9", leftoverDays:4,
+    id:"dinner9", kidTier:3, leftoverDays:4,
     audience:"adults",
     name:"Slow Cooker Turkey Chili",
     emoji:"🌶️", proteinType:"turkey", vegServings:3, vegForward:true, noSide:true,
@@ -2631,7 +2631,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner10", leftoverFor:["dinner42"],
+    id:"dinner10", kidTier:3, leftoverFor:["dinner42"],
     audience:"adults",
     name:"Reverse Sear Beef Tenderloin",
     emoji:"🥩", proteinType:"beef", vegServings:1,
@@ -2709,7 +2709,7 @@ const DEFAULT_DINNERS = [
   }
 
   ,{
-    id:"dinner11",
+    id:"dinner11", kidTier:4,
     audience:"adults",
     name:"Marcella Hazan Tomato Butter Sauce with Brami",
     emoji:"🍅", proteinType:"veg", vegServings:1, vegForward:true, noSide:true,
@@ -2763,7 +2763,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner12", leftoverFor:["dinner42","dinner44"],
+    id:"dinner12", kidTier:2, leftoverFor:["dinner42","dinner44"],
     audience:"adults",
     name:"Kenji's French Onion Soup",
     emoji:"🧅", proteinType:"veg", vegServings:2, vegForward:true, noSide:true,
@@ -2832,7 +2832,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner13",
+    id:"dinner13", kidTier:4,
     audience:"family",
     name:"Samin Nosrat Buttermilk Roast Chicken",
     emoji:"🍗", proteinType:"chicken", vegServings:0,
@@ -2886,7 +2886,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner14",
+    id:"dinner14", kidTier:4,
     audience:"family",
     name:"Kenji's Crispy Cast Iron Chicken Thighs",
     emoji:"🍳", proteinType:"chicken", vegServings:0,
@@ -2932,7 +2932,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner15",
+    id:"dinner15", kidTier:5,
     audience:"family",
     name:"Kenji's Smash Burgers",
     originalIngredients:["1 lb 80/20 ground beef — fat is everything in a smash burger, do not use lean","American cheese slices (Kraft singles — they melt perfectly)","Martin's Potato Rolls","Diced white onion (pressed into patty while smashing)","Yellow mustard","Dill pickle slices","Special sauce: 2 tbsp mayo + 1 tbsp ketchup + 1 tsp mustard + 1 tsp pickle juice","Butter for toasting the buns"],
@@ -2987,7 +2987,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner16",
+    id:"dinner16", kidTier:1,
     audience:"adults",
     name:"Alison Roman's Spiced Chickpea & Spinach Stew",
     emoji:"🫘", proteinType:"veg", vegServings:3, vegForward:true, noSide:true,
@@ -3049,7 +3049,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner17",
+    id:"dinner17", kidTier:4,
     audience:"family",
     name:"Sheet Pan Chicken Fajitas",
     emoji:"🌶️", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true,
@@ -3108,7 +3108,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner18", leftoverFor:["dinner39"],
+    id:"dinner18", kidTier:3, leftoverFor:["dinner39"],
     audience:"adults",
     name:"Honey Garlic Salmon",
     originalIngredients:["4 salmon fillets, skin-on","3 tbsp honey","3 cloves garlic, minced","3 tbsp soy sauce (full sodium)","1 tbsp rice wine vinegar","1 tbsp sesame oil","2 tbsp butter for searing (gives richer crust vs avocado oil)","Sesame seeds and green onions to finish"],
@@ -3163,7 +3163,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner19",
+    id:"dinner19", kidTier:1,
     audience:"adults",
     name:"Shakshuka",
     emoji:"🍳", proteinType:"egg", vegServings:2, vegForward:true, noSide:true,
@@ -3228,7 +3228,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner20", leftoverDays:4,
+    id:"dinner20", kidTier:3, leftoverDays:4,
     audience:"family",
     name:"Slow Cooker Chicken Tikka Masala",
     emoji:"🍛", proteinType:"chicken", vegServings:1,
@@ -3290,7 +3290,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner21", leftoverFor:["dinner58"],
+    id:"dinner21", kidTier:5, leftoverFor:["dinner58"],
     audience:"family",
     name:"Serious Eats Turkey Meatballs",
     emoji:"🍝", proteinType:"turkey", vegServings:1,
@@ -3359,7 +3359,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner22", leftoverDays:4,
+    id:"dinner22", kidTier:2, leftoverDays:4,
     audience:"adults",
     name:"White Bean & Turkey Sausage Stew",
     emoji:"🫘", proteinType:"turkey", vegServings:3, vegForward:true, noSide:true,
@@ -3420,7 +3420,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner23",
+    id:"dinner23", kidTier:4,
     audience:"family",
     name:"Kenji's Ground Turkey Tacos",
     emoji:"🌮", proteinType:"turkey", vegServings:2,
@@ -3492,7 +3492,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner24",
+    id:"dinner24", kidTier:3,
     audience:"adults",
     name:"NYT Slow Cooker Short Ribs",
     emoji:"🥩", proteinType:"beef", vegServings:1,
@@ -3563,7 +3563,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner25",
+    id:"dinner25", kidTier:4,
     audience:"family",
     name:"Baked Chicken Parmesan",
     emoji:"🍅", proteinType:"chicken", vegServings:1,
@@ -3634,7 +3634,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner26",
+    id:"dinner26", kidTier:4,
     audience:"family",
     name:"Cottage Cheese Chicken Fettuccine Alfredo",
     originalIngredients:["1.5 cups heavy cream (no substitution — this is what makes Alfredo Alfredo)","4 tbsp unsalted butter","1 cup freshly grated Parmesan Reggiano (block, not pre-grated)","3 cloves garlic, minced","Fresh fettuccine (dried works but fresh is traditional)","Pinch of nutmeg","Salt and white pepper","Fresh parsley to finish","Note: Traditional Alfredo is just butter + Parmesan + pasta water — no cream cheese, no cottage cheese"],
@@ -3704,7 +3704,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner27",
+    id:"dinner27", kidTier:4,
     name:"Garlic Butter Beef & Potato Bowl",
     emoji:"🥣", proteinType:"beef", vegServings:1,
     equipment:["Sheet pan","Large skillet","Instant-read thermometer","Box grater","3 prep bowls"],
@@ -3780,7 +3780,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner28",
+    id:"dinner28", kidTier:4,
     name:"Big Mac Burger Bowls",
     emoji:"🍔", proteinType:"beef", vegServings:2, vegForward:true, noSide:true,
     equipment:["Sheet pan","Large skillet","Instant-read thermometer","Small bowl (special sauce)","3 prep bowls"],
@@ -3856,7 +3856,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner29",
+    id:"dinner29", kidTier:2,
     name:"Lemon Herb Baked Cod",
     emoji:"🐟", proteinType:"fish", vegServings:2,
     equipment:["Sheet pan + parchment","Instant-read thermometer","Microplane (zest)","Pastry brush","1 prep bowl"],
@@ -3905,7 +3905,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner30",
+    id:"dinner30", kidTier:3,
     name:"Chicken Piccata",
     emoji:"🍋", proteinType:"chicken", vegServings:0,
     equipment:["Large skillet (12-inch)","Meat mallet or heavy pan","Instant-read thermometer","Foil (tenting)","4 prep bowls"],
@@ -3964,7 +3964,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner31",
+    id:"dinner31", kidTier:1,
     name:"Thai Basil Chicken (Pad Krapow Gai)",
     emoji:"🌿", proteinType:"chicken", vegServings:1,
     equipment:["Wok or large skillet (12-inch)","Rice cooker or pot with lid","Small skillet (fried eggs)","Instant-read thermometer","2 prep bowls"],
@@ -4020,7 +4020,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner32",
+    id:"dinner32", kidTier:4,
     name:"Pasta Carbonara",
     emoji:"🍝", proteinType:"pork", vegServings:1,
     equipment:["Large pot (pasta)","Large skillet (12-inch)","Heatproof mixing bowl","Whisk","Microplane or box grater","Tongs","1 prep bowl"],
@@ -4063,7 +4063,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner33",
+    id:"dinner33", kidTier:3,
     name:"Shrimp Scampi",
     emoji:"🦐", proteinType:"shellfish", vegServings:0,
     equipment:["Large skillet (12-inch)","Large pot (pasta)","Colander","Microplane (zest)","4 prep bowls"],
@@ -4123,7 +4123,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner34",
+    id:"dinner34", kidTier:3,
     name:"Korean Beef Bulgogi",
     emoji:"🥩", proteinType:"beef", vegServings:1,
     equipment:["Cast iron skillet or outdoor grill","Box grater (pear/ginger)","Whisk","Tongs","Marinating container or zip bag"],
@@ -4176,7 +4176,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner35",
+    id:"dinner35", kidTier:3,
     name:"Pan Sauce Pork Tenderloin",
     emoji:"🥩", proteinType:"pork", vegServings:3,
     equipment:["Oven-safe skillet (12-inch)","Instant-read thermometer","Whisk","Foil (tenting)","4 prep bowls"],
@@ -4243,7 +4243,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner36",
+    id:"dinner36", kidTier:1,
     name:"Ahi Tuna Poke Bowl",
     emoji:"🐟", proteinType:"fish", vegServings:2, vegForward:true, noSide:true,
     equipment:["Rice cooker or pot with lid","Whisk","Sharp knife (sushi-grade slicing)","Box grater (ginger)","2 prep bowls"],
@@ -4311,7 +4311,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner37",
+    id:"dinner37", kidTier:5,
     name:"High Protein Pizza (Fit Flour Dough)",
     emoji:"🍕", proteinType:"veg", vegServings:0,
     equipment:["Sheet pan + parchment (or pizza stone)","Large mixing bowl","Rolling pin or oiled hands","Box grater","2 prep bowls"],
@@ -4383,7 +4383,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner38",
+    id:"dinner38", kidTier:4,
     name:"High Protein Greek Yogurt Naan",
     emoji:"🫓", proteinType:"veg", vegServings:0,
     equipment:["Cast iron skillet","Large mixing bowl","Rolling pin","Pastry brush","Clean kitchen towel","2 prep bowls"],
@@ -4441,7 +4441,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner39", usesLeftoversFrom:["dinner7","dinner18"],
+    id:"dinner39", kidTier:3, usesLeftoversFrom:["dinner7","dinner18"],
     name:"Leftover Salmon Burgers",
     emoji:"🐟", proteinType:"fish", vegServings:1,
     equipment:["Cast iron or nonstick skillet","Fish spatula","Parchment-lined plate","1 prep bowl"],
@@ -4499,7 +4499,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner40",
+    id:"dinner40", kidTier:3,
     name:"Blended Mushroom Burgers (Turkey or Beef)",
     emoji:"🍔", proteinType:"turkey", vegServings:3,
     equipment:["Food processor or box grater","Cast iron skillet (12-inch)","Instant-read thermometer","Plate (cooling mushrooms)","2 prep bowls"],
@@ -4572,7 +4572,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner41", leftoverFor:["lunch5","l2"],
+    id:"dinner41", kidTier:3, leftoverFor:["lunch5","l2"],
     name:"RecTeq Smoked Turkey Breast",
     emoji:"🦃", proteinType:"turkey", vegServings:0,
     equipment:["RecTeq pellet grill","Probe thermometer (leave-in) or instant-read","Large pot (brine)","Wire rack + sheet pan","Foil (tenting)","2 prep bowls"],
@@ -4650,7 +4650,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner42", usesLeftoversFrom:["dinner10"],
+    id:"dinner42", kidTier:3, usesLeftoversFrom:["dinner10"],
     name:"Steak Sandwiches with Caramelized Onions & Au Jus",
     emoji:"🥖", proteinType:"beef", vegServings:1, noSide:true,
     equipment:["Large skillet (12-inch) or wide pot (onions)","Small saucepan (au jus)","Cast iron or second skillet (steak/toast)","3 prep bowls"],
@@ -4723,7 +4723,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner44",
+    id:"dinner44", kidTier:2,
     name:"French Onion Soup + Steak Sandwiches (Combined Cook)",
     emoji:"🧅", proteinType:"beef", vegServings:2, vegForward:true, noSide:true,
     equipment:["Your largest Dutch oven (10 onions)","Small saucepan (au jus)","Skillet (steak + toast)","Oven-safe soup bowls + sheet pan","Box grater","6 prep bowls"],
@@ -4818,7 +4818,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner45", leftoverFor:["lunch9"],
+    id:"dinner45", kidTier:4, leftoverFor:["lunch9"],
     name:"Best Broccoli Cheddar Soup",
     emoji:"🥦", proteinType:"veg", vegServings:2, vegForward:true, noSide:true,
     equipment:["Dutch oven with lid","Box grater","Immersion blender (or regular blender)","Sheet pan + parchment","4 prep bowls + 1 large measuring cup"],
@@ -4918,7 +4918,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner46", leftoverFor:["dinner57"],
+    id:"dinner46", kidTier:5, leftoverFor:["dinner57"],
     name:"Crispy Baked Chicken Tenders + 3 Dips",
     emoji:"🍗", proteinType:"chicken", vegServings:0,
     audience:"family",
@@ -4980,7 +4980,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner47", quick:true,
+    id:"dinner47", kidTier:5, quick:true,
     name:"One-Pot Cheesy Taco Pasta",
     emoji:"🌮", proteinType:"turkey", vegServings:2,
     audience:"family",
@@ -5045,7 +5045,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner48",
+    id:"dinner48", kidTier:5,
     name:"Breakfast-for-Dinner Sheet Pan Night",
     emoji:"🥞", proteinType:"chicken", vegServings:1, noSide:true,
     audience:"family",
@@ -5105,7 +5105,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner49",
+    id:"dinner49", kidTier:5,
     name:"Chicken Meatball Spaghetti",
     emoji:"🍝", proteinType:"chicken", vegServings:1,
     audience:"family",
@@ -5171,7 +5171,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner50",
+    id:"dinner50", kidTier:5,
     name:"Baked Mac & Cheese (Protein-Boosted)",
     emoji:"🧀", proteinType:"veg", vegServings:0,
     audience:"family",
@@ -5247,7 +5247,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner51", quick:true,
+    id:"dinner51", kidTier:5, quick:true,
     name:"Hidden-Veg Chicken Quesadillas",
     emoji:"🫓", proteinType:"chicken", vegServings:1,
     audience:"family",
@@ -5301,7 +5301,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner52",
+    id:"dinner52", kidTier:3,
     name:"Kevin's Korean BBQ Chicken Rice Bowls",
     emoji:"🍚", proteinType:"chicken", vegServings:2,
     audience:"family",
@@ -5355,7 +5355,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner53",
+    id:"dinner53", kidTier:4,
     name:"Teriyaki Meatball Bowls",
     emoji:"🍡", proteinType:"chicken", vegServings:2,
     audience:"family",
@@ -5405,7 +5405,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner54",
+    id:"dinner54", kidTier:4,
     name:"Rotisserie Chicken Enchilada Skillet",
     emoji:"🫔", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true,
     audience:"family",
@@ -5470,7 +5470,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner55",
+    id:"dinner55", kidTier:5,
     name:"Dumpling Night",
     emoji:"🥟", proteinType:"chicken", vegServings:2,
     audience:"family",
@@ -5529,7 +5529,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner56",
+    id:"dinner56", kidTier:3,
     name:"Salmon Burger Bowls or Buns",
     emoji:"🍔", proteinType:"fish", vegServings:2, vegForward:true, noSide:true,
     audience:"family",
@@ -5582,7 +5582,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner57",
+    id:"dinner57", kidTier:4,
     name:"Rotisserie Chicken Caesar Wraps",
     emoji:"🌯", proteinType:"chicken", vegServings:1, noSide:true,
     audience:"family",
@@ -5629,7 +5629,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner58",
+    id:"dinner58", kidTier:5,
     name:"Italian Meatball Subs",
     emoji:"🥖", proteinType:"chicken", vegServings:0,
     audience:"family",
@@ -5685,7 +5685,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner59",
+    id:"dinner59", kidTier:5,
     name:"Sheet Pan Nugget \"Fajitas\"",
     emoji:"🌮", proteinType:"chicken", vegServings:2,
     audience:"family",
@@ -5737,7 +5737,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner60",
+    id:"dinner60", kidTier:4,
     name:"Pesto Gnocchi with Chicken Sausage",
     emoji:"🍃", proteinType:"chicken", vegServings:1,
     audience:"family",
@@ -5796,7 +5796,7 @@ const DEFAULT_DINNERS = [
     active:true
   },
   {
-    id:"dinner61",
+    id:"dinner61", kidTier:5,
     name:"Rotisserie Chicken Quesadilla Night",
     emoji:"🧀", proteinType:"chicken", vegServings:0, noSide:true,
     audience:"family",
@@ -7679,7 +7679,7 @@ const SIDES = [
     ingredients:["2 Persian cucumbers (or 1 English), sliced thin","2 tbsp rice vinegar","½ tsp sugar","¼ tsp kosher salt","1 tsp sesame seeds (optional)"],
     steps:["Slice 2 cucumbers into thin coins into a bowl.","Add 2 tbsp rice vinegar + ½ tsp sugar + ¼ tsp salt. Toss, sit 5 min.","Sprinkle 1 tsp sesame seeds. Serve cold."],
     kidNote:"Skip the sesame for the girls — plain vinegar cucumbers are a kid favorite." },
-  { id:"side-buttered-peas", name:"Buttered Peas", emoji:"🟢", method:"micro", cuisine:["american","any"], vegServings:1,
+  { id:"side-buttered-peas", kidFav:true, name:"Buttered Peas", emoji:"🟢", method:"micro", cuisine:["american","any"], vegServings:1,
     ingredients:["2 cups frozen peas","1 tbsp butter","¼ tsp kosher salt","Squeeze of lemon (optional)"],
     steps:["Microwave 2 cups frozen peas with 1 tbsp water, covered, 4 min.","Drain. Stir in 1 tbsp butter + ¼ tsp salt. Lemon if you like."],
     kidNote:"The safest green on the planet. Lucy can eat them with a spoon." },
@@ -7691,7 +7691,7 @@ const SIDES = [
     ingredients:["1 lb carrots, cut into coins (or 1 bag baby carrots)","1 tbsp butter","1 tbsp honey","¼ tsp kosher salt","⅓ cup water"],
     steps:["Carrots + ⅓ cup water + 1 tbsp butter + ¼ tsp salt in a skillet. Lid on, medium, 6 min.","Lid off. Add 1 tbsp honey, cook 2–3 min until the water's gone and carrots are glazed."],
     kidNote:"Sweet and soft — a reliable yes." },
-  { id:"side-sweet-potato", name:"Roasted Sweet Potato Cubes", emoji:"🍠", method:"oven", cuisine:["american","mex","any"], vegServings:2,
+  { id:"side-sweet-potato", kidFav:true, name:"Roasted Sweet Potato Cubes", emoji:"🍠", method:"oven", cuisine:["american","mex","any"], vegServings:2,
     ingredients:["2 medium sweet potatoes, ¾-inch cubes","1½ tbsp avocado oil","½ tsp kosher salt","½ tsp smoked paprika (adults) or cinnamon (kids)"],
     steps:["Oven 425°F. Toss 2 cubed sweet potatoes with 1½ tbsp oil + ½ tsp salt on a sheet pan.","Roast 20 min, flip once at 10, until browned.","Dust half with paprika, half with a pinch of cinnamon."],
     kidNote:"Cinnamon half is the kid half. Call them 'sweet potato fries'." },
@@ -7707,7 +7707,7 @@ const SIDES = [
     ingredients:["10 oz baby spinach (1 big bag)","1 tbsp olive oil","2 cloves garlic, sliced","¼ tsp kosher salt","Squeeze of lemon"],
     steps:["Olive oil + 2 sliced garlic cloves in a large skillet over medium 1 min.","Add the whole bag of spinach in batches, toss 2–3 min until just wilted. ¼ tsp salt, squeeze of lemon."],
     kidNote:"Honest note: kids rarely take this one. It's for the adults — give the girls peas or cucumbers instead." },
-  { id:"side-corn", name:"Corn with Butter + Tajín", emoji:"🌽", method:"micro", cuisine:["mex","american","any"], vegServings:1,
+  { id:"side-corn", kidFav:true, name:"Corn with Butter + Tajín", emoji:"🌽", method:"micro", cuisine:["mex","american","any"], vegServings:1,
     ingredients:["2 cups frozen corn (or 3 ears, kernels cut off)","1 tbsp butter","¼ tsp kosher salt","Tajín for the adults","Lime wedge"],
     steps:["Microwave 2 cups corn with 1 tbsp water, covered, 3 min. Drain.","Stir in 1 tbsp butter + ¼ tsp salt. Plate the kids' portion. Tajín + lime on the adults'."],
     kidNote:"Sweet corn with butter — zero resistance." },
@@ -7724,11 +7724,11 @@ const SIDES_BY_ID = {}; SIDES.forEach(x => SIDES_BY_ID[x.id] = x);
 function sideCuisineOf(r){ const n=((r&&r.name)||"").toLowerCase(); if(/korean|thai|teriyaki|bulgogi|poke|dumpling|lettuce cup|basil|asian/.test(n)) return "asian"; if(/taco|burrito|fajita|enchilada|quesadilla|mexican|nugget "fajita|salsa/.test(n)) return "mex"; if(/greek|chickpea|piccata|scampi|shakshuka|cod|lemon herb|mediterranean|salmon/.test(n)) return "med"; return "american"; }
 function sideMethodUsed(r){ const txt=((r&&r.instructions)||[]).join(" ").toLowerCase(); return { oven:/\b(oven|bake|roast|broil|sheet pan)\b/.test(txt), stove:/\b(skillet|saucepan|dutch oven|simmer|sauté|saute|sear|boil)\b/.test(txt) }; }
 // Pick a side that fits the dinner's cuisine and doesn't fight for the same burner/oven
-function pickSide(recipe, exclude){
+function pickSide(recipe, exclude, preferKidFav){
   if(!recipe || recipe.noSide) return null;
   const cz=sideCuisineOf(recipe), used=sideMethodUsed(recipe);
   let ok=SIDES.filter(x=>!(exclude||[]).includes(x.id)); if(!ok.length) ok=SIDES.slice();
-  const scored=ok.map(x=>{ let sc=0; if(x.cuisine.includes(cz)) sc+=10; if(x.cuisine.includes("any")) sc+=3; if(used.oven && x.method==="oven") sc-=8; if(used.stove && x.method==="stove") sc-=3; if(x.method==="micro"||x.method==="raw") sc+=2; sc+=Math.random()*2; return {x,sc}; }).sort((a,b)=>b.sc-a.sc);
+  const scored=ok.map(x=>{ let sc=0; if(x.cuisine.includes(cz)) sc+=10; if(x.cuisine.includes("any")) sc+=3; if(used.oven && x.method==="oven") sc-=8; if(used.stove && x.method==="stove") sc-=3; if(x.method==="micro"||x.method==="raw") sc+=2; if(preferKidFav && x.kidFav) sc+=15; sc+=Math.random()*2; return {x,sc}; }).sort((a,b)=>b.sc-a.sc);
   return scored.length?scored[0].x.id:null;
 }
 function cycleSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e||!e.recipeId) return; const r=byIdAll(e.recipeId); const next=pickSide(Object.assign({},r,{noSide:false}),[e.side]); e.side=next||e.side; planSet(plan,day,slot,e); scheduleSave(); renderPlan(); }
@@ -7747,8 +7747,33 @@ function cleanShareName(k) {
   if (n.length < 3 || /^(salt|pepper|water|oil|olive oil|avocado oil|kosher salt|black pepper|salt and pepper|original|blend|seasoning|the blend)$/i.test(n)) return "";
   return n.charAt(0).toUpperCase() + n.slice(1);
 }
+// ── Kid-comfort ladder ─────────────────────────────────────────────────────
+// Every dinner has kidTier 1–5 (5 = surest bet). kidComfort() nudges the tier by what the girls actually did:
+// kid chips / "Kids loved it" raise it (max +1), "Kids refused" lowers it (max −1).
+function kidComfort(r){
+  if(!r) return 3;
+  const base = Math.max(1, Math.min(5, r.kidTier || 3));
+  const rt = (state.ratings||{})[r.id] || {};
+  const wins = ((rt.kidLog||[]).length) + ((rt.chips||[]).includes("Kids loved it 👧❤️") ? 1 : 0);
+  const refused = (rt.chips||[]).includes("Kids refused 😬") ? 1 : 0;
+  const adj = Math.min(1, wins * 0.5) - refused;
+  return Math.max(1, Math.min(5, Math.round((base + adj) * 2) / 2));
+}
+function kidRecipeWon(r){ const rt=(state.ratings||{})[r.id]||{}; return ((rt.kidLog||[]).length>0 || (rt.chips||[]).includes("Kids loved it 👧❤️")) && !(rt.chips||[]).includes("Kids refused 😬"); }
+// Household level = the comfort floor for regular family nights. Starts at 5 (safest). Drops one rung once the girls
+// have eaten ≥3 different recipes at or below the next rung. Regular family nights allow level−1 and up; the weekly
+// stretch night reaches one more rung down.
+function householdLevel(){
+  const fam = (state.dinners||[]).filter(r => r && r.id && (r.audience||"family") !== "adults");
+  let level = 5;
+  for (let t = 4; t >= 2; t--) { const wins = fam.filter(r => (r.kidTier||3) <= t && kidRecipeWon(r)).length; if (wins >= 3) level = t; }
+  return level;
+}
+function kidStars(n){ const f=Math.floor(n); return "★".repeat(f) + (n-f>=0.5?"½":"") + "☆".repeat(5-Math.ceil(n)); }
+window.kidComfort = kidComfort; window.householdLevel = householdLevel;
+
 function smartPlan(opts) {
-  opts = Object.assign({ dinners: 5, adultNights: 1, quickNights: 2, breakfasts: 0, bkAndrew: true, bkMk: true, bkKids: true, lunches: 2, nextWeek: true, keepExisting: true }, opts || {});
+  opts = Object.assign({ dinners: 5, adultNights: 1, quickNights: 2, breakfasts: 0, bkAndrew: true, bkMk: true, bkKids: true, lunches: 2, nextWeek: true, keepExisting: true, stretch: true }, opts || {});
   // Day arrays win; numeric opts (older callers) are converted to days with the classic preference order
   if (!Array.isArray(opts.cookDays)) {
     const total = Math.max(0, Math.min(7, opts.dinners)), nAdult = Math.min(opts.adultNights, total), nQuick = Math.min(opts.quickNights, Math.max(0, total - nAdult));
@@ -7791,8 +7816,14 @@ function smartPlan(opts) {
     const chosen = opts.cookDays.map(D).sort((a, b) => a - b);
     const adultIdx = opts.adultDays.map(D);
     const quickIdx = opts.quickDays.map(D);
-    return { chosen, adultIdx, quickIdx };
+    let stretchIdx = -1;
+    if (opts.stretch) {
+      const cands = chosen.filter(i => !adultIdx.includes(i) && !quickIdx.includes(i) && i !== D("Monday"));
+      stretchIdx = cands.includes(D("Wednesday")) ? D("Wednesday") : (cands.length ? cands[0] : -1);
+    }
+    return { chosen, adultIdx, quickIdx, stretchIdx };
   }
+  const kidLevel = householdLevel();
   const weekSlots = []; for (let w = 0; w < weeks; w++) weekSlots.push(slotPlanForWeek(w));
 
   const placedIds = () => timeline.filter(t => t.dinner && t.dinner.recipeId).map(t => t.dinner.recipeId);
@@ -7811,8 +7842,16 @@ function smartPlan(opts) {
       const b = onTime ? 45 : 10; if (b > bonus) { bonus = b; note = "🥡 uses the " + it.text + (it.by ? " before " + it.by.slice(0, 3) : ""); } });
     return { bonus, note };
   }
-  function scoreDinner(r, idx, wantAdult, wantQuick) {
+  function scoreDinner(r, idx, wantAdult, wantQuick, isStretch) {
     let s = 50;
+    // 👧 kid-comfort ladder (family nights only; adult nights pick whatever)
+    if (!wantAdult && (r.audience || "family") !== "adults") {
+      const kc = kidComfort(r);
+      const floor = isStretch ? kidLevel - 2 : kidLevel - 1;
+      if (kc < floor) return -9999;
+      if (isStretch) { if (kc < kidLevel) s += 22; else s -= 6; }
+      else if (kc >= kidLevel) s += 18; else s += 4;
+    }
     s += useUpBonus(r, idx).bonus;
     const rt = (state.ratings || {})[r.id] || {};
     s += (rt.stars || 0) * 10; if (rt.favorite) s += 20; if (rt.stars === 1) s -= 40;
@@ -7851,8 +7890,9 @@ function smartPlan(opts) {
     return s;
   }
   function mainProtein(r) { if (r.proteinType) return r.proteinType; const n = (r.name || "").toLowerCase(); return ["salmon","shrimp","cod","tuna","steak","beef","pork","turkey","chicken","meatball","bean","egg"].find(p => n.includes(p)) || "other"; }
-  function reasonFor(r, idx, wantAdult, wantQuick) {
+  function reasonFor(r, idx, wantAdult, wantQuick, isStretch) {
     const reasons = [];
+    if (!wantAdult && (r.audience || "family") !== "adults") { const kc = kidComfort(r); if (isStretch && kc < kidLevel) reasons.push("🌱 stretch night — kids' comfort " + kidStars(kc)); else if (kc >= kidLevel) reasons.push("👧 safe bet"); }
     { const ub = useUpBonus(r, idx); if (ub.bonus >= 20) reasons.push(ub.note); }
     (r.usesLeftoversFrom || []).forEach(src => { for (let back = 1; back <= 3; back++) { const t = timeline[idx - back]; if (t && t.dinner && t.dinner.recipeId === src) reasons.push("🔁 uses leftovers from " + (byId[src] ? byId[src].name.split(" ").slice(0, 3).join(" ") : "earlier") + " (" + t.day.slice(0, 3) + ")"); } });
     if (r.sharedAnchor) timeline.forEach((t, j) => { if (t.dinner && t.dinner.recipeId && Math.abs(j - idx) <= 3 && j !== idx) { const o = byId[t.dinner.recipeId]; if (o && o.sharedAnchor === r.sharedAnchor) reasons.push("🍗 same rotisserie bird as " + t.day.slice(0, 3)); } });
@@ -7870,7 +7910,7 @@ function smartPlan(opts) {
     const t = timeline[i]; const ws = weekSlots[t.week];
     if (!ws.chosen.includes(i)) continue;
     if (t.locked) continue;
-    const wantAdult = ws.adultIdx.includes(i), wantQuick = ws.quickIdx.includes(i);
+    const wantAdult = ws.adultIdx.includes(i), wantQuick = ws.quickIdx.includes(i), isStretch = ws.stretchIdx === i;
     // leftovers night: a leftoverDays recipe placed exactly 2 days ago → "🔁 Leftovers" instead of cooking
     const two = timeline[i - 2];
     const weekHasLeftoverNight = timeline.some((x, j) => Math.floor(j / 7) === t.week && x.dinner && x.dinner.leftoverOf);
@@ -7881,10 +7921,11 @@ function smartPlan(opts) {
     const used = new Set(placedIds());
     const pool = dinners.filter(r => !used.has(r.id));
     if (!pool.length) continue;
-    const ranked = pool.map(r => ({ r, s: scoreDinner(r, i, wantAdult, wantQuick) })).filter(x => x.s > -9000).sort((a, b) => b.s - a.s);
+    let ranked = pool.map(r => ({ r, s: scoreDinner(r, i, wantAdult, wantQuick, isStretch) })).filter(x => x.s > -9000).sort((a, b) => b.s - a.s);
+    if (!ranked.length) ranked = pool.map(r => ({ r, s: scoreDinner(r, i, wantAdult, wantQuick, true) })).filter(x => x.s > -9000).sort((a, b) => b.s - a.s); // ladder too strict → relax to stretch floor
     if (!ranked.length) continue;
-    const best = ranked[0].r;
-    t.dinner = { recipeId: best.id, section: "dinner" }; const usedSides = timeline.filter((t2, j2) => Math.floor(j2 / 7) === Math.floor(i / 7) && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(best, usedSides); if (sd) t.dinner.side = sd; t.dinnerReason = reasonFor(best, i, wantAdult, wantQuick);
+    const best = ranked[0].r; t.stretch = isStretch && kidComfort(best) < kidLevel;
+    t.dinner = { recipeId: best.id, section: "dinner" }; const usedSides = timeline.filter((t2, j2) => Math.floor(j2 / 7) === Math.floor(i / 7) && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(best, usedSides, t.stretch); if (sd) t.dinner.side = sd; t.dinnerReason = reasonFor(best, i, wantAdult, wantQuick, isStretch);
   }
 
   // Breakfasts & lunches per week: pick by rating/recency; lunches that use a placed dinner's leftovers get priority and land 1–2 days after
@@ -7921,7 +7962,7 @@ function smartPlan(opts) {
 function planDefaultsGet() {
   const d = state.planDefaults && Array.isArray(state.planDefaults.cookDays) ? state.planDefaults : { cookDays:["Monday","Tuesday","Wednesday","Thursday","Saturday"], adultDays:["Saturday"], quickDays:["Tuesday","Thursday"] };
   const prefs = d.prefs || {};
-  state.planDefaults = { cookDays: d.cookDays.slice(), adultDays: (d.adultDays||[]).slice(), quickDays: (d.quickDays||[]).slice(), prefs: Object.assign({ bkAndrew:true, bkMk:true, bkKids:true, lunches:2, nextWeek:true, keep:true }, prefs) };
+  state.planDefaults = { cookDays: d.cookDays.slice(), adultDays: (d.adultDays||[]).slice(), quickDays: (d.quickDays||[]).slice(), prefs: Object.assign({ bkAndrew:true, bkMk:true, bkKids:true, lunches:2, nextWeek:true, keep:true, stretch:true }, prefs) };
   return state.planDefaults;
 }
 function togglePlanDay(kind, day) {
@@ -7988,13 +8029,13 @@ function closeAutoplanModal() { const m = document.getElementById("autoplan-moda
 function spOpt(name, fallback) { const el = document.getElementById("sp-" + name); if (!el) return fallback; if (el.type === "checkbox") return el.checked; const v = parseInt(el.textContent || el.value); return isNaN(v) ? fallback : v; }
 
 function spSavePref(id, val) {
-  const map = { "sp-bk-andrew":"bkAndrew", "sp-bk-mk":"bkMk", "sp-bk-kids":"bkKids", "sp-lunches":"lunches", "sp-next":"nextWeek", "sp-keep":"keep" };
+  const map = { "sp-bk-andrew":"bkAndrew", "sp-bk-mk":"bkMk", "sp-bk-kids":"bkKids", "sp-lunches":"lunches", "sp-next":"nextWeek", "sp-keep":"keep", "sp-stretch":"stretch" };
   const k = map[id]; if (!k) return;
   const pd = planDefaultsGet(); pd.prefs[k] = val; scheduleSave();
 }
 function runSmartPlan() {
   const pd = planDefaultsGet();
-  const opts = { cookDays: pd.cookDays.slice(), adultDays: pd.adultDays.slice(), quickDays: pd.quickDays.slice(), bkAndrew: spOpt("bk-andrew", true), bkMk: spOpt("bk-mk", true), bkKids: spOpt("bk-kids", true), breakfasts: 0, lunches: spOpt("lunches", 2), nextWeek: spOpt("next", true), keepExisting: spOpt("keep", true) };
+  const opts = { cookDays: pd.cookDays.slice(), adultDays: pd.adultDays.slice(), quickDays: pd.quickDays.slice(), bkAndrew: spOpt("bk-andrew", true), bkMk: spOpt("bk-mk", true), bkKids: spOpt("bk-kids", true), breakfasts: 0, lunches: spOpt("lunches", 2), nextWeek: spOpt("next", true), keepExisting: spOpt("keep", true), stretch: spOpt("stretch", true) };
   smartPlanDraft = smartPlan(opts);
   renderSmartPlanModal("preview");
 }
@@ -8005,10 +8046,12 @@ function swapSmartPlanSlot(i) {
   const current = t.dinner.recipeId;
   const wantAdult = (byIdAll(current) || {}).audience === "adults";
   const hasSourceBefore = (r) => { if (!(r.usesLeftoversFrom || []).length || r.sharedAnchor) return true; for (let back = 1; back <= 3; back++) { const x = smartPlanDraft.timeline[i - back]; if (x && x.dinner && (r.usesLeftoversFrom || []).includes(x.dinner.recipeId)) return true; } return false; };
-  const pool = (state.dinners || []).filter(r => r && r.id && isActive(r.id) && !used.has(r.id) && r.id !== current && ((r.audience || "family") === (wantAdult ? "adults" : "family")) && hasSourceBefore(r));
+  const lvl = householdLevel(), floor = t.stretch ? lvl - 2 : lvl - 1;
+  let pool = (state.dinners || []).filter(r => r && r.id && isActive(r.id) && !used.has(r.id) && r.id !== current && ((r.audience || "family") === (wantAdult ? "adults" : "family")) && hasSourceBefore(r) && (wantAdult || kidComfort(r) >= floor));
+  if (!pool.length) pool = (state.dinners || []).filter(r => r && r.id && isActive(r.id) && !used.has(r.id) && r.id !== current && ((r.audience || "family") === (wantAdult ? "adults" : "family")) && hasSourceBefore(r));
   if (!pool.length) return;
   const pick = pool[Math.floor(Math.random() * pool.length)];
-  t.dinner = { recipeId: pick.id, section: "dinner" }; const usedSides2 = smartPlanDraft.timeline.filter(t2 => t2 !== t && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(pick, usedSides2); if (sd) t.dinner.side = sd; t.dinnerReason = "↻ swapped in"; t.locked = false;
+  t.dinner = { recipeId: pick.id, section: "dinner" }; const usedSides2 = smartPlanDraft.timeline.filter(t2 => t2 !== t && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(pick, usedSides2, t.stretch); if (sd) t.dinner.side = sd; t.dinnerReason = "↻ swapped in" + (!wantAdult ? (t.stretch && kidComfort(pick) < lvl ? " · 🌱 stretch" : (kidComfort(pick) >= lvl ? " · 👧 safe bet" : "")) : ""); t.locked = false;
   renderSmartPlanModal("preview");
 }
 function byIdAll(id) { return [...(state.dinners||[]), ...(state.breakfasts||[]), ...(state.lunches||[]), ...(state.desserts||[])].find(r => r && r.id === id); }
@@ -8060,6 +8103,7 @@ function renderSmartPlanModal(mode) {
       ${row("☀️", "Adult lunches <span style=\"font-weight:400;color:var(--dim);font-size:12px\">(kids\' lunchboxes live in 🍱 Lunchbox)</span>", stepperHtml("sp-lunches", prefs.lunches, 0, 5, "#34d399"), "rgba(16,185,129,0.08)")}
       ${toggle("sp-next", "Plan next week too (leftovers carry over)", prefs.nextWeek)}
       ${toggle("sp-keep", "Keep what I've already placed", prefs.keep)}
+      ${toggle("sp-stretch", "🌱 One stretch night a week <span style=\"font-weight:400;color:var(--dim);font-size:12px\">(kids' comfort level now " + kidStars(householdLevel()) + " — safe bets the other nights)</span>", prefs.stretch)}
       <button onclick="runSmartPlan()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-weight:800;font-size:15px;cursor:pointer;margin:6px 0 8px">Preview the plan →</button>
       <button onclick="closeAutoplanModal()" style="width:100%;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--muted);font-size:14px;cursor:pointer">Cancel</button>`;
     return;
@@ -8315,6 +8359,7 @@ function renderPlan() {
       <span title="Goal: about 2 vegetable servings per dinner">🥦 Veg servings <b style="color:var(--text)">${vegN}</b> <span style="opacity:0.55">(${cooked.length*2}+)</span> ${chk(vegN>=cooked.length*2)}</span>
       <span title="Goal: at least one vegetable-forward dinner">🌿 Veg-forward <b style="color:var(--text)">${vegFwdN}</b> <span style="opacity:0.55">(1+)</span> ${chk(vegFwdN>=1)}</span>
       <span title="Goal: 35g+ average protein per dinner">🍗 Protein avg <b style="color:var(--text)">${avgProt}g</b> ${chk(avgProt>=35)}</span>
+      ${(function(){ const st = smartPlanDraft.timeline.filter(t => t.week === 0 && t.stretch && t.dinner && t.dinner.recipeId).map(t => (byIdAll(t.dinner.recipeId)||{}).name).filter(Boolean); return `<span title="One night a week reaches one rung below the girls' comfort level">🌱 Stretch: <b style="color:var(--text)">${st.length ? esc(st.join(", ")) : "none"}</b></span>`; })()}
     </div>` : "";
 
 
@@ -8620,6 +8665,7 @@ function renderVault() {
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
               ${stars?`<span style="font-size:11px;color:var(--amber)">${stars}</span>`:""}
               ${cookCount?`<span style="font-size:11px;color:var(--dim)">Made ${cookCount}x</span>`:""}
+              ${(r.audience||"family")!=="adults"&&r.kidTier?`<span title="Kid comfort (5 = surest bet)" style="font-size:11px;color:#fbbf24">Kids ${kidStars(kidComfort(r))}</span>`:""}
               ${kidWinsBadge(r.id)?`<span style="font-size:11px;color:#f472b6">${kidWinsBadge(r.id)}</span>`:""}
               ${assignedDay?`<span style="font-size:11px;color:var(--green)">✅ ${assignedDay[0]}</span>`:""}
               ${(function(){ const hits=useUpUnplanned().filter(it=>useUpRecipeMatch(it,r).score>0).map(it=>it.text); return hits.length?`<span style="font-size:11px;color:#86efac;background:rgba(16,185,129,0.12);padding:1px 7px;border-radius:999px">🥡 uses: ${esc(hits.join(", "))}</span>`:""; })()}
@@ -9502,6 +9548,7 @@ function buildRatingHtml(id, section) {
   } else if (kidWinsBadge(id,true)) {
     summaryHtml = '<div class="rating-summary"><span style="font-size:12px;color:#f472b6;font-weight:700">' + kidWinsBadge(id,true) + '</span></div>';
   }
+  { const kr = byIdAll(id); if (kr && kr.kidTier && (kr.audience||"family") !== "adults") { const rt0 = (state.ratings||{})[id]||{}; const kw = kidWins(id); const won = kw.Livia + kw.Lucy + ((rt0.chips||[]).includes("Kids loved it 👧❤️")?1:0); const ref = (rt0.chips||[]).includes("Kids refused 😬")?1:0; summaryHtml += '<div style="font-size:12px;color:#fbbf24;margin:4px 0 2px">👧 Kid comfort ' + kidStars(kidComfort(kr)) + ' · ' + won + ' win' + (won===1?'':'s') + ' · ' + ref + ' refused</div>'; } }
 
   return `
     <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px">
