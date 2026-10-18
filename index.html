@@ -806,6 +806,7 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
     <button class="tab-btn" onclick="showTab('history')" title="History"><span class="tab-icon">📖</span><span class="tab-label">History</span></button>
     <button class="tab-btn" onclick="showTab('prep')" title="Prep Order"><span class="tab-icon">🔪</span><span class="tab-label">Prep</span></button>
     <button class="tab-btn" onclick="showTab('eatout')" title="Eat Out"><span class="tab-icon">🍔</span><span class="tab-label">Eat Out</span></button>
+    <button class="tab-btn" onclick="showTab('lunchbox')" title="Lunchbox"><span class="tab-icon">🍱</span><span class="tab-label">Lunchbox</span></button>
     <button class="tab-btn" onclick="showTab('settings')" title="Settings"><span class="tab-icon">⚙️</span><span class="tab-label">More</span></button>
     <button class="tab-btn" onclick="showTab('cook')" style="background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:700">👨‍🍳 Cook</button>
   </div>
@@ -827,6 +828,7 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
       <button onclick="closeMoreSheet();showTab('pantry')"><span>🧄</span>Pantry</button>
       <button onclick="closeMoreSheet();showTab('history')"><span>📖</span>History</button>
       <button onclick="closeMoreSheet();showTab('prep')"><span>🔪</span>Prep</button>
+      <button onclick="closeMoreSheet();showTab('lunchbox')"><span>🍱</span>Lunchbox</button>
       <button onclick="closeMoreSheet();showTab('eatout')"><span>🍔</span>Eat Out</button>
       <button onclick="closeMoreSheet();showTab('settings')"><span>⚙️</span>Settings</button>
     </div>
@@ -847,6 +849,7 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
 <div id="page-nutrition" class="page"></div>
 <div id="page-prep" class="page"></div>
 <div id="page-eatout" class="page"></div>
+<div id="page-lunchbox" class="page"></div>
 <div id="cook-overlay" style="display:none;position:fixed;inset:0;z-index:500;background:#0a0f1a;flex-direction:column;overflow-y:auto;">
   <div style="position:sticky;top:0;z-index:10;background:#0a0f1a;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:12px">
     <button onclick="exitCook()" style="padding:8px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s">← Back</button>
@@ -6576,6 +6579,7 @@ let state = {
   activeRecipes: {},
   weekPlan: {},
   nextWeekPlan: {},
+  lunchbox: { plan:{}, feedback:{}, packed:{}, hasThermos:false, schoolDays:["Monday","Tuesday","Wednesday","Thursday","Friday"], noSchool:[] },
   cookHistory: [],
   groceryNotes: {},
   vaultSort: "name",
@@ -6679,6 +6683,7 @@ async function loadFromSupabase() {
         if (plan.weekPlan) state.weekPlan = normalizePlan(plan.weekPlan);
         if (plan.nextWeekPlan) state.nextWeekPlan = normalizePlan(plan.nextWeekPlan);
         if (plan.prepDone) state.prepDone = plan.prepDone;
+        if (plan.lunchbox && typeof plan.lunchbox === "object") state.lunchbox = plan.lunchbox;
         if (plan.cookHistory) state.cookHistory = plan.cookHistory;
         if (plan.groceryNotes) state.groceryNotes = plan.groceryNotes;
       setSyncStatus("saved");
@@ -6690,7 +6695,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{} };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{} };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -6732,6 +6737,7 @@ function loadFromLocal() {
     if (saved.weekPlan) state.weekPlan = normalizePlan(saved.weekPlan);
     if (saved.nextWeekPlan) state.nextWeekPlan = normalizePlan(saved.nextWeekPlan);
     if (saved.prepDone) state.prepDone = saved.prepDone;
+    if (saved.lunchbox && typeof saved.lunchbox === "object") state.lunchbox = saved.lunchbox;
     if (saved.cookHistory) state.cookHistory = saved.cookHistory;
     if (saved.groceryNotes) state.groceryNotes = saved.groceryNotes;
   } catch(e) {}
@@ -6757,11 +6763,11 @@ function showTab(tab) {
   document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
   document.getElementById("page-" + tab).classList.add("active");
-  const tabs = ["plan","vault","grocery","sauces","pantry","history","prep","eatout","settings"];
+  const tabs = ["plan","vault","grocery","sauces","pantry","history","prep","eatout","lunchbox","settings"];
   const topBtn = document.querySelectorAll(".nav-tabs .tab-btn")[tabs.indexOf(tab)];
   if (topBtn) topBtn.classList.add("active");
   // mobile bottom bar
-  const MORE = ["sauces","pantry","history","prep","eatout","settings"];
+  const MORE = ["sauces","pantry","history","prep","eatout","lunchbox","settings"];
   document.querySelectorAll(".bb-btn").forEach(b => {
     const t = b.getAttribute("data-tab");
     b.classList.toggle("active", t === tab || (t === "more" && MORE.includes(tab)));
@@ -6784,6 +6790,7 @@ function renderTab(tab) {
   if (tab === "history")  renderHistoryTab();
   if (tab === "prep")      renderPrepOrderTab();
   if (tab === "eatout")    renderEatOut();
+  if (tab === "lunchbox")  renderLunchbox();
 }
 
 function uid() { return Math.random().toString(36).slice(2,8); }
@@ -8003,6 +8010,7 @@ function renderPlan() {
   el.innerHTML = `
     ${pickerModal}
     ${renderRatingNudge()}
+    ${planWeekView==="this" ? lbPackCard(false) : ""}
     <div id="autoplan-modal" class="sp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeAutoplanModal()">
       <div class="sp-box" style="background:#0f172a;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto"></div>
     </div>
@@ -8355,8 +8363,11 @@ function buildSmartGroceryList() {
     else if (!seen.get(key).sources.includes(source)) seen.get(key).sources.push(source);
   });
   const items = [...seen.values()];
-  // Single category; renderGrocery regroups by store section via categorizeGroceryItem
-  return items.length ? [{ cat: "📅 This week", items }] : [];
+  const lunch = (typeof lbGroceryItems === "function") ? lbGroceryItems(null) : [];
+  const out = [];
+  if (items.length) out.push({ cat: "📅 This week", items });
+  if (lunch.length) out.push({ cat: "🍱 Lunchbox", items: lunch });
+  return out;
 }
 
 
@@ -11602,6 +11613,7 @@ function renderCookScreen() {
         ${pastNotes?'<div style="margin-top:10px"><div style="font-size:12px;color:var(--dim);font-weight:700;margin-bottom:4px">EARLIER NOTES</div>'+pastNotes+'</div>':''}
       </div>
       <div style="font-size:13px;color:var(--dim);text-align:left;margin-bottom:14px">${starsNow?'✅ Rated. Logged to History.':'Not rated yet? No problem — the Plan tab will nudge you next time you open the app.'}</div>
+      ${lbPackCard(false)}
       <button class="cook-done-btn" onclick="exitCook()">← Back to recipes</button>
     </div>`;
   } else {
@@ -11818,6 +11830,485 @@ function timerLabel(stepText, recipe, sectionHeader){
   const sec=(sectionHeader||"").replace(/\(.*?\)/g,"").trim();
   return sec?sec.charAt(0)+sec.slice(1).toLowerCase():"Timer";
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+// 🍱 LUNCHBOX — Livia (7) & Lucy (5). Bento formula: main + fruit + veg + crunch + snack (+ treat)
+// ══════════════════════════════════════════════════════════════════════════
+const LB_KIDS = [{id:"livia",name:"Livia",emoji:"👧"},{id:"lucy",name:"Lucy",emoji:"👧"}];
+const LB_SCHOOL = ["Monday","Tuesday","Wednesday","Thursday","Friday"];
+// kids: loves | ok | stretch | no. thermos: "hot" | "cold" | null. nightBefore=false → assemble in the morning.
+const LUNCH_ITEMS = [
+  // ── MAINS ──
+  {id:"m-turkey-cheese",name:"Turkey & cheese sandwich",emoji:"🥪",slot:"main",kids:{livia:"ok",lucy:"loves"},thermos:null,nightBefore:true,protein:16,cal:320,prep:"2 min",shop:"sliced deli turkey; sliced cheddar; sandwich bread",note:"Mayo or butter on both slices keeps the bread from going soggy overnight."},
+  {id:"m-ham-cheese",name:"Ham & cheese sandwich",emoji:"🥪",slot:"main",kids:{livia:"ok",lucy:"loves"},thermos:null,nightBefore:true,protein:15,cal:330,prep:"2 min",shop:"sliced deli ham; sliced cheddar; sandwich bread"},
+  {id:"m-pbj",name:"PB&J",emoji:"🥜",slot:"main",kids:{livia:"loves",lucy:"loves"},thermos:null,nightBefore:true,protein:9,cal:350,prep:"2 min",shop:"natural peanut butter; low-sugar jam; sandwich bread",note:"PB on both slices, jam in the middle — no soggy bread by noon."},
+  {id:"m-nuggets",name:"Just Bare chicken nuggets",emoji:"🍗",slot:"main",kids:{livia:"loves",lucy:"loves"},thermos:"hot",nightBefore:true,protein:17,cal:260,prep:"5 min",fromDinner:["dinner59"],shop:"Just Bare chicken nuggets (Costco)",note:"Fine cold with ketchup cup. Hot in a pre-heated thermos is the upgrade Lucy asked for."},
+  {id:"m-pizza-lunchable",name:"Homemade pizza lunchables",emoji:"🍕",slot:"main",kids:{livia:"loves",lucy:"ok"},thermos:null,nightBefore:true,protein:14,cal:340,prep:"5 min",fromDinner:["lunch8"],shop:"Fit Flour English muffins or naan rounds; shredded mozzarella; turkey pepperoni; Frik & Frak or Rao's pizza sauce",note:"Sauce in its own little cup. Recipe: Homemade Pizza Lunchables."},
+  {id:"m-deli-lunchable",name:"Homemade turkey/ham & cheese lunchables",emoji:"🧀",slot:"main",kids:{livia:"ok",lucy:"loves"},thermos:null,nightBefore:true,protein:14,cal:300,prep:"2 min",shop:"Triscuits or Simple Mills crackers; deli turkey or ham; cheddar block",note:"Crackers in a separate compartment or they soften. Cube the cheese, fold the meat."},
+  {id:"m-turkey-rollups",name:"Turkey & cheese roll-ups",emoji:"🌯",slot:"main",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:16,cal:220,prep:"2 min",shop:"sliced deli turkey; sliced provolone or cheddar",note:"No bread. Roll turkey around a cheese stick or slice, cut in 3."},
+  {id:"m-quesadilla",name:"Cheese quesadilla triangles (cold)",emoji:"🫓",slot:"main",kids:{livia:"ok",lucy:"loves"},thermos:null,nightBefore:true,protein:13,cal:310,prep:"none",fromDinner:["dinner51","dinner61"],shop:"Mission Carb Balance tortillas; shredded cheddar",note:"Leftover from quesadilla night, or make 2 extra. Salsa cup optional."},
+  {id:"m-tenders",name:"Leftover chicken tenders",emoji:"🍗",slot:"main",kids:{livia:"loves",lucy:"loves"},thermos:"hot",nightBefore:true,protein:22,cal:280,prep:"none",fromDinner:["dinner46"],shop:"",note:"From Crispy Baked Chicken Tenders night. Honey mustard cup."},
+  {id:"m-meatballs",name:"Mini meatballs with toothpicks",emoji:"🍝",slot:"main",kids:{livia:"ok",lucy:"ok"},thermos:"hot",nightBefore:true,protein:18,cal:260,prep:"none",fromDinner:["dinner49","dinner58","dinner21"],shop:"",note:"5–6 small meatballs, a little sauce in a cup, toothpicks. Thermos-hot if you have one."},
+  {id:"m-pasta-thermos",name:"Pasta with Rao's (thermos)",emoji:"🍝",slot:"main",kids:{livia:"ok",lucy:"ok"},thermos:"hot",nightBefore:false,protein:12,cal:330,prep:"5 min",fromDinner:["dinner49","d3"],shop:"Brami or Barilla Protein+ pasta; Rao's marinara",note:"Reheat to piping hot in the morning, into a pre-heated thermos. Parmesan in a twist of foil."},
+  {id:"m-mac-thermos",name:"Mac & cheese (thermos)",emoji:"🧀",slot:"main",kids:{livia:"loves",lucy:"loves"},thermos:"hot",nightBefore:false,protein:14,cal:380,prep:"5 min",fromDinner:["dinner50"],shop:"",note:"Leftover Baked Mac & Cheese, loosened with a splash of milk, heated hot."},
+  {id:"m-taco-pasta-thermos",name:"Taco pasta (thermos)",emoji:"🌮",slot:"main",kids:{livia:"ok",lucy:"ok"},thermos:"hot",nightBefore:false,protein:20,cal:360,prep:"5 min",fromDinner:["dinner47"],shop:"",note:"Leftover One-Pot Cheesy Taco Pasta. Kids' plain version."},
+  {id:"m-ramen-thermos",name:"Ramen (thermos) + peas + egg",emoji:"🍜",slot:"main",kids:{livia:"loves",lucy:"loves"},thermos:"hot",nightBefore:false,protein:11,cal:300,prep:"5 min",shop:"ramen noodles (their brand); frozen peas; eggs",note:"Their brand, HALF the seasoning packet. Stir in a handful of frozen peas (they cook in the thermos). Soft-boiled egg halves on top. Broth hot-hot."},
+  {id:"m-teriyaki-rice-thermos",name:"Teriyaki meatballs + rice (thermos)",emoji:"🍚",slot:"main",kids:{livia:"ok",lucy:"ok"},thermos:"hot",nightBefore:false,protein:18,cal:380,prep:"5 min",fromDinner:["dinner53"],shop:"",note:"Leftover Teriyaki Meatball Bowls."},
+  {id:"m-muffin-pizza",name:"English muffin pizza (cold or thermos)",emoji:"🍕",slot:"main",kids:{livia:"loves",lucy:"ok"},thermos:"hot",nightBefore:true,protein:15,cal:290,prep:"5 min",fromDinner:["breakfast9"],shop:"Fit Flour English muffins; shredded mozzarella; pizza sauce",note:"Bake the night before; good cold like leftover pizza."},
+  {id:"m-pancake-pb",name:"Pancake sandwich with PB",emoji:"🥞",slot:"main",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:12,cal:340,prep:"2 min",fromDinner:["breakfast7","dinner48"],shop:"natural peanut butter",note:"Two leftover sheet-pan pancakes with PB (and sliced banana) between. Breakfast-for-lunch."},
+  {id:"m-egg-cheese-crackers",name:"Hard-boiled eggs + cheese + crackers",emoji:"🥚",slot:"main",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:16,cal:280,prep:"none",shop:"eggs; cheddar block; Triscuits",note:"Boil 6 on Sunday. Salt in a twist of foil. Stretch item — pair with a loved fruit."},
+  {id:"m-hummus-pita",name:"Hummus + pita + cheese",emoji:"🫓",slot:"main",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:12,cal:300,prep:"2 min",shop:"hummus; mini pitas; cheese stick",note:"Pita cut in triangles for dipping. Stretch item."},
+  {id:"m-parfait",name:"Yogurt parfait jar",emoji:"🥣",slot:"main",kids:{livia:"ok",lucy:"ok"},thermos:"cold",nightBefore:true,protein:18,cal:280,prep:"2 min",fromDinner:["breakfast4"],shop:"Fage 5% Greek yogurt; granola; berries",note:"Granola in a separate baggie or it goes soft. Ice pack."},
+  {id:"m-bagel-cc",name:"Bagel + cream cheese",emoji:"🥯",slot:"main",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:12,cal:330,prep:"2 min",shop:"mini bagels; cream cheese"},
+  {id:"m-cheese-crackers-plate",name:"Cheese & crackers plate",emoji:"🧀",slot:"main",kids:{livia:"ok",lucy:"loves"},thermos:null,nightBefore:true,protein:12,cal:290,prep:"2 min",shop:"cheddar block; Babybel; Triscuits",note:"Cubed cheddar + a Babybel + crackers. Add a Chomps stick for protein."},
+  // ── FRUIT ──
+  {id:"f-grapes",name:"Grapes",emoji:"🍇",slot:"fruit",kids:{livia:"ok",lucy:"loves"},thermos:null,nightBefore:true,protein:0,cal:60,prep:"none",shop:"grapes",note:"Halve lengthwise for Lucy."},
+  {id:"f-strawberries",name:"Strawberries",emoji:"🍓",slot:"fruit",kids:{livia:"loves",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:50,prep:"2 min",shop:"strawberries",note:"Hull and halve. Pack dry — wash and dry well or they weep."},
+  {id:"f-apple",name:"Apple slices",emoji:"🍎",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:60,prep:"2 min",shop:"apples; lemon",note:"Squeeze of lemon or a dip in salt water keeps them from browning."},
+  {id:"f-clementine",name:"Clementine",emoji:"🍊",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:40,prep:"none",shop:"clementines",note:"Score the peel so little hands can start it."},
+  {id:"f-banana",name:"Banana",emoji:"🍌",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:1,cal:90,prep:"none",shop:"bananas"},
+  {id:"f-blueberries",name:"Blueberries",emoji:"🫐",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:45,prep:"none",shop:"blueberries"},
+  {id:"f-watermelon",name:"Watermelon cubes",emoji:"🍉",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:"cold",nightBefore:true,protein:0,cal:45,prep:"2 min",shop:"watermelon (pre-cut)"},
+  {id:"f-pineapple",name:"Pineapple chunks",emoji:"🍍",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:"cold",nightBefore:true,protein:0,cal:55,prep:"none",shop:"pineapple chunks (pre-cut)"},
+  {id:"f-applesauce",name:"Applesauce pouch",emoji:"🧃",slot:"fruit",kids:{livia:"loves",lucy:"loves"},thermos:null,nightBefore:true,protein:0,cal:60,prep:"none",shop:"unsweetened applesauce pouches"},
+  {id:"f-gogo-veg",name:"GoGo squeeZ Fruit & VeggieZ pouch",emoji:"🧃",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:60,prep:"none",shop:"GoGo squeeZ Fruit & VeggieZ pouches",note:"Sneaks a veg serving in. Tastes like the apple ones."},
+  {id:"f-ouaf",name:"Once Upon a Farm pouch (fridge)",emoji:"🧃",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:70,prep:"none",shop:"Once Upon a Farm pouches (refrigerated)",note:"Cold-pressed, has veg. Keep with the ice pack."},
+  {id:"f-freeze-dried-straw",name:"Freeze-dried strawberries",emoji:"🍓",slot:"fruit",kids:{livia:"loves",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:40,prep:"none",shop:"freeze-dried strawberries (Costco)",note:"Crunchy — doubles as the crunch on a sandwich day."},
+  {id:"f-raisins",name:"Raisins / Craisins box",emoji:"🍇",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:90,prep:"none",shop:"raisins snack boxes"},
+  {id:"f-mango",name:"Mango chunks (frozen → thawed by lunch)",emoji:"🥭",slot:"fruit",kids:{livia:"ok",lucy:"ok"},thermos:"cold",nightBefore:true,protein:0,cal:60,prep:"none",shop:"frozen mango chunks",note:"Pack frozen; acts as the ice pack and is perfect by noon."},
+  // ── VEG (the dip rule: every veg gets a dip) ──
+  {id:"v-cuke-ranch",name:"Cucumber coins + ranch cup",emoji:"🥒",slot:"veg",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:1,cal:50,prep:"2 min",shop:"cucumber; Bolthouse Farms ranch",note:"Thin coins, pat dry. Ranch in a 1-oz cup. The dip is the whole game."},
+  {id:"v-cuke-tzatziki",name:"Cucumber + Cedar's tzatziki",emoji:"🥒",slot:"veg",kids:{livia:"stretch",lucy:"ok"},thermos:null,nightBefore:true,protein:2,cal:55,prep:"2 min",shop:"cucumber; Cedar's tzatziki"},
+  {id:"v-snap-peas",name:"Sugar snap peas",emoji:"🫛",slot:"veg",kids:{livia:"ok",lucy:"stretch"},thermos:null,nightBefore:true,protein:2,cal:35,prep:"none",shop:"sugar snap peas",note:"Sweet and crunchy — the most-accepted 'real' veg for kids who refuse carrots. Ranch cup."},
+  {id:"v-mini-peppers",name:"Mini sweet peppers",emoji:"🫑",slot:"veg",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:1,cal:30,prep:"2 min",shop:"mini sweet peppers",note:"Red/orange/yellow only (sweet). Slice into rings, seeds out. Hummus or ranch."},
+  {id:"v-frozen-peas",name:"Frozen peas (eaten frozen)",emoji:"🟢",slot:"veg",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:3,cal:40,prep:"none",shop:"frozen peas",note:"Straight from the freezer into a small container — kids eat them like candy, and they're thawed and cold by lunch."},
+  {id:"v-edamame",name:"Edamame in pods + flaky salt",emoji:"🫛",slot:"veg",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:8,cal:90,prep:"2 min",shop:"frozen edamame in pods",note:"Microwave 2 min night before, salt, chill. Popping the pods is the fun."},
+  {id:"v-celery-pb",name:"Celery + PB",emoji:"🥬",slot:"veg",kids:{livia:"ok",lucy:"stretch"},thermos:null,nightBefore:true,protein:4,cal:120,prep:"2 min",shop:"celery; natural peanut butter",note:"Fill the night before; a few raisins on top if they're into ants-on-a-log."},
+  {id:"v-cherry-tomatoes",name:"Cherry tomatoes (toothpick)",emoji:"🍅",slot:"veg",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:1,cal:25,prep:"none",shop:"cherry tomatoes",note:"Whole for Livia; halved for Lucy. Pinch of salt in a foil twist."},
+  {id:"v-carrots-ranch",name:"Baby carrots + ranch/hummus",emoji:"🥕",slot:"veg",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:1,cal:60,prep:"none",shop:"baby carrots; hummus",note:"Historically comes back uneaten — keep it to 3–4 carrots next to a dip they already like."},
+  {id:"v-pickles",name:"Pickles",emoji:"🥒",slot:"veg",kids:{livia:"ok",lucy:"loves"},thermos:null,nightBefore:true,protein:0,cal:10,prep:"none",shop:"dill pickle spears or chips",note:"Lucy's veg. Counts. Pat dry so the juice doesn't soak the box."},
+  {id:"v-sweet-potato",name:"Roasted sweet potato cubes (cold)",emoji:"🍠",slot:"veg",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:1,cal:70,prep:"none",shop:"sweet potato",note:"From the sweet-potato side the night before. A little cinnamon sugar makes them a 'treat'."},
+  {id:"v-corn",name:"Corn kernels (cold)",emoji:"🌽",slot:"veg",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:2,cal:60,prep:"none",shop:"frozen corn",note:"Leftover from corn-with-butter side, or thaw frozen. Butter + pinch of Tajín."},
+  {id:"v-cuke-sushi",name:"Cucumber 'sushi' roll-ups with cream cheese",emoji:"🍣",slot:"veg",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:2,cal:70,prep:"5 min",shop:"cucumber; cream cheese",note:"Peel long cucumber ribbons, spread cream cheese, roll. Novelty earns a try."},
+  // ── CRUNCH ──
+  {id:"c-simple-mills",name:"Simple Mills cheddar crackers",emoji:"🧀",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:2,cal:150,prep:"none",shop:"Simple Mills Farmhouse Cheddar crackers",note:"The Cheez-It swap. Almond flour."},
+  {id:"c-harvest-snaps",name:"Harvest Snaps (pea crisps)",emoji:"🫛",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:5,cal:130,prep:"none",shop:"Harvest Snaps Lightly Salted",note:"Crunchy, salty, 5g protein, made of peas. Best chip swap."},
+  {id:"c-popcorn",name:"Skinny Pop / Lesser Evil popcorn",emoji:"🍿",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:2,cal:100,prep:"none",shop:"Skinny Pop or Lesser Evil popcorn snack bags"},
+  {id:"c-siete",name:"Siete chips",emoji:"🌮",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:1,cal:140,prep:"none",shop:"Siete grain-free tortilla chips",note:"For taco-pasta or quesadilla days with the salsa cup."},
+  {id:"c-bare-apple",name:"Bare apple chips",emoji:"🍎",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:110,prep:"none",shop:"Bare apple chips (Costco)",note:"Crunch AND fruit — skip a separate fruit on these days if the box is full."},
+  {id:"c-pretzels-hummus",name:"Pretzels + hummus",emoji:"🥨",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:4,cal:160,prep:"none",shop:"pretzel crisps; hummus"},
+  {id:"c-annies",name:"Annie's bunnies",emoji:"🐰",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:2,cal:140,prep:"none",shop:"Annie's Cheddar Bunnies"},
+  {id:"c-goldfish",name:"Goldfish (the familiar one)",emoji:"🐟",slot:"crunch",kids:{livia:"loves",lucy:"loves"},thermos:null,nightBefore:true,protein:3,cal:140,prep:"none",shop:"Goldfish crackers",note:"Keep it to once a week in the main box; it still shows up as a snack."},
+  {id:"c-triscuits",name:"Triscuits",emoji:"🍘",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:3,cal:120,prep:"none",shop:"Triscuits"},
+  {id:"c-rice-cakes",name:"Mini rice cakes",emoji:"🍘",slot:"crunch",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:1,cal:70,prep:"none",shop:"Quaker mini rice cakes (apple cinnamon or cheddar)"},
+  {id:"c-chickpeas",name:"Roasted chickpeas",emoji:"🫘",slot:"crunch",kids:{livia:"stretch",lucy:"stretch"},thermos:null,nightBefore:true,protein:6,cal:130,prep:"none",shop:"Biena roasted chickpeas (sea salt)",note:"Crunchy like a chip, 6g protein. Stretch — pair with a loved main."},
+  // ── SNACK (separate, prepackaged-easy) ──
+  {id:"s-applesauce",name:"Applesauce pouch",emoji:"🧃",slot:"snack",kids:{livia:"loves",lucy:"loves"},thermos:null,nightBefore:true,protein:0,cal:60,prep:"none",shop:"unsweetened applesauce pouches"},
+  {id:"s-goldfish",name:"Goldfish pack",emoji:"🐟",slot:"snack",kids:{livia:"loves",lucy:"loves"},thermos:null,nightBefore:true,protein:3,cal:140,prep:"none",shop:"Goldfish snack packs"},
+  {id:"s-chomps",name:"Chomps turkey stick",emoji:"🥩",slot:"snack",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:10,cal:70,prep:"none",shop:"Chomps original turkey sticks",note:"10g protein, no sugar. The best 'easy' snack by a mile."},
+  {id:"s-babybel",name:"Babybel",emoji:"🧀",slot:"snack",kids:{livia:"ok",lucy:"loves"},thermos:null,nightBefore:true,protein:5,cal:70,prep:"none",shop:"Babybel cheese"},
+  {id:"s-string-cheese",name:"String cheese",emoji:"🧀",slot:"snack",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:7,cal:80,prep:"none",shop:"string cheese"},
+  {id:"s-zbar",name:"Clif Z bar",emoji:"🍫",slot:"snack",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:2,cal:130,prep:"none",shop:"Clif Kid Z bars"},
+  {id:"s-thatsit",name:"That's It fruit bar",emoji:"🍎",slot:"snack",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:100,prep:"none",shop:"That's It fruit bars",note:"Two ingredients, both fruit."},
+  {id:"s-yogurt-tube",name:"Yogurt tube (frozen)",emoji:"🧊",slot:"snack",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:4,cal:60,prep:"none",shop:"Chobani or Siggi's yogurt tubes",note:"Freeze them — thawed and cold by snack time, and it's the ice pack."},
+  {id:"s-freeze-dried",name:"Freeze-dried fruit",emoji:"🍓",slot:"snack",kids:{livia:"loves",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:40,prep:"none",shop:"freeze-dried strawberries or mango (Costco)"},
+  {id:"s-trail-mix",name:"Trail mix (nuts ok)",emoji:"🥜",slot:"snack",kids:{livia:"ok",lucy:"stretch"},thermos:null,nightBefore:true,protein:5,cal:160,prep:"none",shop:"kids trail mix with M&Ms"},
+  {id:"s-gogo",name:"GoGo squeeZ",emoji:"🧃",slot:"snack",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:60,prep:"none",shop:"GoGo squeeZ pouches"},
+  {id:"s-bare-chips",name:"Bare apple chips",emoji:"🍎",slot:"snack",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:110,prep:"none",shop:"Bare apple chips (Costco)"},
+  {id:"s-popcorn",name:"Lesser Evil popcorn bag",emoji:"🍿",slot:"snack",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:2,cal:100,prep:"none",shop:"Lesser Evil Himalayan Gold popcorn snack bags"},
+  // ── TREAT (small, ≤2×/week) ──
+  {id:"t-dark-choc",name:"2 squares dark chocolate",emoji:"🍫",slot:"treat",kids:{livia:"loves",lucy:"loves"},thermos:null,nightBefore:true,protein:0,cal:60,prep:"none",shop:"dark chocolate bar"},
+  {id:"t-mini-cookies",name:"3 mini cookies",emoji:"🍪",slot:"treat",kids:{livia:"loves",lucy:"loves"},thermos:null,nightBefore:true,protein:0,cal:90,prep:"none",shop:"mini cookies (Simple Mills or Annie's)"},
+  {id:"t-yasso",name:"Yasso bar (thermos cold)",emoji:"🍦",slot:"treat",kids:{livia:"loves",lucy:"loves"},thermos:"cold",nightBefore:false,protein:5,cal:100,prep:"none",shop:"Yasso frozen Greek yogurt bars",note:"The 'ice cream in the thermos' move. Pre-chill the thermos in the freezer overnight, bar goes in frozen in the morning."},
+  {id:"t-yogurt-bites",name:"Frozen yogurt bites (thermos cold)",emoji:"🧊",slot:"treat",kids:{livia:"ok",lucy:"ok"},thermos:"cold",nightBefore:false,protein:3,cal:70,prep:"none",fromDinner:["d-bites"],shop:"",note:"From the Frozen PB Chocolate Yogurt Bites recipe."},
+  {id:"t-nice-cream",name:"Banana nice cream (thermos cold)",emoji:"🍌",slot:"treat",kids:{livia:"ok",lucy:"ok"},thermos:"cold",nightBefore:false,protein:1,cal:80,prep:"none",fromDinner:["d-nicecream"],shop:"",note:"Scoop frozen into a pre-chilled thermos. Soft-serve by lunch."},
+  {id:"t-fruit-leather",name:"Fruit leather",emoji:"🍓",slot:"treat",kids:{livia:"ok",lucy:"ok"},thermos:null,nightBefore:true,protein:0,cal:50,prep:"none",shop:"Stretch Island fruit leather"},
+];
+const LB_BY_ID = Object.fromEntries(LUNCH_ITEMS.map(i => [i.id, i]));
+const LB_SLOTS = ["main","fruit","veg","crunch","snack","treat"];
+const LB_SLOT_LABEL = {main:"Main",fruit:"Fruit",veg:"Veg",crunch:"Crunch",snack:"Snack",treat:"Treat"};
+
+function lbState(){
+  if (!state.lunchbox || typeof state.lunchbox !== "object") state.lunchbox = {};
+  const lb = state.lunchbox;
+  lb.plan = lb.plan && typeof lb.plan === "object" ? lb.plan : {};
+  lb.feedback = lb.feedback && typeof lb.feedback === "object" ? lb.feedback : {};
+  lb.packed = lb.packed && typeof lb.packed === "object" ? lb.packed : {};
+  lb.hasThermos = !!lb.hasThermos;
+  lb.schoolDays = Array.isArray(lb.schoolDays) && lb.schoolDays.length ? lb.schoolDays : LB_SCHOOL.slice();
+  lb.noSchool = Array.isArray(lb.noSchool) ? lb.noSchool : [];
+  return lb;
+}
+let lbWeekView = "this";
+function lbWeekKey(){ return lbWeekView; }
+
+// Effective acceptance for a kid, adjusted by feedback history (ate ≥3 → loves; untouched ≥2 of last 3 → stretch)
+function lbAccept(item, kid){
+  const base = (item.kids && item.kids[kid]) || "ok";
+  const fb = ((lbState().feedback[item.id] || {})[kid] || []).slice(-6);
+  if (fb.length) {
+    const last3 = fb.slice(-3);
+    const unt = last3.filter(x => x.r === "untouched").length;
+    const ate = fb.filter(x => x.r === "ate").length;
+    if (base !== "no" && unt >= 2) return "stretch";
+    if (base !== "no" && ate >= 3) return "loves";
+  }
+  return base;
+}
+function lbEats(item, kid){ const a = lbAccept(item, kid); return a === "loves" || a === "ok"; }
+function lbRank(a){ return a === "loves" ? 2 : a === "ok" ? 1 : a === "stretch" ? 0.3 : -5; }
+
+// Which dinners are planned 1–2 days before a given school day (for leftover mains)
+function lbLeftoverSources(weekKey, dayIdx){
+  const plan = weekKey === "next" ? (state.nextWeekPlan || {}) : (state.weekPlan || {});
+  const prevPlan = weekKey === "next" ? (state.weekPlan || {}) : null;
+  const out = [];
+  for (let back = 1; back <= 2; back++) {
+    const idx = dayIdx - back;
+    const d = idx >= 0 ? PLAN_DAYS[idx] : null;
+    const src = idx >= 0 ? plan : prevPlan;
+    const dayName = d || (idx < 0 ? PLAN_DAYS[7 + idx] : null);
+    if (!src || !dayName) continue;
+    const e = src[dayName + "_dinner"];
+    if (e && e.recipeId) out.push({ recipeId: e.recipeId, day: dayName });
+  }
+  return out;
+}
+
+function lbSeedRandom(seed){ let x = 0; for (const c of seed) x = (x * 31 + c.charCodeAt(0)) >>> 0; return () => { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
+
+function planLunchWeek(weekKey){
+  weekKey = weekKey || lbWeekKey();
+  const lb = lbState();
+  const rnd = lbSeedRandom(weekKey + ":" + new Date().toISOString().slice(0,10) + ":" + Math.floor(Math.random()*1e6));
+  const days = LB_SCHOOL.filter(d => lb.schoolDays.includes(d));
+  const week = {};
+  const useCount = {}; // id → times used this week (shared)
+  const lastMain = { livia: null, lucy: null };
+  const stretchVegDone = { livia: false, lucy: false };
+  const thermosDays = { n: 0 };
+  let treatCount = 0;
+
+  const pool = s => LUNCH_ITEMS.filter(i => i.slot === s && (lb.hasThermos || !i.thermos || i.thermos === null) && !(i.thermos && !lb.hasThermos));
+  const cap = (item) => /lunchable/i.test(item.name) ? 1 : /nuggets|PB&J/i.test(item.name) ? 2 : item.id === "c-goldfish" ? 1 : 3;
+
+  days.forEach((day, di) => {
+    const dayIdx = PLAN_DAYS.indexOf(day);
+    const sources = lbLeftoverSources(weekKey, dayIdx);
+    // ── MAIN (shared unless one kid says no) ──
+    let mainCands = pool("main").filter(i => (useCount[i.id] || 0) < cap(i) && i.id !== lastMain.livia && i.id !== lastMain.lucy);
+    if (!lb.hasThermos) mainCands = mainCands.filter(i => !i.thermos || i.thermos !== "hot" || i.nightBefore); // cold-ok hot items stay (nuggets/tenders)
+    const scored = mainCands.map(i => {
+      let s = lbRank(lbAccept(i,"livia")) + lbRank(lbAccept(i,"lucy"));
+      const lo = sources.find(src => (i.fromDinner||[]).includes(src.recipeId));
+      if (lo) s += 3;
+      if (lb.hasThermos && i.thermos === "hot" && thermosDays.n < 2) s += 1.2;
+      if (lb.hasThermos && i.thermos === "hot" && thermosDays.n >= 2) s -= 2;
+      if (/sandwich/i.test(i.name) && Object.keys(useCount).some(k => /^m-(turkey|ham)-cheese$/.test(k))) s -= 0.8; // vary sandwiches
+      s += rnd() * 0.9;
+      return { i, s, lo };
+    }).sort((a,b) => b.s - a.s);
+    const pick = scored[0];
+    const mainShared = pick ? pick.i : pool("main")[0];
+    const kidsMain = {};
+    LB_KIDS.forEach(k => {
+      if (lbAccept(mainShared, k.id) === "no") {
+        const alt = scored.find(x => lbAccept(x.i, k.id) !== "no" && x.i.id !== mainShared.id);
+        kidsMain[k.id] = alt ? alt.i : mainShared;
+      } else kidsMain[k.id] = mainShared;
+    });
+    const mainReason = pick && pick.lo ? "🔁 leftover from " + pick.lo.day.slice(0,3) + " " + ((byIdAll(pick.lo.recipeId)||{}).name||"").split(" ").slice(0,3).join(" ") : "";
+    useCount[mainShared.id] = (useCount[mainShared.id]||0) + 1;
+    if (lb.hasThermos && mainShared.thermos === "hot") thermosDays.n++;
+
+    // ── FRUIT: each kid's "loves" 3 days; other days rotate; exposure add of the other kid's fruit ──
+    const fruitFor = {};
+    LB_KIDS.forEach(k => {
+      const loves = pool("fruit").filter(i => lbAccept(i,k.id) === "loves" && !/pouch|applesauce|freeze|raisin/i.test(i.name));
+      const fresh = pool("fruit").filter(i => lbEats(i,k.id) && !/pouch|applesauce|freeze|raisin/i.test(i.name));
+      const useLoved = loves.length && (di % 5 < 3 ? true : rnd() < 0.3);
+      let cands = (useLoved ? loves : fresh).filter(i => (useCount[i.id+":"+k.id]||0) < 3);
+      if (!cands.length) cands = fresh.length ? fresh : pool("fruit");
+      // avoid same fruit as yesterday when possible
+      const prev = di > 0 ? week[days[di-1]][k.id].fruit : null;
+      const alt = cands.filter(i => i.id !== prev);
+      const chosen = (alt.length ? alt : cands)[Math.floor(rnd() * (alt.length ? alt.length : cands.length))];
+      fruitFor[k.id] = chosen;
+      useCount[chosen.id+":"+k.id] = (useCount[chosen.id+":"+k.id]||0) + 1;
+    });
+    // exposure add: the other kid's loved fruit, 1–2 pieces
+    const fruitAdd = {};
+    LB_KIDS.forEach((k, ki) => {
+      const other = LB_KIDS[1-ki];
+      const otherFruit = fruitFor[other.id];
+      if (otherFruit && otherFruit.id !== fruitFor[k.id].id && lbAccept(otherFruit, k.id) !== "no" && rnd() < 0.7) fruitAdd[k.id] = otherFruit.id;
+    });
+
+    // ── VEG: one accepted veg per kid per day; exactly one stretch veg per kid per week, on a loved-main day ──
+    const vegFor = {};
+    LB_KIDS.forEach(k => {
+      const mainLoved = lbAccept(kidsMain[k.id], k.id) === "loves";
+      const prev = di > 0 ? week[days[di-1]][k.id].veg : null;
+      let cands;
+      const remainingDays = days.length - di;
+      const forceStretch = !stretchVegDone[k.id] && (mainLoved || remainingDays <= 1);
+      if (forceStretch) {
+        cands = pool("veg").filter(i => lbAccept(i,k.id) === "stretch");
+        stretchVegDone[k.id] = true;
+      } else {
+        cands = pool("veg").filter(i => lbEats(i,k.id) && i.id !== prev);
+      }
+      if (!cands.length) cands = pool("veg").filter(i => lbAccept(i,k.id) !== "no");
+      const ranked = cands.map(i => ({ i, s: lbRank(lbAccept(i,k.id)) - (useCount[i.id+":"+k.id]||0) * 0.8 + rnd() })).sort((a,b) => b.s - a.s);
+      vegFor[k.id] = ranked[0] ? ranked[0].i : cands[0];
+      useCount[vegFor[k.id].id+":"+k.id] = (useCount[vegFor[k.id].id+":"+k.id]||0) + 1;
+    });
+
+    // ── CRUNCH: rotate; goldfish ≤1/week; match cuisine a little ──
+    const crunchCands = pool("crunch").filter(i => (useCount[i.id]||0) < cap(i));
+    const crunchRanked = crunchCands.map(i => {
+      let s = lbRank(lbAccept(i,"livia")) + lbRank(lbAccept(i,"lucy")) - (useCount[i.id]||0) * 1.5 + rnd();
+      if (/taco|quesadilla/i.test(mainShared.name) && i.id === "c-siete") s += 1.5;
+      if (/sandwich|PB&J/i.test(mainShared.name) && /harvest|simple|popcorn/i.test(i.name)) s += 0.6;
+      if (i.id === "c-goldfish") s -= 1.0;
+      return { i, s };
+    }).sort((a,b) => b.s - a.s);
+    const crunch = crunchRanked[0].i; useCount[crunch.id] = (useCount[crunch.id]||0) + 1;
+
+    // ── SNACK: easy, rotate, protein-leaning 2–3×/week ──
+    const snackCands = pool("snack").filter(i => (useCount[i.id]||0) < 2);
+    const snackRanked = snackCands.map(i => {
+      let s = lbRank(lbAccept(i,"livia")) + lbRank(lbAccept(i,"lucy")) - (useCount[i.id]||0) * 1.2 + rnd();
+      if (i.protein >= 5 && di % 2 === 0) s += 1.0;
+      if (i.id === "s-goldfish" && crunch.id === "c-goldfish") s -= 3;
+      return { i, s };
+    }).sort((a,b) => b.s - a.s);
+    const snack = snackRanked[0].i; useCount[snack.id] = (useCount[snack.id]||0) + 1;
+
+    // ── TREAT: ≤2/week, Fri + one midweek ──
+    let treat = null;
+    if (treatCount < 2 && (day === "Friday" || (day === "Wednesday" && rnd() < 0.8))) {
+      const tc = pool("treat").filter(i => (lb.hasThermos || !i.thermos));
+      const tr = tc.map(i => ({ i, s: lbRank(lbAccept(i,"livia")) + lbRank(lbAccept(i,"lucy")) + (lb.hasThermos && i.thermos === "cold" && day === "Friday" ? 1.5 : 0) + rnd() })).sort((a,b) => b.s - a.s);
+      treat = tr[0] ? tr[0].i.id : null; treatCount++;
+    }
+
+    week[day] = {};
+    LB_KIDS.forEach(k => {
+      week[day][k.id] = { main: kidsMain[k.id].id, fruit: fruitFor[k.id].id, fruitAdd: fruitAdd[k.id] || null, veg: vegFor[k.id].id, vegStretch: lbAccept(vegFor[k.id], k.id) === "stretch", crunch: crunch.id, snack: snack.id, treat };
+      lastMain[k.id] = kidsMain[k.id].id;
+    });
+    week[day]._reason = mainReason;
+  });
+  lb.plan[weekKey] = week;
+  scheduleSave();
+  return week;
+}
+
+function lbSwapOptions(weekKey, day, kid, slot){
+  const lb = lbState(); const cur = ((lb.plan[weekKey]||{})[day]||{})[kid]; if (!cur) return [];
+  const prevDay = LB_SCHOOL[LB_SCHOOL.indexOf(day)-1]; const prev = prevDay && lb.plan[weekKey][prevDay] ? lb.plan[weekKey][prevDay][kid][slot] : null;
+  return LUNCH_ITEMS.filter(i => i.slot === slot && i.id !== cur[slot] && i.id !== prev && lbAccept(i,kid) !== "no" && (lb.hasThermos || !i.thermos))
+    .sort((a,b) => lbRank(lbAccept(b,kid)) - lbRank(lbAccept(a,kid)) + (Math.random()-0.5)).slice(0,3);
+}
+function lbSwap(weekKey, day, kid, slot, newId, both){
+  const lb = lbState(); const wk = lb.plan[weekKey]; if (!wk || !wk[day]) return;
+  const targets = both ? LB_KIDS.map(k=>k.id) : [kid];
+  targets.forEach(k => { if (wk[day][k]) { wk[day][k][slot] = newId; if (slot === "veg") wk[day][k].vegStretch = lbAccept(LB_BY_ID[newId], k) === "stretch"; } });
+  closeModalForce(); scheduleSave(); renderLunchbox();
+}
+function lbOpenSwap(weekKey, day, kid, slot){
+  const opts = lbSwapOptions(weekKey, day, kid, slot);
+  const kidName = (LB_KIDS.find(k=>k.id===kid)||{}).name || "";
+  const shared = ["main","crunch","snack","treat"].includes(slot);
+  openModal(`<div class="modal-header"><h2 style="margin:0;font-size:18px">↻ Swap ${LB_SLOT_LABEL[slot]} — ${esc(day)}${shared?"":" · "+esc(kidName)}</h2><button onclick="closeModalForce()" style="background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer">✕</button></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+      ${opts.length ? opts.map(i => `<button onclick="lbSwap('${weekKey}','${day}','${kid}','${slot}','${i.id}',${shared})" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--text);text-align:left;cursor:pointer;font-size:15px"><span style="font-size:24px">${i.emoji}</span><span style="flex:1"><div style="font-weight:700">${esc(i.name)}</div><div style="font-size:12px;color:var(--dim)">${lbTags(i, kid)}${i.note?" · "+esc(i.note.split(".")[0]):""}</div></span></button>`).join("") : '<div style="color:var(--dim)">No other options in this slot.</div>'}
+      ${slot==="treat"||slot==="veg"?`<button onclick="lbSwap('${weekKey}','${day}','${kid}','${slot}',null,${shared})" style="padding:10px;border-radius:12px;border:1px dashed rgba(255,255,255,0.2);background:transparent;color:var(--dim);cursor:pointer">— none today</button>`:""}
+      ${shared?'<div style="font-size:12px;color:var(--dim);text-align:center">Swaps for both girls</div>':''}
+    </div>`);
+}
+function lbTags(i, kid){
+  const t = [];
+  if (i.thermos === "hot") t.push("🫙 hot"); if (i.thermos === "cold") t.push("🫙 cold");
+  t.push(i.nightBefore ? "🌙 night-before" : "⏰ morning");
+  if (kid && lbAccept(i, kid) === "stretch") t.push("🌱 stretch");
+  if (i.protein >= 10) t.push(i.protein + "g protein");
+  return t.join(" · ");
+}
+function lbToggleThermos(){ const lb = lbState(); lb.hasThermos = !lb.hasThermos; scheduleSave(); renderLunchbox(); }
+
+// ── Dates ──
+function lbDateKey(d){ return d.toISOString().split("T")[0]; }
+function lbTomorrow(){ const d = new Date(); d.setDate(d.getDate()+1); return d; }
+function lbDayName(d){ return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]; }
+function lbIsSchoolDay(d){ const lb = lbState(); return lb.schoolDays.includes(lbDayName(d)) && !lb.noSchool.includes(lbDateKey(d)); }
+// Plan week key that a given date belongs to, relative to this Monday-start week
+function lbWeekKeyForDate(d){
+  const now = new Date(); const mon = new Date(now); const dow = (now.getDay()+6)%7; mon.setDate(now.getDate()-dow); mon.setHours(0,0,0,0);
+  const diff = Math.floor((new Date(d.getFullYear(),d.getMonth(),d.getDate()) - mon)/86400000);
+  return diff >= 7 ? "next" : diff >= 0 ? "this" : null;
+}
+function lbSkipTomorrow(){ const lb = lbState(); const k = lbDateKey(lbTomorrow()); if (!lb.noSchool.includes(k)) lb.noSchool.push(k); scheduleSave(); renderPlan(); }
+function lbUnskip(k){ const lb = lbState(); lb.noSchool = lb.noSchool.filter(x=>x!==k); scheduleSave(); renderPlan(); }
+
+// ── Merge two kids' boxes into display rows ──
+function lbMergedRows(dayPlan){
+  const rows = [];
+  LB_SLOTS.forEach(slot => {
+    const a = dayPlan.livia ? dayPlan.livia[slot] : null, b = dayPlan.lucy ? dayPlan.lucy[slot] : null;
+    if (!a && !b) return;
+    if (a === b) {
+      const it = LB_BY_ID[a]; if (!it) return;
+      const adds = [];
+      if (slot === "fruit") { if (dayPlan.livia.fruitAdd) adds.push("Livia +2 " + (LB_BY_ID[dayPlan.livia.fruitAdd]||{}).emoji); if (dayPlan.lucy.fruitAdd) adds.push("Lucy +2 " + (LB_BY_ID[dayPlan.lucy.fruitAdd]||{}).emoji); }
+      rows.push({ slot, item: it, kids: ["livia","lucy"], extra: adds.join(" · "), stretch: slot==="veg" && (dayPlan.livia.vegStretch || dayPlan.lucy.vegStretch) });
+    } else {
+      if (a) { const it = LB_BY_ID[a]; if (it) rows.push({ slot, item: it, kids: ["livia"], extra: slot==="fruit" && dayPlan.livia.fruitAdd ? "+2 " + (LB_BY_ID[dayPlan.livia.fruitAdd]||{}).emoji : "", stretch: slot==="veg" && dayPlan.livia.vegStretch }); }
+      if (b) { const it = LB_BY_ID[b]; if (it) rows.push({ slot, item: it, kids: ["lucy"], extra: slot==="fruit" && dayPlan.lucy.fruitAdd ? "+2 " + (LB_BY_ID[dayPlan.lucy.fruitAdd]||{}).emoji : "", stretch: slot==="veg" && dayPlan.lucy.vegStretch }); }
+    }
+  });
+  return rows;
+}
+
+// ── Lunchbox tab ──
+let lbExpanded = {};
+function renderLunchbox(){
+  const el = document.getElementById("page-lunchbox"); if (!el) return;
+  const lb = lbState(); const weekKey = lbWeekKey(); const week = lb.plan[weekKey] || null;
+  const todayName = lbDayName(new Date()); const tomorrowName = lbDayName(lbTomorrow());
+  const days = LB_SCHOOL.filter(d => lb.schoolDays.includes(d));
+  const dayCards = week ? days.map(day => {
+    const dp = week[day]; if (!dp) return "";
+    const open = lbExpanded[weekKey+day] !== undefined ? lbExpanded[weekKey+day] : (day === todayName || day === tomorrowName || window.innerWidth >= 1024);
+    const rows = lbMergedRows(dp);
+    const sameAll = rows.every(r => r.kids.length === 2);
+    const rowHtml = rows.map(r => {
+      const who = r.kids.length === 2 ? "" : `<span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:${r.kids[0]==="livia"?"rgba(99,102,241,0.15)":"rgba(236,72,153,0.15)"};color:${r.kids[0]==="livia"?"#a5b4fc":"#f9a8d4"}">${r.kids[0]==="livia"?"Livia":"Lucy"}</span>`;
+      const tags = [r.item.thermos==="hot"?"🫙 hot":r.item.thermos==="cold"?"🫙 cold":"", r.item.nightBefore?"":"⏰ morning", r.stretch?"🌱 stretch":""].filter(Boolean).map(t=>`<span style="font-size:10px;color:var(--dim);background:rgba(255,255,255,0.06);padding:1px 6px;border-radius:999px">${t}</span>`).join(" ");
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,0.06)">
+        <span style="font-size:22px;width:28px;text-align:center">${r.item.emoji}</span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font-size:10px;font-weight:800;letter-spacing:0.6px;color:var(--dim);text-transform:uppercase;width:46px">${LB_SLOT_LABEL[r.slot]}</span>${who}<span style="font-size:14px;font-weight:600">${esc(r.item.name)}</span>${r.extra?`<span style="font-size:12px;color:var(--green)">(${esc(r.extra)})</span>`:""}</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;padding-left:52px">${tags}</div>
+        </div>
+        <button onclick="lbOpenSwap('${weekKey}','${day}','${r.kids[0]}','${r.slot}')" title="Swap" style="background:none;border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:var(--dim);font-size:14px;cursor:pointer;padding:6px 9px;min-width:36px">↻</button>
+      </div>`;
+    }).join("");
+    const prot = LB_KIDS.map(k => { const p = dp[k.id]; return LB_SLOTS.reduce((a,s)=>a+((LB_BY_ID[p[s]]||{}).protein||0),0); });
+    return `<div class="card" style="background:var(--surface);border-radius:14px;padding:12px 14px;margin-bottom:10px;${day===todayName?"border:1px solid rgba(16,185,129,0.4)":""}">
+      <div onclick="lbExpanded['${weekKey+day}']=${!open};renderLunchbox()" style="display:flex;align-items:center;gap:10px;cursor:pointer">
+        <div style="flex:1"><div style="font-size:16px;font-weight:800">${day}${day===todayName?' <span style="font-size:11px;color:var(--green);font-weight:700">TODAY</span>':day===tomorrowName?' <span style="font-size:11px;color:#fbbf24;font-weight:700">TOMORROW</span>':''}</div>
+        <div style="font-size:12px;color:var(--dim)">${(LB_BY_ID[dp.livia.main]||{}).emoji||""} ${esc((LB_BY_ID[dp.livia.main]||{}).name||"")}${dp.livia.main!==dp.lucy.main?" · "+esc((LB_BY_ID[dp.lucy.main]||{}).name||""):""}${dp._reason?' <span style="color:var(--green)">'+esc(dp._reason)+'</span>':''} · ${prot[0]}g / ${prot[1]}g protein</div></div>
+        <span style="color:var(--dim)">${open?"▾":"▸"}</span>
+      </div>
+      ${open ? `<div style="margin-top:6px">${rowHtml}</div>${sameAll?"":'<div style="font-size:11px;color:var(--dim);margin-top:6px">Rows without a name badge are the same for both.</div>'}` : ""}
+    </div>`;
+  }).join("") : `<div style="text-align:center;padding:36px 20px;border:1.5px dashed rgba(255,255,255,0.15);border-radius:16px;margin-bottom:14px"><div style="font-size:40px;margin-bottom:8px">🍱</div><div style="font-size:17px;font-weight:700;margin-bottom:6px">No lunches planned ${weekKey==="next"?"for next week":"this week"}</div><div style="color:var(--dim);font-size:14px;margin-bottom:14px">One tap plans Mon–Fri for both girls: a main they like, fruit, a veg with a dip, something crunchy, and a snack — with one small "stretch" veg each per week next to safe things.</div><button onclick="planLunchWeek('${weekKey}');renderLunchbox()" style="padding:12px 22px;border-radius:12px;border:none;background:var(--green);color:#0a0f1a;font-weight:700;font-size:15px;cursor:pointer">✨ Plan the week</button></div>`;
+
+  // groceries for the visible week
+  const groc = lbGroceryItems(weekKey);
+  const grocHtml = groc.length ? `<div class="card" style="background:var(--surface);border-radius:14px;padding:12px 14px;margin-top:6px"><div style="font-size:13px;font-weight:800;color:var(--green);margin-bottom:6px">🛒 Lunch groceries ${weekKey==="next"?"(next week)":"(this week)"} <span style="font-weight:500;color:var(--dim)">— also in Shop and the Instacart list</span></div><div style="display:flex;flex-wrap:wrap;gap:6px">${groc.map(g=>`<span style="font-size:12px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--text)">${esc(g.text)}</span>`).join("")}</div></div>` : "";
+
+  // What came back? (last school day before today)
+  const fbHtml = renderLbFeedbackStrip();
+
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:6px 0 10px">
+      <div style="font-size:22px;font-weight:800;flex:1;min-width:140px">🍱 Lunchbox</div>
+      <div style="display:inline-flex;background:rgba(255,255,255,0.06);border-radius:999px;padding:3px">
+        <button onclick="lbWeekView='this';renderLunchbox()" style="padding:6px 14px;border-radius:999px;border:none;background:${weekKey==="this"?"var(--green)":"transparent"};color:${weekKey==="this"?"#0a0f1a":"var(--muted)"};font-weight:700;font-size:13px;cursor:pointer">This week</button>
+        <button onclick="lbWeekView='next';renderLunchbox()" style="padding:6px 14px;border-radius:999px;border:none;background:${weekKey==="next"?"var(--green)":"transparent"};color:${weekKey==="next"?"#0a0f1a":"var(--muted)"};font-weight:700;font-size:13px;cursor:pointer">Next week</button>
+      </div>
+      ${week?`<button onclick="if(confirm('Re-plan ${weekKey==="next"?"next":"this"} week\\'s lunches? Your swaps will be replaced.')){planLunchWeek('${weekKey}');renderLunchbox()}" style="padding:8px 14px;border-radius:999px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer">✨ Re-plan</button>`:""}
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+      <button onclick="lbToggleThermos()" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;border:1.5px solid ${lb.hasThermos?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.15)"};background:${lb.hasThermos?"rgba(16,185,129,0.12)":"transparent"};color:${lb.hasThermos?"var(--green)":"var(--muted)"};font-weight:700;font-size:13px;cursor:pointer"><span>${lb.hasThermos?"✓":"○"}</span>🫙 We have a thermos</button>
+      <span style="font-size:12px;color:var(--dim)">${lb.hasThermos?"Hot mains (ramen, mac & cheese, nuggets) and frozen treats are in the rotation.":"Turn on once the Funtainer arrives — unlocks hot lunches and the ice-cream-in-a-thermos trick."}</span>
+    </div>
+    ${fbHtml}
+    ${dayCards}
+    ${grocHtml}
+    <div style="font-size:12px;color:var(--dim);margin-top:12px;line-height:1.5">How the week is built: same main for both unless one won't eat it · never the same main two days running · lunchables ≤1×, nuggets and PB&J ≤2× · each girl gets her favorite fruit most days with 1–2 pieces of the other's fruit for exposure · one veg they eat every day (always with a dip) plus <b>one</b> 🌱 stretch veg per girl per week, placed next to a main they love · Goldfish ≤1× in the box · a small treat ≤2× (Wed/Fri) · leftover mains pulled from the dinner plan. "What came back?" teaches it: 3 eaten → favorite; 2 of 3 untouched → back to stretch.</div>`;
+}
+
+function lbLastSchoolDayBefore(d){ const x = new Date(d); for (let i=0;i<7;i++){ x.setDate(x.getDate()-1); if (lbIsSchoolDay(x)) return x; } return null; }
+function renderLbFeedbackStrip(){
+  const lb = lbState();
+  const now = new Date();
+  // after 1pm today counts as "came back" day; otherwise yesterday
+  const target = (now.getHours() >= 15 && lbIsSchoolDay(now)) ? now : lbLastSchoolDayBefore(now);
+  if (!target) return "";
+  const wk = lbWeekKeyForDate(target); if (!wk) return "";
+  const dp = (lb.plan[wk]||{})[lbDayName(target)]; if (!dp) return "";
+  const dk = lbDateKey(target);
+  const doneAll = LB_KIDS.every(k => ["main","veg"].every(s => ((lb.feedback[dp[k.id][s]]||{})[k.id]||[]).some(x=>x.d===dk)));
+  if (doneAll && !lbExpanded["fb"+dk]) return `<div style="font-size:12px;color:var(--dim);margin-bottom:10px">✅ Logged what came back ${target.toDateString()===now.toDateString()?"today":"on "+lbDayName(target)}. <a onclick="lbExpanded['fb${dk}']=true;renderLunchbox()" style="color:var(--green);cursor:pointer">edit</a></div>`;
+  const label = target.toDateString()===now.toDateString() ? "today" : lbDayName(target);
+  const rows = LB_KIDS.map(k => {
+    const p = dp[k.id];
+    const slots = ["main","veg","fruit","crunch"].filter(s => p[s]);
+    return `<div style="margin-top:6px"><div style="font-size:12px;font-weight:800;color:${k.id==="livia"?"#a5b4fc":"#f9a8d4"}">${k.emoji} ${k.name}</div>${slots.map(s => { const it = LB_BY_ID[p[s]]; if (!it) return ""; const cur = ((lb.feedback[it.id]||{})[k.id]||[]).find(x=>x.d===dk); const b = (r,ico,col) => `<button onclick="lbFeedback('${it.id}','${k.id}','${dk}','${r}')" style="width:34px;height:30px;border-radius:8px;border:1px solid ${cur&&cur.r===r?col:"rgba(255,255,255,0.12)"};background:${cur&&cur.r===r?col.replace(")",",0.2)").replace("rgb","rgba"):"transparent"};font-size:14px;cursor:pointer">${ico}</button>`; return `<div style="display:flex;align-items:center;gap:8px;padding:3px 0"><span style="font-size:16px">${it.emoji}</span><span style="flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(it.name)}</span>${b("ate","🟢","rgb(16,185,129)")}${b("half","🟡","rgb(245,158,11)")}${b("untouched","🔴","rgb(239,68,68)")}</div>`; }).join("")}</div>`;
+  }).join("");
+  return `<div style="background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:12px 14px;margin-bottom:12px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#a5b4fc">🎒 WHAT CAME BACK ${label.toUpperCase()}?</div><div style="font-size:12px;color:var(--dim)">Two taps per box. This is how the plan learns what each girl actually eats.</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">${rows}</div></div>`;
+}
+function lbFeedback(itemId, kid, dateKey, r){
+  const lb = lbState(); lb.feedback[itemId] = lb.feedback[itemId] || {}; const arr = lb.feedback[itemId][kid] = lb.feedback[itemId][kid] || [];
+  const i = arr.findIndex(x => x.d === dateKey); if (i >= 0) arr[i].r = r; else arr.push({ d: dateKey, r });
+  if (arr.length > 12) arr.splice(0, arr.length - 12);
+  scheduleSave(); renderLunchbox();
+}
+
+// ── Grocery integration ──
+function lbGroceryItems(weekKey){
+  const lb = lbState(); const keys = weekKey ? [weekKey] : (state.groceryBothWeeks ? ["this","next"] : ["this"]);
+  const counts = {}; // phrase → {days:Set, item}
+  keys.forEach(wk => { const week = lb.plan[wk]; if (!week) return; Object.entries(week).forEach(([day, dp]) => {
+    LB_KIDS.forEach(k => { const p = dp[k.id]; if (!p) return; LB_SLOTS.forEach(s => { const it = LB_BY_ID[p[s]]; if (!it || !it.shop) return; it.shop.split(";").map(x=>x.trim()).filter(Boolean).forEach(ph => { const key = ph.toLowerCase(); if (!counts[key]) counts[key] = { phrase: ph, days: new Set(), item: it }; counts[key].days.add(wk+day); }); });
+      if (p.fruitAdd) { const fi = LB_BY_ID[p.fruitAdd]; if (fi && fi.shop) fi.shop.split(";").map(x=>x.trim()).forEach(ph => { const key = ph.toLowerCase(); if (!counts[key]) counts[key] = { phrase: ph, days: new Set(), item: fi }; counts[key].days.add(wk+day); }); }
+    }); }); });
+  return Object.values(counts).map(c => ({ text: c.phrase + (c.days.size > 1 ? " ×" + c.days.size + " days" : ""), sources: ["🍱 Lunchbox"] }));
+}
+
+// ── Pack tonight / Morning view (Plan tab + Done screen) ──
+function lbPackCard(compact){
+  const lb = lbState();
+  const now = new Date(); const hour = now.getHours();
+  // Before 9am on a school day: morning view for TODAY. Otherwise: pack tonight for TOMORROW.
+  const morning = hour < 9 && lbIsSchoolDay(now);
+  const target = morning ? now : lbTomorrow();
+  if (!lbIsSchoolDay(target)) {
+    const tk = lbDateKey(target);
+    if (!morning && lb.noSchool.includes(tk)) return `<div style="font-size:12px;color:var(--dim);margin:0 0 12px">🏫 No school tomorrow — no lunches to pack. <a onclick="lbUnskip('${tk}')" style="color:var(--green);cursor:pointer">undo</a></div>`;
+    return "";
+  }
+  const wk = lbWeekKeyForDate(target); if (!wk) return "";
+  const dayName = lbDayName(target);
+  const dp = (lb.plan[wk]||{})[dayName];
+  const dk = lbDateKey(target);
+  if (!dp) {
+    return `<div style="background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#a5b4fc">🍱 LUNCHES</div><div style="font-size:14px">No lunch plan for ${morning?"today":"tomorrow"} yet.</div></div><button onclick="planLunchWeek('${wk}');renderPlan()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--green);color:#0a0f1a;font-weight:700;font-size:13px;cursor:pointer">✨ Plan lunches</button><button onclick="lbSkipTomorrow()" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;text-decoration:underline">No school ${morning?"today":"tomorrow"}</button></div>`;
+  }
+  const rows = lbMergedRows(dp);
+  const packed = lb.packed[dk] || {};
+  const night = rows.filter(r => r.item.nightBefore), morn = rows.filter(r => !r.item.nightBefore);
+  const thermosItems = rows.filter(r => r.item.thermos && lb.hasThermos);
+  const line = r => { const id = r.slot + ":" + r.item.id; const done = !!packed[id]; const who = r.kids.length === 2 ? "" : ` <span style="font-size:10px;font-weight:800;color:${r.kids[0]==="livia"?"#a5b4fc":"#f9a8d4"}">${r.kids[0]==="livia"?"Livia":"Lucy"}</span>`; return `<div onclick="lbTogglePacked('${dk}','${id}')" style="display:flex;align-items:center;gap:10px;padding:7px 0;cursor:pointer;${done?"opacity:0.5":""}"><div style="width:22px;height:22px;border-radius:6px;border:2px solid ${done?"var(--green)":"rgba(255,255,255,0.25)"};background:${done?"var(--green)":"transparent"};color:#0a0f1a;font-size:14px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0">${done?"✓":""}</div><span style="font-size:18px">${r.item.emoji}</span><span style="flex:1;font-size:14px;${done?"text-decoration:line-through":""}">${esc(r.item.name)}${who}${r.extra?` <span style="color:var(--green);font-size:12px">(${esc(r.extra)})</span>`:""}${r.stretch?' <span style="font-size:11px;color:#86efac">🌱 small portion</span>':""}</span>${r.item.thermos&&lb.hasThermos?`<span style="font-size:11px;color:#fbbf24">🫙 ${r.item.thermos}</span>`:""}</div>`; };
+  const showRows = morning ? morn.concat([]) : night;
+  const total = rows.length, done = rows.filter(r => packed[r.slot+":"+r.item.id]).length;
+  const thermosNote = thermosItems.length ? `<div style="font-size:12px;color:#fbbf24;margin-top:6px">🫙 ${thermosItems.some(r=>r.item.thermos==="hot")?"Hot thermos: fill with boiling water 5 min before packing, dump, then add food piping hot.":""} ${thermosItems.some(r=>r.item.thermos==="cold")?"Cold thermos: put it in the freezer tonight; frozen treat goes in frozen in the morning.":""}</div>` : "";
+  return `<div style="background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:12px 16px;margin:0 0 12px">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:180px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#a5b4fc">${morning?"⏰ THIS MORNING — "+dayName.toUpperCase()+"'S LUNCHES":"🌙 PACK TONIGHT — "+dayName.toUpperCase()+"'S LUNCHES"}</div><div style="font-size:12px;color:var(--dim)">${done}/${total} packed · ${(LB_BY_ID[dp.livia.main]||{}).name||""}${dp.livia.main!==dp.lucy.main?" / "+((LB_BY_ID[dp.lucy.main]||{}).name||""):""}</div></div>
+      <button onclick="showTab('lunchbox')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:12px;cursor:pointer">Open 🍱</button>
+      ${morning?"":`<button onclick="lbSkipTomorrow()" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;text-decoration:underline">No school tomorrow</button>`}</div>
+    ${compact ? "" : `<div style="margin-top:6px">${showRows.map(line).join("")}</div>
+    ${!morning && morn.length ? `<div style="margin-top:8px;font-size:12px;font-weight:800;color:#fbbf24">⏰ MORNING (don't pack tonight)</div><div>${morn.map(line).join("")}</div>` : ""}
+    ${morning ? `<div style="margin-top:8px;font-size:12px;font-weight:800;color:var(--dim)">🧊 GRAB FROM THE FRIDGE</div><div>${night.map(line).join("")}</div>` : ""}
+    ${thermosNote}`}
+  </div>`;
+}
+function lbTogglePacked(dk, id){ const lb = lbState(); lb.packed[dk] = lb.packed[dk] || {}; lb.packed[dk][id] = !lb.packed[dk][id]; Object.keys(lb.packed).forEach(k => { if (new Date(k) < new Date(Date.now()-14*86400000)) delete lb.packed[k]; }); scheduleSave(); if (currentTab === "plan") renderPlan(); else if (cookState && cookState.recipe) renderCookScreen(); }
+
 function renderTimerStrip(currentStep){
   const timers=cookState.timers||{};
   const pills=Object.keys(timers).map(Number).filter(i=>i!==currentStep&&(timers[i].running||timers[i].done)).sort((a,b)=>a-b);
