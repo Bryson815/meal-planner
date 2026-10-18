@@ -776,6 +776,7 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
   .modal-sticky-actions{position:fixed;left:0;right:0;bottom:0;padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(13,17,23,0.96);border-top:1px solid var(--border);display:flex;gap:8px;z-index:6}
   .ingredient-line,.ingr-text{font-size:16px}
 }
+@media (max-width:767px){.cond-foot{flex-direction:column !important;align-items:stretch !important}.cond-btns{display:flex !important;width:100%}.cond-btns button{flex:1;min-height:44px;white-space:nowrap}.cond-where{margin-bottom:4px;justify-content:flex-start}}
 </style>
 </head>
 <body>
@@ -1252,7 +1253,8 @@ const DEFAULT_BREAKFASTS = [
       "Add the ½ cup cheddar. Fold once more.",
       "── SERVE IMMEDIATELY ──",
       "ACID FINISH: a few drops of hot sauce or a squeeze of lime brightens the whole dish.",
-      "Serve with toast for the kids, avocado and hot sauce for adults."
+      "Serve with toast for the kids, avocado and hot sauce for adults.",
+      "🫙 CONDIMENT IDEAS — Everything Bagel seasoning (kid-safe) · zhoug or Herdez salsa verde on adult plates · Momofuku chili crunch if you're feeling it."
     ],
     tips:"LOW AND SLOW: Medium-low heat is non-negotiable for creamy scrambled eggs. High heat = rubbery, dry eggs. | LARGE FOLDS: Resist the urge to stir constantly — large gentle folds create big, custardy curds. Constant stirring breaks them up into tiny dry pieces. | OFF HEAT EARLY: Remove the pan from heat when the eggs are still slightly wet. They finish cooking in the pan from residual heat. Waiting until they look done = overdone. | SEASON THE EGGS: Whisk salt into the raw eggs before cooking — it breaks down the proteins slightly and makes fluffier, creamier scrambled eggs. | CHEESE LAST: Add cheese off heat so it melts gently without making the eggs watery.",
     kidNote:"Kids love scrambled eggs — keep it simple for theirs (just eggs, cheese and sausage). Adults get the hot sauce and avocado. This is the fastest weekend family breakfast when you don't want to spend time in the kitchen.",
@@ -1434,7 +1436,8 @@ const DEFAULT_LUNCHES = [
       "── ASSEMBLE ──",
       "Layer greens in each bowl. Add warm grains, shredded chicken, cherry tomatoes, cucumber.",
       "Add a dollop of hummus. Drizzle with Primal Kitchen Greek dressing — or swap for Nothing Hidden Ranch, Lemon Herb Drizzle, or Tzatziki from the Sauces tab.",
-      "Adults: finish with a pinch of Smoked Chipotle Chili Flakes or Herbes de Provence."
+      "Adults: finish with a pinch of Smoked Chipotle Chili Flakes or Herbes de Provence.",
+      "🫙 CONDIMENT IDEAS — Bolthouse Ranch for the girls · Trader Joe's Green Goddess or zhoug for the adults · pickled red onions on top."
     ],
     tips:"ACID: The Primal Kitchen Greek dressing already has lemon/vinegar — but if it tastes flat, an extra squeeze of fresh lemon right before eating makes a big difference. | SEASON THE GRAINS: Taste your farro or quinoa while warm and make sure it's well seasoned with salt — underseasoned grains make the whole bowl taste bland no matter how good the toppings are. | WARM GRAINS = better zucchini: Stir the grated zucchini into the grains while they're still hot — it wilts perfectly. Cold grains won't wilt it properly. | COMPONENTS SEPARATE: Keep chicken, grains, veg and dressing all in separate containers in the fridge — assembles in 3 min each day."
   },
@@ -1506,7 +1509,8 @@ const DEFAULT_LUNCHES = [
       "Combine a portion of each component in a bowl.",
       "Drizzle with Primal Kitchen Caesar dressing. Toss.",
       "ACID FINISH: squeeze of lemon right before eating brightens everything.",
-      "Eat at home or pack dressing separately if taking to work."
+      "Eat at home or pack dressing separately if taking to work.",
+      "🫙 CONDIMENT IDEAS — a spoon of Rana pesto stirred into the dressing · peppadews chopped in · Everything Bagel seasoning on top for crunch."
     ],
     tips:"KEEP COMPONENTS SEPARATE: The biggest meal prep mistake is pre-dressing the salad — it goes soggy within hours. Keep everything separate and dress right before eating. | BRAMI PASTA: Holds up much better than regular pasta in salad — doesn't get mushy in the fridge. | LEFTOVER CHAIN: This is the perfect use for Sunday Sheet Pan Chicken leftovers — zero extra cooking required.",
     kidNote:"Kids version: skip the Caesar dressing and use ranch. Remove anchovies/capers. This is more of an adult lunch.",
@@ -1545,7 +1549,8 @@ const DEFAULT_LUNCHES = [
       "Top with a dollop of cottage cheese and a drizzle of ranch.",
       "Finish with sliced green onions.",
       "ACID FINISH: squeeze of lime over everything — brightens the buffalo and cottage cheese.",
-      "Pack dressing separately if meal prepping for work."
+      "Pack dressing separately if meal prepping for work.",
+      "🫙 CONDIMENT IDEAS — Bolthouse Ranch (kid-safe) · Frank's RedHot to taste · pickled jalapeños or giardiniera for crunch."
     ],
     tips:"LEFTOVER GOLD: This is the best possible use for leftover taco chicken — the buffalo sauce completely transforms the flavor profile. Two totally different meals from one cook. | COTTAGE CHEESE: Don't skip this — it's the creamy cooling element that makes buffalo bowls great. Blends into the bowl and you barely notice it's cottage cheese. Adds ~14g protein with zero effort. | CAULIFLOWER RICE: The frozen Green Giant medleys are significantly better than plain riced cauliflower — more flavor, better texture. 25 cal per cup.",
     kidNote:"This is more of an adult lunch — buffalo heat isn't usually kid-friendly. Make a mild version with just ranch and chicken for the girls if needed.",
@@ -1585,7 +1590,8 @@ const DEFAULT_LUNCHES = [
       "Season with salt, pepper, and a dash of Cholula.",
       "ACID FINISH: squeeze of lemon over the avocado before rolling — keeps it green and brightens everything.",
       "Roll tightly — fold sides in first, then roll from bottom.",
-      "Slice diagonally. Eat immediately or wrap in parchment for later."
+      "Slice diagonally. Eat immediately or wrap in parchment for later.",
+      "🫙 CONDIMENT IDEAS — Cedar's tzatziki or Bolthouse Cilantro Avocado inside the wrap · zhoug for the adults · pickled red onions."
     ],
     tips:"AVOCADO TIMING: If prepping Sunday, leave avocado out and add fresh each morning — it browns fast. Everything else holds fine 3 days. | HUMMUS AS SPREAD: Hummus replaces mayo entirely — adds protein, flavor, and healthy fat vs empty calories in mayo. | MISSION EXTRA THIN: Lower calorie than standard tortillas. Worth seeking out at Publix. | BATCH SUNDAY: Prep 4 wraps (minus avocado) — wrap each tightly in parchment, stack in the fridge. MK grabs one each day and adds avocado.",
     kidNote:"Kids love wraps — make simpler versions with turkey, cheese and hummus (no spinach visible). Great lunchbox option for the girls too.",
@@ -1626,7 +1632,8 @@ const DEFAULT_LUNCHES = [
       "Combine components in a bowl. Drizzle with Primal Kitchen Greek dressing.",
       "ACID FINISH: squeeze of fresh lemon right before eating — essential.",
       "Top with extra feta. Serve with pita on the side.",
-      "Or drizzle with Tzatziki from your squeeze bottle instead of the bottled dressing."
+      "Or drizzle with Tzatziki from your squeeze bottle instead of the bottled dressing.",
+      "🫙 CONDIMENT IDEAS — Cedar's tzatziki · a smear of toum · peppadews instead of (or with) the olives."
     ],
     tips:"LEFTOVER CHAIN: Greek Chicken Salad is the most natural use for Sunday Sheet Pan Chicken leftovers — same Mediterranean flavor profile, zero extra cooking. | RED ONION SOAK: 10 min in cold water transforms raw red onion from harsh to bright and sweet. Worth it. | ACID IS ESSENTIAL: Fresh lemon right before eating is what makes this taste restaurant-quality vs dull. Don't skip it. | TZATZIKI UPGRADE: Your homemade Tzatziki from the Sauces tab instead of bottled dressing makes this dramatically better.",
     kidNote:"The girls will probably eat the chicken and cucumber separately with ranch rather than as a salad — that's fine. This is primarily MK's lunch.",
@@ -1667,7 +1674,8 @@ const DEFAULT_LUNCHES = [
       "Add ½ avocado, diced + ½ cucumber, diced + a handful of cherry tomatoes, halved (optional).",
       "ACID FINISH: squeeze of lemon generously over everything — this is non-negotiable for canned tuna.",
       "Toss gently. Taste and adjust salt.",
-      "Eat straight from the bowl or serve over a handful of greens."
+      "Eat straight from the bowl or serve over a handful of greens.",
+      "🫙 CONDIMENT IDEAS — Kewpie + a little sriracha and lime for spicy mayo · Kikkoman ponzu drizzle · Everything Bagel seasoning on the avocado."
     ],
     tips:"DRAIN WELL: Excess water from the can makes everything watery and dilutes the flavor. Squeeze thoroughly before adding to the bowl. | WILD PLANET OR SAFE CATCH: Worth the upgrade from store-brand canned tuna — much better flavor and texture, lower mercury. Available at Whole Foods and Publix. | ACID IS EVERYTHING: Lemon juice transforms canned tuna from boring to bright and fresh. Be generous. | CAPERS: If MK likes capers, add 1 tbsp — they add a briny punch that makes this taste much more sophisticated. | PANTRY POWER: This requires zero planning or fresh ingredients beyond lemon and avocado — always available when nothing else is prepped.",
     kidNote:"This is firmly an adult lunch. Most kids don't love canned tuna — not worth trying to make it kid-friendly.",
@@ -1712,7 +1720,8 @@ const DEFAULT_LUNCHES = [
       "── HOW THE GIRLS BUILD IT AT SCHOOL ──",
       "Spread the sauce on the muffin halves with the pepperoni (no utensil needed), sprinkle the cheese, lay the pepperoni on top. Eat cold like a Lunchable.",
       "── HOME VERSION (2 min) ──",
-      "Toaster oven to 400°F. Spread 1 tbsp sauce on each muffin half, top with 2 tbsp mozzarella and 4 pepperoni slices. Toast 2-3 min until the cheese bubbles. Cool 1 min — the cheese is hot."
+      "Toaster oven to 400°F. Spread 1 tbsp sauce on each muffin half, top with 2 tbsp mozzarella and 4 pepperoni slices. Toast 2-3 min until the cheese bubbles. Cool 1 min — the cheese is hot.",
+      "🫙 CONDIMENT IDEAS — plain for the girls · hot honey drizzle or chopped peppadews on the grown-up ones."
     ],
     tips:"FIT FLOUR MUFFINS: 12g protein per muffin before the cheese. A regular English muffin works if the batch is gone. | SAUCE SEPARATE: The sauce cup is the whole reason this works — sauce touching bread for 6 hours is a soggy mess. | TURKEY PEPPERONI: Half the fat of regular, same flavor the kids expect. Applegate has the cleanest ingredients. | LOW-MOISTURE MOZZ: Fresh mozzarella weeps liquid in a lunchbox. Use the shredded block kind or string cheese. | ICE PACK: Cheese and pepperoni need to stay cold until lunch.",
     kidNote:"This was Livia's request. Let both girls help assemble on Sunday night — they put the pepperoni in and feel like it is theirs. Lucy: cut the pepperoni slices in half and halve the grapes lengthwise. If either wants cheese only, skip the pepperoni and add 2 more mozzarella coins.",
@@ -1759,7 +1768,8 @@ const DEFAULT_LUNCHES = [
       "Lid off. Add 🧀 Bowl 2 (1 cup cheddar + 1 tbsp butter). Fold gently with a fork until the cheese melts and the broccoli is mixed through. Fluff, do not mash.",
       "Taste. Add a pinch of salt if needed. Pepper on the adult portions only.",
       "── SERVE ──",
-      "Scoop beside tenders, pork, salmon, or meatballs. Kids: extra cheddar on top if it helps."
+      "Scoop beside tenders, pork, salmon, or meatballs. Kids: extra cheddar on top if it helps.",
+      "🫙 CONDIMENT IDEAS — plain for the girls · Cholula or Fly By Jing chili crisp on the adult scoops · a spoon of Herdez salsa verde if it's beside tacos."
     ],
     tips:"RINSE THE RICE: Surface starch is what makes rice gluey. Thirty seconds under the tap fixes it. | BROCCOLI SMALL: Grape-sized pieces steam through in 5 min and the girls do not get a big green chunk. This is why leftover small-chopped broccoli from the soup is ideal. | NO PEEKING: Every lid lift lets steam out and adds cooking time. Set a timer. | OFF HEAT FOR CHEESE: Same rule as everywhere — cheese into a pot on the heat goes greasy. | DOUBLE IT: 2 cups rice + 3 cups water + 5 cups broccoli + 1½ cups cheddar in a larger pot, same times.",
     kidNote:"Call it cheese rice, not broccoli rice. Both girls eat broccoli this way because the pieces are tiny and coated in cheddar. Lucy: extra cheddar on top and she will pile on Parmesan too. If a piece of stem is too big, fish it out of her bowl rather than skipping the dish.",
@@ -2057,7 +2067,8 @@ const DEFAULT_DINNERS = [
       "If using leftover shredded chicken: add 3 cups and stir to warm, 2 min.",
       "Stir in the 🫙 Sauce Bowl. Cook 1-2 min.",
       "Stir in 🟢 Bowl 3 (water chestnuts + green onions). Optional: ½ cup coleslaw mix for crunch.",
-      "Spoon into lettuce leaves. Sriracha on the side for adults."
+      "Spoon into lettuce leaves. Sriracha on the side for adults.",
+      "🫙 CONDIMENT IDEAS — Bachan's drizzle (kid-safe) · sambal oelek or Fly By Jing chili crisp for adults · a splash of ponzu on the lettuce."
     ],
     tips:"INTERNAL TEMP: Ground chicken/turkey goes to 160°F — ground meat is where we hold the line. At HIGH heat this happens in 6-8 min. | PAT DRY: Pat the ground meat dry before browning if it looks wet — excess moisture causes steaming not browning. | FOND: After browning the meat, scrape up any fond before adding the sauce. | ACID BALANCE: The rice wine vinegar is your acid here — taste the filling before serving and if it tastes flat, add another small splash of vinegar. It cuts through the richness of the hoisin. | MAILLARD: Same rule as ground turkey in Bolognese — leave it undisturbed 3 min to brown before breaking up. Browned turkey has dramatically more flavor than grey steamed turkey. | SALT CHECK: Hoisin is already salty — taste before adding any extra salt. | SAUCE TRICK: Mix the sauce in a small bowl before it goes in the pan so it coats everything evenly the moment it hits the heat."
   },
@@ -4218,7 +4229,8 @@ const DEFAULT_DINNERS = [
       "── FINISH ──",
       "ACID FINISH: fresh basil torn over the top immediately after coming out of the oven — the heat wilts it perfectly.",
       "Red pepper flakes for the adults.",
-      "Rest 3 min before slicing — cheese needs to set slightly."
+      "Rest 3 min before slicing — cheese needs to set slightly.",
+      "🫙 CONDIMENT IDEAS — hot honey drizzle on the pepperoni half · chopped peppadews · Momofuku chili crunch for the adults."
     ],
     tips:"FIT FLOUR DOUGH TEXTURE: Denser and less elastic than regular pizza dough — do not try to toss it. Press it out with your palms on parchment. It will not stretch as far as regular dough but bakes up with a great crispy-chewy texture. | PRE-BAKE THE CRUST: 5 min pre-bake before adding toppings is the single best trick for crispier pizza at home — prevents soggy center. | PIZZA STONE: If you have one use it — preheat 30+ min with the oven, slide pizza on with parchment. Makes a dramatic difference in crust texture. | FRIK & FRAK SAUCE: Do not oversauce — a thin even layer. Too much sauce = soggy pizza. | FRESH MOZZARELLA: Tear it by hand rather than slicing — irregular pieces melt better and look more artisan. Pat it dry first — fresh mozzarella has water that can pool. | 72g PROTEIN: The whole pizza dough before toppings has 72g protein. With cheese and toppings a 2-slice serving hits 50-60g protein. This is genuinely remarkable for pizza.",
     kidNote:"Kids love this — tastes identical to regular pizza. Make their half simple (sauce, mozzarella, pepperoni) and do the adult half with prosciutto and arugula or whatever you want. The family pizza night format is great — everyone builds their section. The girls can add their own toppings.",
@@ -4752,7 +4764,8 @@ const DEFAULT_DINNERS = [
       "Ladle the girls' bowls first before any adult toppings. Top with extra grated cheddar. Set out Parmesan and Goldfish crackers.",
       "If Lucy balks at the chunks: pour her bowl into a tall cup, immersion blend 5 seconds, pour back. Smooth soup, done.",
       "── SERVE: ADULT BOWLS ──",
-      "Dust with smoked paprika, crack black pepper over, add a few dashes of hot sauce. Turkey bacon crumbles if you went there."
+      "Dust with smoked paprika, crack black pepper over, add a few dashes of hot sauce. Turkey bacon crumbles if you went there.",
+      "🫙 CONDIMENT IDEAS — Cholula or Yellowbird habanero on adult bowls · Everything Bagel seasoning on the sourdough strips · Fly By Jing chili crisp for the brave."
     ],
     tips:"CHEESE IS EVERYTHING: Blocks only, grated yourself, at room temperature. Pre-shredded cheese is coated in anti-caking starch that makes soup grainy and keeps it from melting smooth. | NEVER BOIL AFTER CHEESE: The number one way broccoli cheddar soup fails. Off heat, handful at a time, stir until each melts. | 3 CUPS BROTH FIRST: Six cups of liquid against ¼ cup flour runs thin. Start with 3, hold the 4th, adjust at the end. | SALT LAST: Cheese + Worcestershire + Dijon all carry salt. Taste after the cheese is in. | BLEND TWO-THIRDS: More blended than the usual half — creamy with small pieces, which keeps the girls happy. | POT STAYS NEUTRAL: Smoked paprika, cracked pepper, hot sauce, bacon all go on adult bowls only. The pot itself is mild and kid-friendly. | BLENDER SAFETY: Regular blender — no more than half full, towel over the vented lid, two batches. | SOURDOUGH STRIPS over bread bowls: less intimidating for kids, less waste, better crust-to-soup ratio. Do half plain for the girls, half garlic for the adults.",
     kidNote:"Lucy asked for this one — big win. The pot is deliberately mild: no paprika, no pepper, no hot sauce until the adult bowls. Carrots grated invisible, broccoli chunks small from the two-thirds blend. Extra cheddar on top, Parmesan on the table, Goldfish to float. Plain sourdough strips for dipping. If chunks are still a problem, blend her bowl smooth in a cup — 5 seconds.",
@@ -4813,7 +4826,8 @@ const DEFAULT_DINNERS = [
       "Air fryer at 400°F for 10-12 min, flipping once at 6 min, in a single layer (two batches). Same 150°F pull.",
       "── SERVE ──",
       "Kids: tenders on a plate with the three dips in the middle — honey mustard, ranch, ketchup. Let them dip.",
-      "Adults: drizzle with hot honey, or toss 3-4 tenders in ¼ cup Frank's + 1 tbsp melted butter for buffalo tenders. Ranch on the side."
+      "Adults: drizzle with hot honey, or toss 3-4 tenders in ¼ cup Frank's + 1 tbsp melted butter for buffalo tenders. Ranch on the side.",
+      "🫙 CONDIMENT IDEAS — Bolthouse Ranch and honey mustard for the girls · Mike's Hot Honey drizzle · Frank's + melted butter buffalo toss · Bachan's for a teriyaki tender."
     ],
     tips:"WIRE RACK: Air under the chicken means the bottoms brown instead of sitting in steam. If you have no rack, flip at 10 min. | OIL IN THE PANKO: Dry panko stays pale in the oven. 2 tbsp oil worked through the crumbs is what gives the fried look without frying. | YOGURT SOAK: The acidity tenderizes and the thickness holds the crust on far better than egg wash. Buttermilk works the same way. | 150°F: Thin tenders go from juicy to dry in two minutes. Pull at 150, rest 5 — safe and juicy. | FREEZE A BATCH: Bread extra strips, freeze raw on a sheet pan, bag them. Bake from frozen at 425°F for 22-25 min.",
     kidNote:"Built for Livia and Lucy — plain crust, three dips, finger food. Cut a couple into bite-sized nuggets for Lucy. Let each girl pick her dip order; the choosing is half the fun. If the Parmesan in the crust is too much, leave it out of a corner of the dish for them.",
@@ -4877,7 +4891,8 @@ const DEFAULT_DINNERS = [
       "Taste. Add salt if needed — the seasoning packet and cheese carry salt, so taste first.",
       "── SERVE ──",
       "Kids' bowls first, before any toppings: extra cheddar on top and a handful of crushed tortilla chips to scoop with.",
-      "Adults: salsa, pickled jalapeños, cilantro, a squeeze of lime, a spoon of Greek yogurt, Cholula."
+      "Adults: salsa, pickled jalapeños, cilantro, a squeeze of lime, a spoon of Greek yogurt, Cholula.",
+      "🫙 CONDIMENT IDEAS — Herdez salsa verde (mild, kid-safe) · Bolthouse Cilantro Avocado drizzle · Yellowbird habanero and pickled jalapeños for the adults."
     ],
     tips:"PASTA IN THE SAUCE: The starch thickens the sauce and the pasta soaks up taco flavor. Use 8 oz for 2 cups broth — more pasta and it goes dry. | SIETE SEASONING: Clean ingredients, no sugar, mild enough for kids. Any taco seasoning works; cut back on added salt. | OFF HEAT FOR CHEESE: Same rule as the broccoli soup — cheese into a boiling pot breaks and goes oily. | ZUCCHINI: Grated and cooked with the onion it vanishes. Squeeze it in a towel first if it is very watery. | 85/15 BEEF: Richer flavor; drain the fat after browning or the pot gets greasy.",
     kidNote:"Both girls: this eats like cheesy pasta, not like tacos. Keep every topping off the pot — plain bowl, extra cheese, tortilla chips for scooping. Lucy may want hers with Parmesan instead of cheddar on top; fine. If the sauce looks too red for them, stir an extra handful of cheddar into their bowls.",
@@ -5002,7 +5017,8 @@ const DEFAULT_DINNERS = [
       "Add the drained spaghetti to the Dutch oven with the meatballs and sauce, or plate separately for the girls. A splash of the reserved pasta water loosens the sauce if it is thick.",
       "── SERVE ──",
       "Kids' plates: spaghetti, 4-5 small meatballs, sauce on the side or lightly tossed — whichever they prefer that night. Parmesan bowl on the table.",
-      "Adults: torn basil, red pepper flakes, a drizzle of good olive oil over the top."
+      "Adults: torn basil, red pepper flakes, a drizzle of good olive oil over the top.",
+      "🫙 CONDIMENT IDEAS — Parmesan bowl on the table (kids) · a spoon of Rana pesto swirled into adult bowls · Momofuku chili crunch or Calabrian chili for heat."
     ],
     tips:"ONE-INCH MEATBALLS: Kid-fork size, cook fast and evenly, and there are enough that the girls can count them. | BAKE THEN SIMMER: Baking sets them so they do not break apart; the simmer makes them tender and flavors the sauce. No pan-frying, no splatter. | SQUEEZE THE ZUCCHINI: The single most important hidden-veg step. Wet zucchini = mushy meatballs. | 160°F: Ground chicken is lean and goes dry fast past 160. Check the biggest one and pull the pot. | RAO'S: Sweetest, cleanest jarred sauce the kids accept. Frik & Frak (Whole Foods) if you want a step up.",
     kidNote:"This exists for Lucy and the Parmesan bowl. Serve her spaghetti plain with sauce on the side the first time, meatballs cut in half. Livia will take it tossed. Both: Parmesan on the table, they pile it on themselves. If the zucchini flecks get noticed, call them 'herbs.'",
@@ -5077,7 +5093,8 @@ const DEFAULT_DINNERS = [
       "Rest 5 min before serving. It sets up and stops being lava.",
       "── SERVE ──",
       "Kids: scoop straight from the dish, nothing on top. A side of fruit or the cheesy broccoli rice.",
-      "Adults: a few dashes of Cholula, crumbled turkey bacon over the top, or a swipe of Dijon on the plate."
+      "Adults: a few dashes of Cholula, crumbled turkey bacon over the top, or a swipe of Dijon on the plate.",
+      "🫙 CONDIMENT IDEAS — plain for the girls · Cholula or Frank's on adult bowls · Fly By Jing chili crisp over the panko · a dab of Dijon stirred in."
     ],
     tips:"BLOCKS, GRATED, ROOM TEMP: Same rule as the soup. Pre-shredded cheese is coated in starch and never melts smooth. | COTTAGE CHEESE BLENDED: 30 seconds in the blender and it is a creamy protein base with no curds. Undetectable. Adds about 25g protein to the dish. | UNDERCOOK THE PASTA: Two minutes under. It bakes 15 more minutes in the sauce. Fully cooked pasta turns to mush. | OFF HEAT FOR CHEESE: The only way this fails is boiling after the cheese goes in. | NOT A MACRO MEAL: 620 calories per serving. This is a Sunday dinner. The protein boost just makes it a better one.",
     kidNote:"The pot is plain on purpose — no mustard taste comes through, no pepper visible, no toppings. Both girls get it as-is with fruit on the side. If Lucy wants to add Parmesan on top, let her. If the panko top is 'too crunchy,' serve from the middle of the dish.",
@@ -5130,7 +5147,8 @@ const DEFAULT_DINNERS = [
       "── SERVE ──",
       "Let each quesadilla rest 1 min so the cheese sets, then cut into 3 triangles with a pizza cutter.",
       "Kids: triangles on a plate with mild salsa and the yogurt for dipping.",
-      "Adults: tuck pickled jalapeños into the fold before cooking, hot salsa, cilantro, a squeeze of lime."
+      "Adults: tuck pickled jalapeños into the fold before cooking, hot salsa, cilantro, a squeeze of lime.",
+      "🫙 CONDIMENT IDEAS — Herdez salsa verde + Greek yogurt for dipping (kids) · Bolthouse Cilantro Avocado · pickled jalapeños and Yellowbird serrano for adults."
     ],
     tips:"SQUEEZE THE ZUCCHINI: Wet zucchini makes a soggy quesadilla and gives the veg away. Wring it out like a dish rag. | FINE GRATE THE CARROT: Fine holes, not large — it melts into the cheese and reads as cheddar. | MEDIUM HEAT: Too hot and the tortilla burns before the cheese melts. Golden spots, not black. | FOLD, DON'T STACK: A folded single tortilla flips cleanly; two stacked tortillas slide apart. | ROTISSERIE SHORTCUT: One Costco rotisserie chicken is two nights of quesadillas plus lunch.",
     kidNote:"Livia and Lucy both: triangles, mild salsa, 'white sauce' (yogurt). Leave the seasoning out of their filling if they are suspicious of specks. The carrot looks like cheese and the zucchini disappears — do not announce the vegetables. Lucy may want hers with just cheese; make hers first and set it aside.",
@@ -5183,7 +5201,8 @@ const DEFAULT_DINNERS = [
       "Flip, pour in the sauce from the cup, and toss 2 min until the sauce coats and bubbles and the chicken is heated through. It is pre-cooked sous-vide — no thermometer needed.",
       "── SERVE ──",
       "Kids: rice in the bowl, plain chicken on top (pull a few pieces out before saucing if they want it mild), cucumber slices on the side. Slaw optional.",
-      "Adults: rice, saucy chicken, a pile of 🟡 Bowl 1 slaw, cucumber, sriracha mayo drizzle, sesame seeds and green onion."
+      "Adults: rice, saucy chicken, a pile of 🟡 Bowl 1 slaw, cucumber, sriracha mayo drizzle, sesame seeds and green onion.",
+      "🫙 CONDIMENT IDEAS — extra Bachan's on the rice (kid-safe) · gochujang stirred into Greek yogurt or Kewpie · Fly By Jing chili crisp · Makoto ginger dressing on the slaw."
     ],
     tips:"KEVIN'S IS THE REAL DEAL: Sous-vide, no junk, 30g protein per serving. Costco 2-pack is the best price. | DON'T OVERCOOK: It is already cooked. 4 minutes total in the pan — any longer and it dries out. | SLAW TRICK: Rice vinegar + a pinch of sugar + 10 minutes turns bagged slaw into something that tastes intentional. | RICE POUCH UPGRADE: Fluff with a fork and a pinch of salt; nobody will know it was frozen.",
     kidNote:"Pull a few pieces of chicken out before the sauce goes in if the girls want it plain — Korean BBQ sauce is sweet, not spicy, so most kids like it as-is. Cucumber slices with a sprinkle of salt are the easy veg here; the slaw is a bonus if they'll try it.",
@@ -5232,7 +5251,8 @@ const DEFAULT_DINNERS = [
       "Pour the 🫙 Glaze Cup over the meatballs. Toss 1-2 min uncovered until the glaze thickens and clings. Turn off the heat.",
       "── SERVE ──",
       "Kids: rice, 5-6 meatballs, broccoli florets on the side with a pinch of salt. Extra glaze from the pan spooned over the rice.",
-      "Adults: rice, meatballs and glaze, broccoli, sriracha, sesame seeds, green onion, squeeze of lime."
+      "Adults: rice, meatballs and glaze, broccoli, sriracha, sesame seeds, green onion, squeeze of lime.",
+      "🫙 CONDIMENT IDEAS — Herdez salsa verde (kid-safe) · Bolthouse Cilantro Avocado drizzle · pickled jalapeños · Yellowbird habanero for the adults."
     ],
     tips:"AIDELLS VS AMYLU: Aidells tastes better (more pineapple, more browning); Amylu is leaner and cheaper at Costco. Both work. | GLAZE IS THE UPGRADE: The meatballs alone are a little one-note. Two minutes of hoisin-soy glaze makes them taste like a restaurant dish. | BROCCOLI SHORTCUT: Steam-in-bag is fine here. Hit it with salt and a tiny drizzle of sesame oil and it tastes like effort.",
     kidNote:"Finger-food meatballs are the whole point — Lucy can eat these with a toothpick. The teriyaki-pineapple flavor is sweet and kid-friendly. If broccoli is a fight, serve it as 'trees' with a little ranch for dipping.",
@@ -5296,7 +5316,8 @@ const DEFAULT_DINNERS = [
       "Rest 3 min so the skillet stops bubbling before you scoop.",
       "── SERVE ──",
       "Kids: scoop onto plates, extra cheese on top, a spoon of Greek yogurt, crushed chips for crunch.",
-      "Adults: cilantro, pickled jalapeños, Greek yogurt, lime squeeze, hot sauce."
+      "Adults: cilantro, pickled jalapeños, Greek yogurt, lime squeeze, hot sauce.",
+      "🫙 CONDIMENT IDEAS — Kikkoman ponzu for dipping (kid-safe) · Fly By Jing or Momofuku chili crunch on adult plates · Makoto ginger dressing on the cucumbers."
     ],
     tips:"SAUCE MATTERS: Frontera red chile is the best jarred enchilada sauce at a normal store; Siete is cleaner but milder. Old El Paso works if that's what's there. | SUBMERGE THE TORTILLAS: They need to be under the sauce to soften. If the skillet looks dry, add another splash of broth. | SAVE THE REST OF THE BIRD: One rotisserie chicken also covers Caesar Wraps or Grain Bowls later this week — plan them together. | OVEN-SAFE SKILLET: Cast iron or stainless. If yours has a plastic handle, transfer to a 9×13 dish before broiling.",
     kidNote:"It is basically cheesy chicken-and-bean casserole — very kid-safe. Use mild enchilada sauce and skip the Ro-Tel chiles (plain diced tomatoes) if either girl is heat-sensitive. Crushed tortilla chips on top make it fun.",
@@ -5354,7 +5375,8 @@ const DEFAULT_DINNERS = [
       "Lid off. Let them sizzle 30-60 seconds more to re-crisp the bottoms. Slide onto a platter crispy side up.",
       "── SERVE ──",
       "Kids: 6-8 dumplings each, a small bowl of 🫙 dipping sauce, a pile of edamame to pop, cucumber slices. Let them dip and pop — it is the fun part.",
-      "Adults: dumplings with chili crisp spooned over, green onion, 🟡 Bowl 1 cucumber salad, edamame."
+      "Adults: dumplings with chili crisp spooned over, green onion, 🟡 Bowl 1 cucumber salad, edamame.",
+      "🫙 CONDIMENT IDEAS — Cedar's tzatziki (kid-safe) · Kewpie + sriracha + lime spicy mayo · pickled red onions · Everything Bagel seasoning on the bun."
     ],
     tips:"FROM FROZEN: Never thaw dumplings — they get gummy. Straight from the freezer into hot oil. | THE LID IS NOT OPTIONAL: Fry then steam is how you get crispy bottoms and cooked centers. Water in, lid on, same second. | TWO BATCHES BEATS ONE CROWDED PAN: Dumplings touching each other steam instead of fry. | BIBIGO CHICKEN & VEG: The Costco bag is the best value and kids like the mild filling. The pork ones are good too if you want to switch.",
     kidNote:"Dumplings are already a kid favorite; edamame is a game (squeeze the pod, beans pop out). Give each girl her own tiny dipping bowl — sharing a sauce bowl causes fights. Skip the sesame oil in their sauce if they find it 'weird'.",
@@ -5406,7 +5428,8 @@ const DEFAULT_DINNERS = [
       "While the burgers cook: toast the 2 buns.",
       "── SERVE ──",
       "Kids: burger on a toasted bun with a swipe of tzatziki, lettuce leaf, tomato slice. Cut in half for Lucy. Cucumber slices on the side.",
-      "Adults: dress 🟡 Bowl 1 with 1 tbsp olive oil + squeeze of ½ lemon + salt. Pile in a bowl, top with 2 burgers broken into big chunks, a big spoon of tzatziki, pickled onion, feta, Everything Bagel seasoning."
+      "Adults: dress 🟡 Bowl 1 with 1 tbsp olive oil + squeeze of ½ lemon + salt. Pile in a bowl, top with 2 burgers broken into big chunks, a big spoon of tzatziki, pickled onion, feta, Everything Bagel seasoning.",
+      "🫙 CONDIMENT IDEAS — Bolthouse Ranch instead of Caesar for the girls · peppadews or giardiniera chopped in · a few dashes of Cholula for adults."
     ],
     tips:"TRIDENT FROM COSTCO: Wild Alaskan, no fillers, 20g protein each. The best frozen protein in the store — keep a bag in the freezer permanently. | NEVER THAW: Thawed salmon burgers fall apart. Frozen into a hot pan is the whole technique. | DON'T PRESS: Pressing squeezes the moisture out. Leave them alone for the first 4 minutes. | 130°F MAX: They are fully cooked at 125-130°F. Past that they dry out fast.",
     kidNote:"A salmon burger on a brioche bun with tzatziki reads as 'a burger' to most kids — don't oversell the fish part. If either girl resists, break the patty into chunks and call them salmon nuggets with 'white dip'.",
@@ -5452,7 +5475,8 @@ const DEFAULT_DINNERS = [
       "Kids first, before dressing: lay 2 tortillas flat. Put a handful of undressed romaine down the middle, ¾ cup chicken on top, a sprinkle of Parmesan, 4-5 croutons. Spoon 1 tsp of the kit dressing over if they want it. Roll: fold the bottom up, fold the sides in, roll tight.",
       "Adults: toss the remaining romaine with HALF the dressing packet + the kit Parmesan + ¼ cup extra Parmesan + a squeeze of ½ lemon. Add the rest of the chicken and toss again.",
       "Lay 2 tortillas flat. Divide the dressed salad down the middle, add croutons, roll tight. Optional: warm each tortilla 20 seconds in a dry skillet first so it rolls without cracking.",
-      "Slice each wrap in half on a diagonal. Serve immediately."
+      "Slice each wrap in half on a diagonal. Serve immediately.",
+      "🫙 CONDIMENT IDEAS — plain with extra marinara (kids) · Mezzetta giardiniera · chopped peppadews · hot honey on the toasted roll is a sleeper hit."
     ],
     tips:"HALF THE DRESSING: Kit dressing is where the sodium and calories hide. Half a packet plus lemon and extra Parmesan tastes better anyway. | LEFTOVER TENDERS VERSION: If you made Crispy Baked Chicken Tenders earlier in the week, slice the leftovers cold — crunchy chicken in a Caesar wrap is better than rotisserie. | WARM THE TORTILLA: 20 seconds in a dry pan makes it pliable and keeps it from splitting when you roll. | ROLL TIGHT: Bottom up, sides in, then roll. Loose wraps fall apart on the first bite.",
     kidNote:"Build the girls' wraps before the dressing goes on — plain romaine, chicken, cheese, croutons, maybe a teaspoon of dressing. Cut in half and it's a 'chicken roll'. If wraps are a no, serve it deconstructed: chicken, croutons and romaine in piles with a cup of dressing to dip.",
@@ -5507,7 +5531,8 @@ const DEFAULT_DINNERS = [
       "Back under the broiler 1-2 min until the cheese melts and bubbles. Rest 2 min — the sauce is lava.",
       "── SERVE ──",
       "Kids: one sub cut in half crosswise (Lucy gets a half or a 'meatball boat' — open-faced on half a roll). Extra Parmesan on the table.",
-      "Adults: giardiniera piled on top, red pepper flakes, torn basil."
+      "Adults: giardiniera piled on top, red pepper flakes, torn basil.",
+      "🫙 CONDIMENT IDEAS — Herdez salsa verde and Bolthouse Cilantro Avocado (kid-safe) · pickled jalapeños · Yellowbird serrano · Tajín on the peppers."
     ],
     tips:"TOAST THE BREAD: An untoasted roll turns to mush under hot sauce. Butter, broil, then fill. | RAO'S: Still the best jar on the shelf. The ¼ cup water loosens it so it coats instead of clumps. | LEFTOVER MEATBALL VERSION: Homemade Serious Eats meatballs from earlier in the week make this a great dinner from leftovers — plan them 2-3 days apart. | OPEN-FACED FOR KIDS: A sub is hard for small hands. Half a roll, open-faced, fork and knife — same dinner, no mess.",
     kidNote:"Meatballs + cheese + bread is about as safe as it gets. Serve Lucy's open-faced on half a roll so she can eat it with a fork. Parmesan bowl on the table. Keep the giardiniera far away from their plates — the brine spreads.",
@@ -5558,7 +5583,8 @@ const DEFAULT_DINNERS = [
       "In the last 3 min, wrap 8 tortillas in a damp paper towel and microwave 45 seconds, or warm them one at a time in a dry skillet 15 seconds a side.",
       "── SERVE ──",
       "Kids: nuggets on the plate with a tortilla, cheese and a little Greek yogurt — let them build or just dip. Peppers on the side for the brave.",
-      "Adults: tortilla, peppers and onions, 4-5 chicken chunks, cheese, salsa, Greek yogurt, lime squeeze, avocado, jalapeños, cilantro."
+      "Adults: tortilla, peppers and onions, 4-5 chicken chunks, cheese, salsa, Greek yogurt, lime squeeze, avocado, jalapeños, cilantro.",
+      "🫙 CONDIMENT IDEAS — extra Rana pesto thinned with a splash of water (kids) · Momofuku chili crunch · peppadews chopped over · Everything Bagel seasoning."
     ],
     tips:"JUST BARE IS DIFFERENT: Whole chicken breast pieces, light breading, no mystery meat — it's why the Costco bag has a cult following. Perdue Simply Smart is the Kroger/Publix equivalent. | KEEP THEM SEPARATE ON THE PAN: Chicken on one side, veg on the other, so the breading doesn't sit in pepper juice and go soft. | PRE-SLICED FAJITA VEG: In the produce section near the cut fruit. Saves 5 minutes and a cutting board. | DOUBLE THE PEPPERS FOR ADULTS: The veg shrinks a lot. If you want real fajita-level peppers, use two packs.",
     kidNote:"Chicken nuggets in a tortilla with cheese — this is a guaranteed yes. Livia will probably build a real taco; Lucy may just eat nuggets and a rolled-up cheese tortilla. Both count. Peppers are offered, not required.",
@@ -5616,7 +5642,8 @@ const DEFAULT_DINNERS = [
       "Squeeze in ½ lemon, add ½ cup Parmesan and a few cracks of black pepper. Toss once more.",
       "── SERVE ──",
       "Kids: gnocchi and sausage coins in a bowl. Go light on the pesto for theirs (pull a portion before the sauce if green sauce is a problem) and add extra Parmesan.",
-      "Adults: red pepper flakes, pine nuts, burrata torn over the top."
+      "Adults: red pepper flakes, pine nuts, burrata torn over the top.",
+      "🫙 CONDIMENT IDEAS — Herdez salsa verde + Greek yogurt for dipping (kids) · Bolthouse Cilantro Avocado · Yellowbird habanero and pickled jalapeños for adults."
     ],
     tips:"NEVER BOIL TJ'S CAULIFLOWER GNOCCHI: The package says to. Ignore it — boiled, they turn to mush. Pan-fried from frozen they get crispy and taste like real gnocchi. | PESTO OFF HEAT: Basil pesto scorches and goes muddy in a hot pan. Heat off, then stir it in. | TOMATOES WHOLE: Whole cherry tomatoes burst in the pan and make their own sauce. Halved ones just go soft. | SAUSAGE FIRST, THEN GNOCCHI IN THE FAT: The rendered sausage fat flavors the gnocchi crust.",
     kidNote:"Gnocchi are soft little pillows — kids like the texture. Pesto can be a hard sell visually; pull the girls' portion before the sauce goes in and give them gnocchi + sausage with butter and Parmesan. Call the tomatoes 'tomato pops' and they might try one.",
@@ -5670,7 +5697,8 @@ const DEFAULT_DINNERS = [
       "── WHILE THE LAST ONE COOKS: SALAD ──",
       "Toss the Southwest salad kit with half its dressing in a bowl.",
       "── SERVE ──",
-      "Cut each quesadilla into 4 wedges with a pizza cutter. Kids: wedges + Greek yogurt for dipping + a little salsa if they want. Adults: wedges with salsa, Cholula, avocado, and the salad on the side."
+      "Cut each quesadilla into 4 wedges with a pizza cutter. Kids: wedges + Greek yogurt for dipping + a little salsa if they want. Adults: wedges with salsa, Cholula, avocado, and the salad on the side.",
+      "🫙 CONDIMENT IDEAS — Herdez salsa verde + Greek yogurt for dipping (kids) · Bolthouse Cilantro Avocado · Yellowbird habanero and pickled jalapeños for adults."
     ],
     tips:"CHEESE ON BOTH SIDES OF THE FILLING: Cheese over the whole tortilla, filling on half, fold — the cheese welds it shut so nothing falls out. | MEDIUM, NOT HIGH: High heat burns the tortilla before the cheese melts. Medium and patience. | PIZZA CUTTER: Cleaner wedges than a knife, and kids can help. | WANT THE VEG VERSION: The Hidden-Veg Chicken Quesadillas recipe grates zucchini and carrot into the cheese — same method, sneakier.",
     kidNote:"Quesadilla wedges with 'white dip' (Greek yogurt) is a top-3 kid dinner. Make the girls' with a little less seasoning on the chicken and no jalapeños. Cut into 6 smaller wedges for Lucy. The salad kit is for the adults — offer the girls cucumber or carrot sticks instead.",
@@ -6259,20 +6287,22 @@ const DEFAULT_SAUCES = [
     emoji:"🥗",
     calories:70, protein:17,
     prepTime:"2 min",
-    keeps:"5 days fridge",
+    keeps:"5–7 days fridge",
     description:"Burlap & Barrel ranch seasoning + Greek yogurt — creamy, tangy, dramatically better than store-bought. Kids go crazy for this as a veggie dip.",
     squeezeBottle:true,
     ingredients:[
-      "1 cup Fage 0% Greek yogurt",
-      "2 tsp Burlap & Barrel Nothing Hidden Ranch seasoning",
-      "2-3 tbsp Fairlife 2% milk (thin to squeeze bottle consistency)",
+      "½ cup Fage 0% Greek yogurt",
+      "1 tsp Burlap & Barrel Nothing Hidden Ranch seasoning — sub: 1 tsp Hidden Valley Ranch seasoning packet",
+      "1-2 tbsp Fairlife 2% milk (thin to squeeze bottle consistency)",
       "Squeeze of fresh lemon",
       "Pinch of salt"
     ],
+    batchNote:"Makes ~½ cup — enough for 2 meals. Double for a crowd.",
+    storeSwap:"Bolthouse Farms Classic Ranch Yogurt Dressing (22 cal/tbsp, Kroger/Publix) — the girls accept it.",
     instructions:[
       "Combine all ingredients in a bowl and whisk until smooth.",
       "Taste and adjust — more ranch seasoning for stronger flavor, more milk to thin.",
-      "Pour into a squeeze bottle. Keeps 5 days in the fridge.",
+      "Pour into a squeeze bottle. Keeps 5–7 days in the fridge.",
     ],
     usedIn:["Grain bowls","Turkey melts","Lettuce cups","Chicken dipping","Carrots & cucumbers for kids"],
     tips:"Double the batch — this disappears fast. The kids will use it as a dip for everything."
@@ -6283,13 +6313,15 @@ const DEFAULT_SAUCES = [
     emoji:"🧄",
     calories:110, protein:22,
     prepTime:"5 min",
-    keeps:"4 days fridge",
+    keeps:"3–4 days fridge",
+    batchNote:"Makes ~½ cup — sauces 2 servings of pasta. Double for the family.",
+    storeSwap:"This is a pasta-night sauce, not a condiment. For a 2-minute swap: 1 tbsp Rana basil pesto thinned with pasta water.",
     description:"Blended Good Culture cottage cheese makes a silky Alfredo-style sauce with 22g protein. Better than Olive Garden, RD-approved.",
     squeezeBottle:false,
     ingredients:[
-      "1 cup Good Culture 4% cottage cheese — sub: any full-fat cottage cheese (Kroger Simple Truth, Daisy, or Hood)",
-      "2 tbsp reduced-fat Parmesan, grated",
-      "1 clove garlic, minced",
+      "½ cup Good Culture 4% cottage cheese — sub: any full-fat cottage cheese (Kroger Simple Truth, Daisy, or Hood)",
+      "1 tbsp Parmesan, grated",
+      "½ clove garlic, minced (or ¼ tsp garlic powder)",
       "Salt & pepper",
       "Burlap & Barrel Smoked Chipotle Chili Flakes (optional, adults only)",
       "2-3 tbsp pasta water or Fairlife milk to thin"
@@ -6310,15 +6342,17 @@ const DEFAULT_SAUCES = [
     emoji:"🌿",
     calories:90, protein:21,
     prepTime:"5 min",
-    keeps:"5 days fridge",
+    keeps:"3–4 days fridge (cucumber weeps after that)",
+    batchNote:"Makes ~½ cup — 2 meals. Squeeze the cucumber dry or it turns watery by day 2.",
+    storeSwap:"Cedar's Tzatziki (Kroger/Publix/WF) — 15 cal/tbsp, keeps 3 weeks sealed. Honestly better for a weeknight.",
     description:"Classic Greek cucumber-dill sauce. Works as a dip, drizzle, marinade and salad dressing. 21g protein per serving.",
     squeezeBottle:true,
     ingredients:[
-      "1 cup Fage 0% Greek yogurt",
-      "½ cucumber, grated on a box grater",
-      "1 clove garlic, minced or grated",
-      "1 tbsp fresh lemon juice",
-      "1 tsp dried dill (or 1 tbsp fresh)",
+      "½ cup Fage 0% Greek yogurt",
+      "¼ cucumber, grated on a box grater and squeezed dry in a paper towel",
+      "½ clove garlic, grated",
+      "2 tsp fresh lemon juice",
+      "½ tsp dried dill (or 1½ tsp fresh)",
       "Salt & pepper to taste"
     ],
     instructions:[
@@ -6337,16 +6371,18 @@ const DEFAULT_SAUCES = [
     emoji:"🌶️",
     calories:80, protein:15,
     prepTime:"3 min",
-    keeps:"7 days fridge",
+    keeps:"5–7 days fridge",
+    batchNote:"Makes ~½ cup — 2 meals. Double for a crowd.",
+    storeSwap:"1 tbsp Kewpie mayo + 1 tsp sriracha + squeeze of lime. 30 seconds, same result.",
     description:"Japanese steakhouse sauce made healthy. Greek yogurt base with sriracha and smoked paprika — goes on absolutely everything.",
     squeezeBottle:true,
     ingredients:[
-      "1 cup Fage 0% Greek yogurt",
-      "1 tbsp Primal Kitchen avocado oil mayo",
-      "1-2 tsp sriracha or Cholula (adjust to heat preference)",
-      "1 tsp garlic powder",
-      "1 tsp smoked paprika (or Burlap & Barrel Chipotle Chili Flakes)",
-      "1 tsp rice wine vinegar",
+      "½ cup Fage 0% Greek yogurt",
+      "2 tsp Kewpie or Primal Kitchen avocado oil mayo",
+      "½-1 tsp sriracha or Cholula (adjust to heat preference)",
+      "½ tsp garlic powder",
+      "½ tsp smoked paprika (or Burlap & Barrel Chipotle Chili Flakes)",
+      "½ tsp rice wine vinegar",
       "Pinch of sugar or honey",
       "Salt to taste"
     ],
@@ -6364,14 +6400,16 @@ const DEFAULT_SAUCES = [
     emoji:"🍋",
     calories:65, protein:14,
     prepTime:"2 min",
-    keeps:"5 days fridge",
+    keeps:"5–7 days fridge",
+    batchNote:"Makes ~½ cup — 2 meals. Double for a crowd.",
+    storeSwap:"Trader Joe's Green Goddess (20 cal/tbsp) or a drizzle of Primal Kitchen Greek dressing straight from the bottle.",
     description:"Bright, light Greek yogurt sauce with Penzeys herbs and lemon. Like a high-protein Primal Kitchen dressing you make yourself.",
     squeezeBottle:true,
     ingredients:[
-      "¾ cup Fage 0% Greek yogurt",
-      "2 tbsp Primal Kitchen Greek dressing (or 1 tbsp lemon juice + 1 tbsp olive oil)",
-      "1 tsp Penzeys Mural of Flavor (or dried oregano + thyme)",
-      "1 clove garlic, grated",
+      "½ cup Fage 0% Greek yogurt",
+      "4 tsp Primal Kitchen Greek dressing (or 2 tsp lemon juice + 2 tsp olive oil)",
+      "¾ tsp Penzeys Mural of Flavor (or dried oregano + thyme)",
+      "½ clove garlic, grated",
       "Salt & pepper",
       "1-2 tbsp Fairlife milk to thin"
     ],
@@ -6389,7 +6427,9 @@ const DEFAULT_SAUCES = [
     emoji:"🥜",
     calories:110, protein:8,
     prepTime:"3 min",
-    keeps:"7 days fridge",
+    keeps:"2 weeks fridge (bring to room temp or add a splash of warm water)",
+    batchNote:"Makes ~½ cup — 2 meals. Worth doubling — it keeps.",
+    storeSwap:"None needed — this one is worth making. Everything in it is a shelf-stable pantry item.",
     description:"Better than PF Chang's. Natural peanut butter base with coconut aminos and ginger — the perfect lettuce cup drizzle.",
     squeezeBottle:true,
     ingredients:[
@@ -6397,7 +6437,7 @@ const DEFAULT_SAUCES = [
       "2 tbsp coconut aminos or reduced-sodium soy sauce",
       "1 tbsp rice wine vinegar — sub: apple cider vinegar or white wine vinegar (Kroger)",
       "1 tsp sesame oil (Asian aisle at Kroger) — sub: a few drops of toasted sesame oil or skip entirely",
-      "1 tsp fresh ginger, grated (or ginger paste)",
+      "1 tsp ginger paste (tube — keeps 3 months in the fridge; Gourmet Garden at Kroger) — or 1 tsp fresh grated",
       "1-2 tsp sriracha (optional, skip for kids)",
       "2-3 tbsp warm water to thin"
     ],
@@ -8103,6 +8143,18 @@ function buildSmartGroceryList() {
   return items.length ? [{ cat: "📅 This week", items }] : [];
 }
 
+
+// Does this grocery line name a store condiment the user has marked "Have"?
+function condimentOwned(text){
+  const t=(text||"").toLowerCase(); if(!t) return false;
+  return STORE_CONDIMENTS.some(c=>{
+    if((state.pantry||{})[c.id]!=="have") return false;
+    const brand=c.brand.toLowerCase().split(/ or |\//)[0].trim();
+    const nm=c.name.toLowerCase().replace(/\(.*?\)/g,"").trim();
+    const keys=[brand, nm].filter(k=>k.length>3);
+    return keys.some(k=>t.includes(k)) || (c.id==="c-cholula"&&t.includes("cholula")) || (c.id==="c-franks"&&t.includes("frank"));
+  });
+}
 function renderGrocery() {
   const el = document.getElementById("page-grocery");
   const useSmartList = !state.useStaticGrocery;
@@ -8132,8 +8184,9 @@ function renderGrocery() {
   const cats = sectionOrder.filter(s => sectionMap[s] && sectionMap[s].length).map(section => {
     const itemHtml = sectionMap[section].map(({item, cat, i, itemText}) => {
       const key = cat + ":" + i;
-      const checked = state.grocery[key] ? "checked" : "";
-      const sourceText = (item && item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + '</span>' : "";
+      const inPantryCond = condimentOwned(itemText);
+      const checked = (state.grocery[key] || inPantryCond) ? "checked" : "";
+      const sourceText = ((item && item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + '</span>' : "") + (inPantryCond ? ' <span class="grocery-source" style="color:var(--green);border:1px solid rgba(16,185,129,0.3)">in pantry</span>' : "");
       const note = (state.groceryNotes && state.groceryNotes[key]) ? state.groceryNotes[key] : "";
       return `<div class="grocery-item ${checked}" onclick="toggleGrocery('${esc(key)}',this)" style="flex-direction:column;align-items:flex-start">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
@@ -8890,6 +8943,101 @@ function cyclePantry(id) {
 }
 
 
+
+// ── Store-bought condiments worth buying (cal/tbsp approx). Shared pantry keys with the Pantry tab (state.pantry[id]).
+const STORE_CONDIMENTS = [
+  { id:"c-bachans", name:"Japanese BBQ Sauce (Original or Hot & Spicy)", brand:"Bachan's", emoji:"🍶", calPerTbsp:25, tier:"transform", kidOk:true, keeps:"months refrigerated", where:["Costco","Kroger","Whole Foods"], why:"Soy-ginger-garlic glaze. The single best bottle for a quick chicken, salmon, or rice-bowl night — brush on in the last 2 min or spoon over at the table.", usesOn:"Kevin's Korean BBQ Bowls · Salmon Burgers · Chicken Tenders · Teriyaki Meatball Bowls · plain rice", sub:"Kinder's Teriyaki or Soy Vay Veri Veri Teriyaki" },
+  { id:"c-flybyjing", name:"Sichuan Chili Crisp", brand:"Fly By Jing", emoji:"🌶️", calPerTbsp:70, tier:"transform", kidOk:false, keeps:"shelf-stable, months", where:["Whole Foods","Costco"], why:"Crunchy, numbing, deeply savory. One teaspoon is enough — on eggs, dumplings, rice, roasted broccoli, even the mac & cheese.", usesOn:"Dumpling Night · Savory Scramble · Kevin's Bowls · Baked Mac & Cheese (adults)", sub:"Momofuku Chili Crunch or Lao Gan Ma" },
+  { id:"c-momofuku", name:"Chili Crunch", brand:"Momofuku", emoji:"🔥", calPerTbsp:70, tier:"transform", kidOk:false, keeps:"shelf-stable, months", where:["Whole Foods","Kroger"], why:"Milder, crunchier cousin of Fly By Jing — more garlic-shallot, less numbing. If you only buy one chili crisp, this is the crowd-pleaser.", usesOn:"Eggs · Poke Bowl · Pesto Gnocchi · Thai Basil Chicken", sub:"Fly By Jing or Trader Joe's Chili Onion Crunch" },
+  { id:"c-hothoney", name:"Hot Honey", brand:"Mike's", emoji:"🍯", calPerTbsp:60, tier:"transform", kidOk:true, keeps:"shelf-stable, a year+", where:["Costco","Kroger","Publix"], why:"It's sugar, so a drizzle not a pour — but on chicken tenders, pizza, salmon, or roasted Brussels it turns a plain plate into a restaurant one.", usesOn:"Chicken Tenders · Fit Flour Pizza · Honey Garlic Salmon · Cornbread with chili", sub:"Any honey + a pinch of red pepper flakes, warmed 20 sec" },
+  { id:"c-zhoug", name:"Zhoug (spicy green herb sauce)", brand:"Whole Foods house or Trader Joe's", emoji:"🌿", calPerTbsp:45, tier:"transform", kidOk:false, keeps:"2–3 weeks refrigerated", where:["Whole Foods"], why:"Cilantro, chili, garlic, cardamom. Spoon on eggs, chicken, grain bowls, or inside a wrap — MK's kind of sauce. Freezes in an ice-cube tray.", usesOn:"Greek Chicken Bowls · Rotisserie Grain Bowls · Shakshuka · Turkey Wraps", sub:"Chimichurri + a squeeze of lime" },
+  { id:"c-herdez", name:"Salsa Verde", brand:"Herdez", emoji:"🫙", calPerTbsp:5, tier:"transform", kidOk:true, keeps:"2 weeks refrigerated once opened", where:["Kroger","Publix"], why:"Bright, tangy, basically free. The fastest way to make tacos, burrito bowls, eggs, or a quesadilla taste finished.", usesOn:"Turkey Tacos · Burrito Bowls · Quesadilla Night · Enchilada Skillet · Taco Pasta", sub:"Frontera Tomatillo salsa" },
+  { id:"c-gochujang", name:"Gochujang", brand:"Chung Jung One or Mother-in-Law's", emoji:"🟥", calPerTbsp:30, tier:"transform", kidOk:false, keeps:"a year refrigerated", where:["Kroger","Whole Foods"], why:"Sweet-savory Korean chili paste. Stir 1 tbsp into ¼ cup Greek yogurt or Kewpie for an instant bowl sauce, or into the bulgogi marinade.", usesOn:"Korean Beef Bulgogi · Kevin's Bowls · Salmon Burgers · roasted broccoli", sub:"Sriracha + 1 tsp miso or soy" },
+  { id:"c-cedars", name:"Tzatziki", brand:"Cedar's", emoji:"🥒", calPerTbsp:15, tier:"creamy", kidOk:true, keeps:"3 weeks sealed, 7 days opened", where:["Kroger","Publix","Whole Foods"], why:"Better than most homemade and no grating. 30 cal per 2 tbsp. Replaces making tzatziki on a weeknight.", usesOn:"Greek Chicken Bowls · Salmon Burger Bowls · Turkey Wraps · raw veg for the girls", sub:"Homemade Greek Yogurt Tzatziki (Sauces tab)" },
+  { id:"c-bolthouse-cilantro", name:"Cilantro Avocado Yogurt Dressing", brand:"Bolthouse Farms", emoji:"🥑", calPerTbsp:22, tier:"creamy", kidOk:true, keeps:"refrigerated, see date (~2 months)", where:["Kroger","Publix"], why:"Creamy, lime-y, 45 cal per 2 tbsp. The best light dressing for anything Mexican — drizzle on bowls, tacos, quesadillas.", usesOn:"Burrito Bowls · Nugget Fajitas · Taco Pasta · Enchilada Skillet", sub:"Greek yogurt + lime + a spoon of salsa verde" },
+  { id:"c-bolthouse-ranch", name:"Classic Ranch Yogurt Dressing", brand:"Bolthouse Farms", emoji:"🥛", calPerTbsp:22, tier:"creamy", kidOk:true, keeps:"refrigerated, see date (~2 months)", where:["Kroger","Publix"], why:"The best of the light ranches — the girls accept it. 45 cal per 2 tbsp vs 140 for Hidden Valley.", usesOn:"Chicken Tenders · Buffalo Chicken Bowls · raw carrots and cucumbers · Caesar Wraps", sub:"Homemade Nothing Hidden Ranch (Sauces tab)" },
+  { id:"c-tj-goddess", name:"Green Goddess Dressing", brand:"Trader Joe's", emoji:"🥬", calPerTbsp:20, tier:"creamy", kidOk:true, keeps:"refrigerated, ~1 month", where:["Trader Joe's"], why:"Avocado-based, herby, 20 cal/tbsp. Worth a TJ's stop — on grain bowls, chicken, as a dip, on eggs.", usesOn:"Rotisserie Grain Bowls · Lemon Herb Cod · Chicken Tenders · Turkey Wraps", sub:"Homemade Lemon Herb Drizzle (Sauces tab) or Primal Kitchen Green Goddess" },
+  { id:"c-kewpie", name:"Mayo", brand:"Kewpie", emoji:"🥚", calPerTbsp:100, tier:"creamy", kidOk:true, keeps:"refrigerated, months", where:["Costco","Kroger","Whole Foods"], why:"Same calories as regular mayo but twice the flavor (egg yolks + MSG), so you use half. 1 tbsp + 1 tsp sriracha + squeeze of lime = the spicy mayo for poke and salmon burgers.", usesOn:"Ahi Poke Bowl · Salmon Burgers · Smash Burgers · Steak Sandwiches", sub:"Primal Kitchen Avocado Oil Mayo" },
+  { id:"c-makoto", name:"Ginger Dressing", brand:"Makoto", emoji:"🫚", calPerTbsp:30, tier:"creamy", kidOk:true, keeps:"refrigerated, ~2 months", where:["Kroger","Publix"], why:"The sushi-restaurant ginger salad dressing, in a bottle (refrigerated section). 60 cal per 2 tbsp. MK's ginger salad, solved.", usesOn:"Ahi Poke Bowl · Kevin's Bowls · iceberg wedge with any Asian dinner · Dumpling Night", sub:"Kikkoman Ponzu + a dab of ginger paste" },
+  { id:"c-pk-chipotle", name:"Chipotle Lime Mayo", brand:"Primal Kitchen", emoji:"🌯", calPerTbsp:100, tier:"creamy", kidOk:false, keeps:"refrigerated, months", where:["Kroger","Whole Foods","Costco"], why:"Avocado-oil mayo with real smoke and lime. Rich, so 1 tbsp — thin with a spoon of Greek yogurt to stretch it.", usesOn:"Turkey Wraps · Smash Burgers · Nugget Fajitas · Salmon Burgers", sub:"Kewpie + Cholula + lime" },
+  { id:"c-yb-habanero", name:"Habanero Condiment", brand:"Yellowbird", emoji:"🟠", calPerTbsp:5, tier:"heat-acid", kidOk:false, keeps:"shelf-stable", where:["Kroger","Whole Foods"], why:"Fruity, carrot-based heat with body — more like a sauce than a vinegar hot sauce. Adults' bowls only.", usesOn:"Taco Pasta · Enchilada Skillet · eggs · Chili", sub:"Cholula or Valentina" },
+  { id:"c-yb-serrano", name:"Serrano Condiment", brand:"Yellowbird", emoji:"🟢", calPerTbsp:5, tier:"heat-acid", kidOk:false, keeps:"shelf-stable", where:["Kroger","Whole Foods"], why:"Green, bright, medium heat. Great on anything with avocado or lime.", usesOn:"Burrito Bowls · Quesadillas · Poke Bowl · eggs", sub:"Herdez Salsa Verde + jalapeño" },
+  { id:"c-cholula", name:"Original Hot Sauce", brand:"Cholula", emoji:"🌶️", calPerTbsp:0, tier:"heat-acid", kidOk:false, keeps:"shelf-stable, forever", where:["Kroger","Publix","Costco"], why:"Already in your pantry. Zero calories, mild, goes on everything — the broccoli soup adult bowls, eggs, tacos.", usesOn:"Broccoli Cheddar Soup (adults) · eggs · Turkey Tacos · Chicken Tenders", sub:"Frank's RedHot" },
+  { id:"c-franks", name:"RedHot Original", brand:"Frank's", emoji:"🧯", calPerTbsp:0, tier:"heat-acid", kidOk:false, keeps:"shelf-stable", where:["Kroger","Publix"], why:"Vinegar heat. 2 tbsp Frank's + 1 tbsp melted butter = buffalo sauce; or just shake on.", usesOn:"Buffalo Chicken Bowls · Chicken Tenders · Mac & Cheese (adults)", sub:"Cholula" },
+  { id:"c-sambal", name:"Sambal Oelek", brand:"Huy Fong", emoji:"🫙", calPerTbsp:5, tier:"heat-acid", kidOk:false, keeps:"refrigerated, a year", where:["Kroger","Whole Foods"], why:"Pure chili + garlic + vinegar, no sugar. Stir into noodles, stir-fries, soups, or mix with Kewpie.", usesOn:"Thai Basil Chicken · Dumpling Night · Peanut Sauce · Kevin's Bowls", sub:"Sriracha (sweeter) or chili garlic sauce" },
+  { id:"c-ponzu", name:"Ponzu", brand:"Kikkoman", emoji:"🍋", calPerTbsp:10, tier:"heat-acid", kidOk:true, keeps:"refrigerated, months", where:["Kroger","Publix"], why:"Citrus soy. Dumpling dip, salmon drizzle, avocado + cucumber dressing — 10 cal a tablespoon.", usesOn:"Dumpling Night · Ahi Poke Bowl · Sheet Pan Salmon · cucumber salad", sub:"Soy sauce + lime juice 2:1" },
+  { id:"c-giardiniera", name:"Giardiniera (mild or hot)", brand:"Mezzetta", emoji:"🥕", calPerTbsp:5, tier:"heat-acid", kidOk:true, keeps:"refrigerated, months", where:["Kroger","Publix"], why:"Pickled cauliflower, carrots, peppers. A spoonful on a sandwich or bowl does what a sauce does for 5 calories.", usesOn:"Italian Meatball Subs · Steak Sandwiches · Turkey Melts · Chicken Parm plate", sub:"Pepperoncini" },
+  { id:"c-pickled-onion", name:"Pickled Red Onions (jar)", brand:"Kroger / Whole Foods", emoji:"🧅", calPerTbsp:5, tier:"heat-acid", kidOk:true, keeps:"refrigerated, months", where:["Kroger","Whole Foods"], why:"Sweet-sour crunch that lifts tacos, bowls, burgers, and salmon. Or make a jar: 1 sliced red onion + ½ cup vinegar + ½ cup water + 1 tbsp sugar + 1 tsp salt, 30 min.", usesOn:"Turkey Tacos · Salmon Burgers · Smash Burgers · Grain Bowls · Caesar Wraps", sub:"Thin-sliced raw red onion soaked in lime juice 10 min" },
+  { id:"c-pickled-jal", name:"Pickled Jalapeños", brand:"La Costeña or Mezzetta", emoji:"🫑", calPerTbsp:5, tier:"heat-acid", kidOk:false, keeps:"refrigerated, months", where:["Kroger","Publix"], why:"Heat plus acid in one spoon. On taco pasta, nachos, quesadillas, chili.", usesOn:"Taco Pasta · Enchilada Skillet · Chili · Quesadillas", sub:"Fresh jalapeño slices" },
+  { id:"c-peppadew", name:"Peppadew Peppers", brand:"Peppadew (olive bar or jar)", emoji:"🔴", calPerTbsp:15, tier:"heat-acid", kidOk:true, keeps:"refrigerated, months", where:["Kroger","Whole Foods"], why:"Sweet-tangy little peppers, barely spicy. Chop onto pizza, subs, salads, or stuff with goat cheese for an adults-night snack.", usesOn:"Fit Flour Pizza · Meatball Subs · Greek Chicken Bowls · Pizza Lunchables (adult)", sub:"Roasted red peppers + a splash of vinegar" },
+  { id:"c-rana-pesto", name:"Basil Pesto (refrigerated)", brand:"Rana or Kirkland", emoji:"🌿", calPerTbsp:80, tier:"rich", kidOk:true, keeps:"refrigerated, 2 weeks opened; freezes", where:["Kroger","Publix","Costco"], why:"Oil-heavy, so 1 tbsp — thinned with pasta water it sauces a whole bowl. Kids like it on pasta and in grilled cheese.", usesOn:"Pesto Gnocchi · Turkey Melts · Chicken Caesar Pasta Salad · eggs", sub:"Jarred shelf-stable pesto (Barilla) — noticeably worse" },
+  { id:"c-chimichurri", name:"Chimichurri (refrigerated)", brand:"Gaucho Ranch", emoji:"🥩", calPerTbsp:60, tier:"rich", kidOk:true, keeps:"refrigerated, 3 weeks", where:["Kroger","Whole Foods"], why:"Parsley, garlic, vinegar, oil. For steak nights, eggs, roasted veg — bright enough that a tablespoon is plenty.", usesOn:"Reverse Sear Tenderloin · Steak Skewers · Pork Tenderloin · Steak Sandwiches", sub:"Zhoug" },
+  { id:"c-toum", name:"Toum (garlic sauce)", brand:"Ziyad or Whole Foods", emoji:"🧄", calPerTbsp:60, tier:"rich", kidOk:true, keeps:"refrigerated, a month", where:["Whole Foods","Kroger"], why:"Whipped garlic and oil — the white sauce from a shawarma shop. Intense; a teaspoon on grilled chicken or in a wrap.", usesOn:"Greek Chicken Bowls · Cast Iron Chicken Thighs · Turkey Wraps · Naan", sub:"Garlic mashed into Greek yogurt" },
+  { id:"c-harissa", name:"Harissa", brand:"Mina", emoji:"🫙", calPerTbsp:20, tier:"rich", kidOk:false, keeps:"refrigerated, months", where:["Whole Foods","Kroger"], why:"Smoky North African chili paste. 1 tsp stirred into ¼ cup Greek yogurt is a 10-second sauce for chicken, salmon, or roasted veg.", usesOn:"Shakshuka · Chickpea Stew · Lemon Herb Cod · Greek Chicken Bowls", sub:"Gochujang (sweeter) or sambal + smoked paprika" },
+  { id:"c-tajin", name:"Clásico Seasoning", brand:"Tajín", emoji:"🍋", calPerTbsp:0, tier:"heat-acid", kidOk:true, keeps:"shelf-stable", where:["Kroger","Publix","Costco"], why:"Chili-lime salt. Not technically a condiment, functionally the same — on corn, fruit, avocado, tacos. The girls like it on mango.", usesOn:"Corn on the cob · Burrito Bowls · fruit plate · Quesadillas", sub:"Chili powder + lime zest + salt" },
+  { id:"c-ebtb", name:"Everything Bagel Seasoning", brand:"Trader Joe's or Kroger", emoji:"🥯", calPerTbsp:0, tier:"heat-acid", kidOk:true, keeps:"shelf-stable", where:["Kroger","Costco","Trader Joe's"], why:"Crunch and salt for eggs, avocado toast, the English muffins, cottage cheese, salmon.", usesOn:"Fit Flour English Muffins · Savory Scramble · Salmon Burgers · cottage cheese bowl", sub:"Sesame seeds + flaky salt + dried onion" },
+];
+const CONDIMENT_TIERS = [
+  ["transform","⚡ Changes the whole meal"],
+  ["creamy","🥣 Creamy without the damage"],
+  ["heat-acid","🌶️ Heat & acid (basically free)"],
+  ["rich","🫒 Rich — a little goes far"],
+];
+function toggleCondimentHave(id){ state.pantry = state.pantry||{}; state.pantry[id] = state.pantry[id]==="have" ? "" : "have"; scheduleSave(); if(currentTab==="sauces") renderSauces(); else if(currentTab==="pantry") renderPantry(); }
+function addCondimentToShop(id){ const c=STORE_CONDIMENTS.find(x=>x.id===id); if(!c) return; state.needsGrocery = state.needsGrocery||[]; const text=c.name+" ("+c.brand+")"; const exists=state.needsGrocery.some(x=>(typeof x==="string"?x:x.text)===text); if(!exists) state.needsGrocery.push({text, sources:["Condiments"]}); scheduleSave(); const btn=document.getElementById("cshop-"+id); if(btn){btn.textContent="✓ On list";btn.disabled=true;} }
+function condimentCardHtml(c){
+  const have = (state.pantry||{})[c.id]==="have";
+  const onList = (state.needsGrocery||[]).some(x=>(typeof x==="string"?x:x.text)===c.name+" ("+c.brand+")");
+  const wherePills = c.where.map(w=>'<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--dim)">'+esc(w)+'</span>').join("");
+  const calCol = c.calPerTbsp<=10 ? "#34d399" : c.calPerTbsp<=35 ? "#fbbf24" : "#f87171";
+  return `<div class="cond-card" style="background:var(--surface);border:1px solid rgba(255,255,255,0.08);border-left:4px solid ${have?"var(--green)":"rgba(255,255,255,0.08)"};border-radius:14px;padding:12px 14px;margin-bottom:10px">
+    <div style="display:flex;align-items:flex-start;gap:10px">
+      <span style="font-size:26px;line-height:1;flex-shrink:0">${c.emoji}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:700;color:var(--text);line-height:1.25">${c.kidOk?'<span title="kid-friendly" style="font-size:12px;margin-right:4px">👧</span>':''}${esc(c.name)}</div>
+        <div style="font-size:12px;color:var(--dim);margin-top:1px">${esc(c.brand)} · 🧊 ${esc(c.keeps)}</div>
+      </div>
+      <span style="flex-shrink:0;font-size:12px;font-weight:800;padding:4px 9px;border-radius:999px;background:rgba(255,255,255,0.06);color:${calCol}">${c.calPerTbsp} cal/tbsp</span>
+    </div>
+    <div style="font-size:14px;color:#cbd5e1;line-height:1.45;margin:8px 0 6px">${esc(c.why)}</div>
+    <div style="font-size:13px;color:var(--muted);line-height:1.4"><span style="color:var(--green);font-weight:700">Goes on:</span> ${esc(c.usesOn)}</div>
+    <div class="cond-foot" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px">
+      <div class="cond-where" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:120px">${wherePills}</div>
+      <div class="cond-btns" style="display:flex;gap:6px;flex-shrink:0">
+      <button onclick="toggleCondimentHave('${c.id}')" style="padding:8px 12px;border-radius:10px;border:1.5px solid ${have?"var(--green)":"rgba(255,255,255,0.15)"};background:${have?"rgba(16,185,129,0.15)":"transparent"};color:${have?"var(--green)":"var(--text)"};font-size:13px;font-weight:700;cursor:pointer;min-height:36px">${have?"✓ Have it":"Have it?"}</button>
+      <button id="cshop-${c.id}" onclick="addCondimentToShop('${c.id}')" ${onList?"disabled":""} style="padding:8px 12px;border-radius:10px;border:none;background:${onList?"rgba(255,255,255,0.06)":"rgba(99,102,241,0.2)"};color:${onList?"var(--dim)":"#a5b4fc"};font-size:13px;font-weight:700;cursor:pointer;min-height:36px">${onList?"✓ On list":"+ Shop"}</button>
+      </div>
+    </div>
+  </div>`;
+}
+function renderStoreCondiments(){
+  const haveN = STORE_CONDIMENTS.filter(c=>(state.pantry||{})[c.id]==="have").length;
+  const tiers = CONDIMENT_TIERS.map(([key,label])=>{
+    const items = STORE_CONDIMENTS.filter(c=>c.tier===key);
+    return `<div style="margin-bottom:14px"><div style="font-size:13px;font-weight:800;color:var(--green);letter-spacing:0.8px;text-transform:uppercase;margin:6px 0 10px;padding-left:2px">${label}</div>${items.map(condimentCardHtml).join("")}</div>`;
+  }).join("");
+  return `
+    <div style="margin-bottom:14px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px">🛒 Buy, don't make</div>
+      <div style="color:var(--dim);font-size:14px;line-height:1.45">Store-bought bottles that taste excellent, don't wreck the calorie budget, and keep for months — so nothing gets thrown out. A spoonful, not a ladle: most carry real sodium or sugar, and the point is one tablespoon that changes the whole plate. Tap <b style="color:var(--text)">Have it</b> so the shopping list skips bottles you own. ${haveN?`<span style="color:var(--green)">${haveN} in your pantry.</span>`:""}</div>
+    </div>
+    ${tiers}
+    <div style="height:8px"></div>`;
+}
+
+// Which recipes mention this sauce, and whether any of them are planned this week or next
+function sauceUsedBy(sauce){
+  const all=[...state.dinners,...state.breakfasts,...state.lunches].filter(r=>r&&r.id);
+  const key=sauce.name.toLowerCase().replace(/^nothing hidden /,"").replace(/greek yogurt /,"").replace(/spicy /,"").replace(/cottage cheese /,"");
+  return all.filter(r=>{ const txt=((r.ingredients||[]).join(" ")+" "+(r.instructions||[]).join(" ")).toLowerCase(); return txt.includes(sauce.name.toLowerCase())||txt.includes(key); });
+}
+function sauceWeekUse(sauce){
+  const used=sauceUsedBy(sauce);
+  const planned=new Set(Object.values({...(state.weekPlan||{}),...(state.nextWeekPlan||{})}).map(a=>a&&a.recipeId).filter(Boolean));
+  const thisWeek=used.filter(r=>planned.has(r.id));
+  if(thisWeek.length) return '<div style="margin-top:10px;font-size:13px;color:var(--green);font-weight:700">📅 This week: '+thisWeek.map(r=>esc(r.name)).join(", ")+(thisWeek.length>=2?' — worth making':' — just one meal; consider the shortcut')+'</div>';
+  return '<div style="margin-top:10px;font-size:12px;color:var(--dim)">Used in '+used.length+' recipe'+(used.length===1?'':'s')+' · nothing planned this week uses it</div>';
+}
 function renderSauces() {
   const el = document.getElementById("page-sauces");
   const saucesHtml = state.sauces.map(sauce => {
@@ -8915,6 +9063,7 @@ function renderSauces() {
             <div style="flex:1">
               <div style="font-size:18px;font-weight:700;color:var(--text)">${esc(sauce.name)}</div>
               <div style="font-size:13px;color:var(--dim);margin-top:2px">${esc(sauce.description)}</div>
+              ${sauce.batchNote?`<div style="font-size:12px;color:var(--amber);margin-top:4px">${esc(sauce.batchNote)}</div>`:""}
             </div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
@@ -8936,7 +9085,9 @@ function renderSauces() {
         <div style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.06)">
           <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Use on</div>
           <div style="display:flex;flex-wrap:wrap;gap:6px">${usedInHtml}</div>
+          ${sauceWeekUse(sauce)}
         </div>
+        ${sauce.storeSwap ? `<div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(99,102,241,0.05)"><span style="font-size:13px;font-weight:700;color:#a5b4fc">🛒 Shortcut:</span> <span style="font-size:14px;color:var(--muted)">${esc(sauce.storeSwap)}</span></div>` : ""}
         ${sauce.tips ? `
         <div style="padding:14px 16px;background:rgba(245,158,11,0.04);border-top:1px solid rgba(245,158,11,0.15)">
           <div style="font-size:13px;font-weight:700;color:var(--amber);margin-bottom:4px">💡 Pro tip</div>
@@ -8946,13 +9097,10 @@ function renderSauces() {
   }).join("");
 
   el.innerHTML = `
-    <div style="margin-bottom:16px">
-      <div style="font-size:20px;font-weight:700;margin-bottom:4px">🫙 Squeeze Bottle Sauces</div>
-      <div style="color:var(--dim);font-size:14px">High-protein homemade sauces. Make Sunday, use all week.</div>
-    </div>
-    <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:14px 16px;margin-bottom:16px">
-      <div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:6px">🗓 Sunday prep tip</div>
-      <div style="font-size:14px;color:var(--muted);line-height:1.5">Make 2-3 of these on Sunday during your meal prep. They keep 5-7 days and make every meal this week dramatically better — and higher protein.</div>
+    ${renderStoreCondiments()}
+    <div style="margin:22px 0 14px;border-top:1px solid rgba(255,255,255,0.08);padding-top:18px">
+      <div style="font-size:20px;font-weight:700;margin-bottom:4px">🥄 Make it (when 2+ meals this week use it)</div>
+      <div style="color:var(--dim);font-size:14px;line-height:1.45">High-protein homemade sauces. Batches are sized at ~½ cup — enough for two meals — so nothing goes to waste. Only worth making when two or more dinners this week call for it; otherwise use the Shortcut.</div>
     </div>
     ${saucesHtml}
     <div style="height:30px"></div>
@@ -10924,22 +11072,27 @@ function renderAtlantaStatic() {
     </div>
     ${cuisineHtml}`;
 }
+// Condiments share pantry keys with the Sauces tab ("Have it")
+(function(){ if (typeof PANTRY_SECTIONS!=="undefined" && typeof STORE_CONDIMENTS!=="undefined" && !PANTRY_SECTIONS.some(x=>x.section.indexOf("finishers")>=0)) {
+  PANTRY_SECTIONS.push({ section:"🫙 Condiments & finishers", items: STORE_CONDIMENTS.map(c=>({ id:c.id, name:c.name+" ("+c.brand+")", sub:c.calPerTbsp+" cal/tbsp · "+c.keeps+" · "+c.where.join("/"), condiment:true })) });
+}})();
 function renderPantry() {
   const el = document.getElementById("page-pantry");
   const allItems = PANTRY_SECTIONS.flatMap(s => s.items);
   const haveCount = allItems.filter(i => state.pantry[i.id] === "have").length;
   const lowCount  = allItems.filter(i => state.pantry[i.id] === "low").length;
-  const outCount  = allItems.filter(i => !state.pantry[i.id]).length;
-  const needToBuy = allItems.filter(i => state.pantry[i.id] !== "have");
+  const outCount  = allItems.filter(i => !i.condiment && !state.pantry[i.id]).length;
+  const needToBuy = allItems.filter(i => i.condiment ? state.pantry[i.id] === "low" : state.pantry[i.id] !== "have");
 
   // Single clean list — one row per item, tap to cycle status
   const sectionsHtml = PANTRY_SECTIONS.map(({section, items}) => {
     const rows = items.map(item => {
       const status = state.pantry[item.id] || "";
-      const statusLabel = status === "have" ? "✓ Have" : status === "low" ? "⚠ Low" : "✕ Out";
-      const statusColor = status === "have" ? "var(--green)" : status === "low" ? "var(--amber)" : "#ef4444";
-      const statusBg    = status === "have" ? "rgba(16,185,129,0.1)" : status === "low" ? "rgba(245,158,11,0.1)" : "rgba(239,68,68,0.08)";
-      const borderColor = status === "have" ? "rgba(16,185,129,0.3)" : status === "low" ? "rgba(245,158,11,0.3)" : "rgba(239,68,68,0.15)";
+      const statusLabel = status === "have" ? "✓ Have" : status === "low" ? "⚠ Low" : (item.condiment ? "— Don't have" : "✕ Out");
+      const neutral = item.condiment && !status;
+      const statusColor = status === "have" ? "var(--green)" : status === "low" ? "var(--amber)" : neutral ? "var(--dim)" : "#ef4444";
+      const statusBg    = status === "have" ? "rgba(16,185,129,0.1)" : status === "low" ? "rgba(245,158,11,0.1)" : neutral ? "rgba(255,255,255,0.03)" : "rgba(239,68,68,0.08)";
+      const borderColor = status === "have" ? "rgba(16,185,129,0.3)" : status === "low" ? "rgba(245,158,11,0.3)" : neutral ? "rgba(255,255,255,0.1)" : "rgba(239,68,68,0.15)";
       return `
         <div onclick="cyclePantry('${item.id}')" style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:${statusBg};border:1.5px solid ${borderColor};border-radius:14px;margin-bottom:8px;cursor:pointer;transition:all 0.15s;">
           <div style="flex:1;min-width:0">
@@ -10955,6 +11108,7 @@ function renderPantry() {
     return `
       <div style="margin-bottom:20px">
         <div style="font-size:13px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;padding-left:4px">${section}</div>
+        ${section.indexOf("finishers")>=0 ? '<div style="font-size:12px;color:var(--dim);margin:-4px 0 10px 4px">Optional bottles — only "Low" ones go on the grocery list. Details and ideas in the Sauces tab.</div>' : ""}
         ${rows}
       </div>`;
   }).join("");
@@ -10988,7 +11142,7 @@ function renderPantry() {
 
 function addPantryToGrocery() {
   state.needsGrocery = PANTRY_SECTIONS.flatMap(s => s.items)
-    .filter(i => state.pantry[i.id] !== "have")
+    .filter(i => i.condiment ? state.pantry[i.id] === "low" : state.pantry[i.id] !== "have")
     .map(i => ({ text: i.name + (state.pantry[i.id] === "low" ? " (running low)" : ""), sources: ["Pantry"] }));
   showTab("grocery");
 }
