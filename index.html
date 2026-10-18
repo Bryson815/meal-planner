@@ -7876,7 +7876,7 @@ function renderSmartPlanModal(mode) {
              + block("🍷", "Adults night(s)", pd.adultDays.length ? pd.adultDays.map(d=>d.slice(0,3)).join(", ") : "none", "adult", pd.adultDays, "#f472b6", true, "rgba(244,114,182,0.08)")
              + block("⚡", "Quick nights", pd.quickDays.length ? pd.quickDays.map(d=>d.slice(0,3)).join(", ") : "none", "quick", pd.quickDays, "#fbbf24", true, "rgba(245,158,11,0.08)"); })()}
       ${row("🌅", "Breakfasts", stepperHtml("sp-breakfasts", 2, 0, 5, "#fbbf24"), "rgba(245,158,11,0.06)")}
-      ${row("☀️", "Lunches", stepperHtml("sp-lunches", 2, 0, 5, "#34d399"), "rgba(16,185,129,0.08)")}
+      ${row("☀️", "Adult lunches <span style=\"font-weight:400;color:var(--dim);font-size:12px\">(kids\' lunchboxes live in 🍱 Lunchbox)</span>", stepperHtml("sp-lunches", 2, 0, 5, "#34d399"), "rgba(16,185,129,0.08)")}
       ${toggle("sp-next", "Plan next week too (leftovers carry over)", true)}
       ${toggle("sp-keep", "Keep what I've already placed", true)}
       <button onclick="runSmartPlan()" style="width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-weight:800;font-size:15px;cursor:pointer;margin:6px 0 8px">Preview the plan →</button>
@@ -7891,7 +7891,7 @@ function renderSmartPlanModal(mode) {
       let dinnerHtml = `<div style="color:var(--dim);font-size:13px">— no dinner (eat out / leftovers)</div>`;
       if (t.dinner && t.dinner.leftoverOf) { const src = byIdAll(t.dinner.leftoverOf); dinnerHtml = `<div style="font-size:14px;font-weight:700;color:#cbd5e1">🔁 Leftovers: ${esc(src ? src.name : "")}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div>`; }
       else if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r) dinnerHtml = `<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">${r.emoji || "🍽️"}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text)">${esc(r.name)}${r.quick ? ' <span style="font-size:10px;background:rgba(245,158,11,0.15);color:#fbbf24;border-radius:999px;padding:1px 6px;font-weight:800">⚡</span>' : ""}${(r.audience === "adults") ? ' <span style="font-size:10px;background:rgba(244,114,182,0.15);color:#f472b6;border-radius:999px;padding:1px 6px;font-weight:800">🍷</span>' : ""}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div></div></div>`; }
-      const sides = [t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side] ? "🥦 + " + SIDES_BY_ID[t.dinner.side].name : "", t.breakfast ? "🌅 " + ((byIdAll(t.breakfast.recipeId) || {}).name || "") : "", t.lunch ? "☀️ " + ((byIdAll(t.lunch.recipeId) || {}).name || "") + (t.lunch.reason && /leftover/.test(t.lunch.reason) ? " 🔁" : "") : ""].filter(Boolean).join(" · ");
+      const sides = [t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side] ? "🥦 + " + SIDES_BY_ID[t.dinner.side].name : "", t.breakfast ? "🌅 Breakfast: " + ((byIdAll(t.breakfast.recipeId) || {}).name || "") : "", t.lunch ? "☀️ Adult lunch: " + ((byIdAll(t.lunch.recipeId) || {}).name || "") + (t.lunch.reason && /leftover/.test(t.lunch.reason) ? " 🔁" : "") : ""].filter(Boolean).join(" · ");
       return `<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px">
         <div style="width:38px;flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--green);padding-top:3px">${t.day.slice(0, 3).toUpperCase()}</div>
         <div style="flex:1;min-width:0">${dinnerHtml}${sides ? `<div style="font-size:12px;color:#94a3b8;margin-top:4px">${esc(sides)}</div>` : ""}</div>
@@ -8042,7 +8042,7 @@ function renderPlan() {
 
   const MEAL_SLOTS = [
     { key: "breakfast", label: "Breakfast", emoji: "🌅", color: "var(--amber)", bg: "rgba(245,158,11,0.08)", border: "rgba(245,158,11,0.2)" },
-    { key: "lunch",     label: "Lunch",     emoji: "☀️",  color: "var(--green)", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.2)" },
+    { key: "lunch",     label: "Adult lunch", emoji: "☀️",  color: "var(--green)", bg: "rgba(16,185,129,0.08)", border: "rgba(16,185,129,0.2)" },
     { key: "dinner",    label: "Dinner",    emoji: "🌙",  color: "var(--indigo)", bg: "rgba(99,102,241,0.08)", border: "rgba(99,102,241,0.2)" },
   ];
 
