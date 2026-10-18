@@ -7842,8 +7842,10 @@ function smartPlan(opts) {
       const b = onTime ? 45 : 10; if (b > bonus) { bonus = b; note = "🥡 uses the " + it.text + (it.by ? " before " + it.by.slice(0, 3) : ""); } });
     return { bonus, note };
   }
-  function scoreDinner(r, idx, wantAdult, wantQuick, isStretch) {
+  function scoreDinner(r, idx, wantAdult, wantQuick, isStretch, allowAdults) {
     let s = 50;
+    // family nights never get an adults-only recipe (unless the family pool is truly empty)
+    if (!wantAdult && (r.audience || "family") === "adults" && !allowAdults) return -9999;
     // 👧 kid-comfort ladder (family nights only; adult nights pick whatever)
     if (!wantAdult && (r.audience || "family") !== "adults") {
       const kc = kidComfort(r);
@@ -7921,9 +7923,13 @@ function smartPlan(opts) {
     const used = new Set(placedIds());
     const pool = dinners.filter(r => !used.has(r.id));
     if (!pool.length) continue;
-    let ranked = pool.map(r => ({ r, s: scoreDinner(r, i, wantAdult, wantQuick, isStretch) })).filter(x => x.s > -9000).sort((a, b) => b.s - a.s);
-    if (!ranked.length) ranked = pool.map(r => ({ r, s: scoreDinner(r, i, wantAdult, wantQuick, true) })).filter(x => x.s > -9000).sort((a, b) => b.s - a.s); // ladder too strict → relax to stretch floor
+    const rank = (st, adults) => pool.map(r => ({ r, s: scoreDinner(r, i, wantAdult, wantQuick, st, adults) })).filter(x => x.s > -9000).sort((a, b) => b.s - a.s);
+    let ranked = rank(isStretch, false);
+    if (!ranked.length) ranked = rank(true, false); // ladder too strict → relax to stretch floor
+    if (!ranked.length) ranked = rank(true, true);  // still nothing → allow an adults recipe rather than an empty night
     if (!ranked.length) continue;
+    // quick night: if any quick recipe fits, it wins outright — a 6-hour braise is never a "quick" dinner
+    if (wantQuick && ranked.some(x => x.r.quick)) ranked = ranked.filter(x => x.r.quick);
     const best = ranked[0].r; t.stretch = isStretch && kidComfort(best) < kidLevel;
     t.dinner = { recipeId: best.id, section: "dinner" }; const usedSides = timeline.filter((t2, j2) => Math.floor(j2 / 7) === Math.floor(i / 7) && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(best, usedSides, t.stretch); if (sd) t.dinner.side = sd; t.dinnerReason = reasonFor(best, i, wantAdult, wantQuick, isStretch);
   }
