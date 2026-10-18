@@ -8379,7 +8379,7 @@ function renderPlan() {
           <div onclick="openDaySlotPicker('${day}','${slot.key}')" class="plan-slot-empty" ondragover="planDragOver(event,'${slot.key}')" ondragleave="planDragLeave(event)" ondrop="planDrop(event,planWeekView,'${day}','${slot.key}')"
             style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.02);border-radius:10px;margin-bottom:4px;border:1px dashed rgba(255,255,255,0.08);cursor:pointer">
             <span style="font-size:11px;font-weight:700;color:var(--dim);width:60px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.5px">${slot.label}</span>
-            <span style="font-size:13px;color:var(--dim)">${slot.key==="dinner" && !planDefaultsGet().cookDays.includes(day) ? '<span style="color:rgba(148,163,184,0.7);font-style:italic">Eat out / leftovers</span> <span style="opacity:0.6">· tap to add</span>' : "+ Add " + slot.label.toLowerCase()}</span>
+            <span style="font-size:13px;color:var(--dim)">${slot.key==="dinner" && !planDefaultsGet().cookDays.includes(day) && Object.keys(activePlan()||{}).some(k=>/_dinner$/.test(k)&&activePlan()[k]&&(activePlan()[k].recipeId||activePlan()[k].leftoverOf)) ? '<span style="color:rgba(148,163,184,0.7);font-style:italic">Off night</span> <span style="opacity:0.6">· tap to add</span>' : "+ Add " + slot.label.toLowerCase()}</span>
           </div>`;
       }
     }).join("");
@@ -8398,9 +8398,9 @@ function renderPlan() {
 
     // Day picker modal
   const pickerModal = `
-    <div id="day-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;display:none;align-items:flex-end;justify-content:center">
-      <div style="background:#0f172a;border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:80vh;overflow-y:auto">
-        <div style="font-size:17px;font-weight:700;margin-bottom:4px" id="day-picker-title">Choose a recipe</div>
+    <div id="day-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;display:none;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeDayPicker()">
+      <div style="background:#0f172a;border-radius:20px 20px 0 0;padding:20px;width:100%;max-height:80vh;overflow-y:auto;position:relative">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px"><div style="font-size:17px;font-weight:700" id="day-picker-title">Choose a recipe</div><button onclick="closeDayPicker()" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;flex-shrink:0">✕ Close</button></div>
         <div style="color:var(--dim);font-size:13px;margin-bottom:14px">Tap to assign to this day</div>
         <input type="text" id="day-picker-search" placeholder="🔍 Search..." oninput="filterDayPicker(this.value)"
           style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.06);color:var(--text);font-size:14px;margin-bottom:12px;box-sizing:border-box">
@@ -8486,6 +8486,8 @@ function removeDaySlot(day, slotKey) {
   renderPlan();
 }
 
+
+document.addEventListener("keydown", function(e){ if(e.key!=="Escape") return; const dp=document.getElementById("day-picker-modal"); if(dp&&dp.style.display==="flex"){ closeDayPicker(); return; } const ap=document.getElementById("autoplan-modal"); if(ap&&ap.style.display==="flex"&&typeof closeAutoplanModal==="function"){ closeAutoplanModal(); return; } const m=document.getElementById("modal"); if(m&&m.style.display==="flex"){ closeModalForce(); } });
 function openDayPicker(day) {
   currentDayPickerDay = day;
   const modal = document.getElementById("day-picker-modal");
