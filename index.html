@@ -780,6 +780,12 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
   .ingredient-line,.ingr-text{font-size:16px}
 }
 @media (max-width:767px){.cond-foot{flex-direction:column !important;align-items:stretch !important}.cond-btns{display:flex !important;width:100%}.cond-btns button{flex:1;min-height:44px;white-space:nowrap}.cond-where{margin-bottom:4px;justify-content:flex-start}}
+.cook-voice-btn.on{background:rgba(239,68,68,0.18) !important;border-color:rgba(239,68,68,0.6) !important;color:#fca5a5 !important}
+.cook-voice-btn.on .vdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:6px;animation:cookPulse 1s infinite;vertical-align:middle}
+.cook-voice-btn.active{background:rgba(16,185,129,0.15) !important;border-color:rgba(16,185,129,0.5) !important;color:#34d399 !important}
+.cook-voice-btn.thinking{opacity:0.7}
+.cook-nav-voice{display:none}
+@media (max-width:767px){ #cook-wake-pill,#cook-heard,.cook-voice-btn{display:none !important} .cook-nav-voice{display:block !important} }
 </style>
 </head>
 <body>
@@ -845,9 +851,14 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
   <div style="position:sticky;top:0;z-index:10;background:#0a0f1a;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:12px">
     <button onclick="exitCook()" style="padding:8px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s">← Back</button>
     <div style="font-size:16px;font-weight:800;color:var(--text);letter-spacing:-0.3px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="cook-overlay-title">Cook Mode</div>
+    <span id="cook-wake-pill" style="display:none;font-size:11px;font-weight:700;color:#fbbf24;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:999px;padding:4px 10px;white-space:nowrap;flex-shrink:0">☀️ Screen stays on</span>
+    <span id="cook-heard" style="display:none;font-size:12px;color:var(--dim);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1;min-width:0"></span>
+    <button id="cook-mic-btn" class="cook-voice-btn" onclick="toggleVoice()" title="Voice control — say 'Chef, next'" style="display:none;padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;white-space:nowrap">🎙</button>
+    <button id="cook-read-btn" class="cook-voice-btn" onclick="toggleReadAloud()" title="Read each step aloud" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0">🔊</button>
     <button onclick="openCookChat()" style="padding:8px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#07090f;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0">👨‍🍳 Ask</button>
   </div>
   <div id="cook-overlay-content" style="flex:1;"></div>
+  <video id="nosleep-video" muted loop playsinline style="position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;left:-10px;top:-10px"></video>
   <div id="multi-timer-container" style="display:none;position:sticky;bottom:0;z-index:50;background:#0a0f1a;padding:10px 16px;border-top:1px solid rgba(255,255,255,0.08)">
     <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">⏱️ Active Timers</div>
     <div id="multi-timer-panel"></div>
@@ -6569,6 +6580,7 @@ let state = {
   groceryNotes: {},
   vaultSort: "name",
   anthropicKey: "",  // stored locally only, never sent to Supabase
+  readAloud: false, voiceAutoStart: false, voiceTipSeen: false,
 };
 
 let supabase = null;
@@ -11451,6 +11463,9 @@ function openCookChat() {
 function closeCookMode() {
   const overlay = document.getElementById("cook-overlay");
   if (overlay) overlay.style.display = "none";
+  try{ stopVoice(); }catch(e){}
+  try{ releaseWakeLock(); }catch(e){}
+  try{ if("speechSynthesis" in window) speechSynthesis.cancel(); }catch(e){}
   if (cookState && cookState.timer && cookState.timer.interval) {
     clearInterval(cookState.timer.interval);
     cookState.timer.running = false;
@@ -11473,6 +11488,10 @@ function startCooking(section,id) {
     const titleEl=document.getElementById("cook-overlay-title");
     if(titleEl) titleEl.textContent=recipe.emoji+" "+recipe.name;
     renderCookScreen();
+    acquireWakeLock();
+    updateVoiceButtons();
+    if(state.voiceAutoStart&&(window.SpeechRecognition||window.webkitSpeechRecognition)) startVoice(false);
+    if(state.readAloud) setTimeout(speakCurrentStep,400);
   }
 }
 
@@ -11642,7 +11661,8 @@ function renderCookScreen() {
     const tipHtml=(step===total-1&&recipe.tips)?`<div class="cook-tip-box"><div class="cook-tip-label">💡 Pro tip</div><div class="cook-tip-text">${esc(recipe.tips)}</div></div>`:"";
     const eqHtml=(step===0&&recipe.equipment&&recipe.equipment.length)?`<div style="background:rgba(245,158,11,0.08);border:2px solid rgba(245,158,11,0.3);border-radius:14px;padding:14px 18px;margin-bottom:16px"><div style="color:#fbbf24;font-size:13px;font-weight:800;letter-spacing:0.6px;margin-bottom:8px">🍳 YOU'LL NEED</div><div style="display:flex;flex-wrap:wrap;gap:8px">${recipe.equipment.map(e=>`<span style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:6px 14px;font-size:clamp(15px,1.4vw,19px);color:#f1f5f9;font-weight:600">${esc(e)}</span>`).join("")}</div></div>`:"";
     const secHtml=(showSectionBanner&&sectionHeader)?`<div style="background:rgba(16,185,129,0.1);border:2px solid rgba(16,185,129,0.4);border-radius:14px;padding:14px 20px;margin-bottom:20px;align-self:flex-start"><div style="color:#34d399;font-size:12px;font-weight:800;letter-spacing:1.2px;margin-bottom:4px">${backToMain?"↩ BACK TO THE MAIN DISH":PARALLEL_RE.test(sectionHeader)?"⇄ SIDE TASK — RUNS IN PARALLEL":"▶ SWITCHING TO"}</div><div style="color:#f1f5f9;font-size:clamp(20px,2.2vw,28px);font-weight:800;text-transform:none;letter-spacing:-0.3px">${esc(sectionHeader.charAt(0)+sectionHeader.slice(1).toLowerCase())}</div></div>`:"";
-    const hvHtml=secHtml+eqHtml+((step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"");
+    const voiceTip=(cookState.showVoiceTip)?`<div style="background:rgba(239,68,68,0.08);border:2px solid rgba(239,68,68,0.3);border-radius:14px;padding:14px 18px;margin-bottom:16px;position:relative"><button onclick="cookState.showVoiceTip=false;renderCookScreen()" style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button><div style="color:#fca5a5;font-size:12px;font-weight:800;letter-spacing:0.8px;margin-bottom:6px">🎙 VOICE IS ON — START EVERY COMMAND WITH “CHEF”</div><div style="color:#f1f5f9;font-size:clamp(15px,1.3vw,18px);line-height:1.6">“Chef, next” · “Chef, repeat” · “Chef, how much garlic” · “Chef, set a timer for 8 minutes” · “Chef, how much time is left” · “Chef, should this be covered?” · “Chef, help”</div></div>`:"";
+    const hvHtml=voiceTip+secHtml+eqHtml+((step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"");
     const scaleNote=cookScale!==1?'<span class="cook-step-scale-note">'+(cookScale===0.5?'½':cookScale===1.5?'1½':cookScale)+'× RECIPE</span>':'';
     body=`<div class="cook-layout"><div class="cook-main">
 
@@ -11742,6 +11762,8 @@ function renderCookScreen() {
 
   <!-- BOTTOM: big chunky nav buttons -->
   <div style="flex-shrink:0;padding:16px 20px 24px;display:flex;gap:10px;background:rgba(7,9,15,0.95);border-top:1px solid rgba(255,255,255,0.08)">
+    ${(window.SpeechRecognition||window.webkitSpeechRecognition)?`<button class="cook-nav-voice" onclick="toggleVoice()" style="flex:0 0 56px;padding:0;font-size:22px;border-radius:16px;border:2px solid ${cookState.voiceOn?'rgba(239,68,68,0.6)':'rgba(255,255,255,0.18)'};background:${cookState.voiceOn?'rgba(239,68,68,0.18)':'rgba(255,255,255,0.06)'};color:#eef2f7;cursor:pointer">🎙</button>`:''}
+    <button class="cook-nav-voice" onclick="toggleReadAloud()" style="flex:0 0 56px;padding:0;font-size:22px;border-radius:16px;border:2px solid ${state.readAloud?'rgba(16,185,129,0.5)':'rgba(255,255,255,0.18)'};background:${state.readAloud?'rgba(16,185,129,0.15)':'rgba(255,255,255,0.06)'};color:#eef2f7;cursor:pointer">${state.readAloud?'🔊':'🔈'}</button>
     <button class="cook-ingr-btn" onclick="cookState.showIngr=true;renderCookScreen()"
       style="flex:1;padding:20px 0;font-size:15px;font-weight:800;border-radius:16px;border:2px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.1);color:#10b981;cursor:pointer;line-height:1.2">
       🧾<br>Ingredients
@@ -11760,6 +11782,8 @@ function renderCookScreen() {
   const cookEl = document.getElementById("cook-overlay-content");
   if(cookEl) {
     cookEl.innerHTML=`<div style="min-height:calc(100vh - 56px);display:flex;flex-direction:column;">${body}</div>`;
+    if(state.readAloud&&!isDone&&cookState._lastSpokenStep!==step){ cookState._lastSpokenStep=step; clearTimeout(_readTimer); _readTimer=setTimeout(speakCurrentStep,350); }
+    updateVoiceButtons();
     cookEl.scrollTop=0;
     const hot=cookEl.querySelector(".cook-side-body .ci-item.hot");
     if(hot){try{hot.scrollIntoView({block:"center"});}catch(e){}}
@@ -11808,6 +11832,191 @@ function renderTimerStrip(currentStep){
 }
 function dismissTimer(i){ if(cookState.timers&&cookState.timers[i]){ cookState.timers[i].done=false; } renderCookScreen(); }
 function timerBeep(){ try{const ctx=new(window.AudioContext||window.webkitAudioContext)();[0,300,600].forEach(d=>{const o=ctx.createOscillator(),g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.setValueAtTime(0.3,ctx.currentTime+d/1000);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+d/1000+0.3);o.start(ctx.currentTime+d/1000);o.stop(ctx.currentTime+d/1000+0.3);});}catch(e){} }
+
+// ── Screen wake lock ───────────────────────────────────────────────────────
+const NOSLEEP_MP4="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAu1tZGF0AAACrQYF//+p3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDE1MiByMjg1NCBlOWE1OTAzIC0gSC4yNjQvTVBFRy00IEFWQyBjb2RlYyAtIENvcHlsZWZ0IDIwMDMtMjAxNyAtIGh0dHA6Ly93d3cudmlkZW9sYW4ub3JnL3gyNjQuaHRtbCAtIG9wdGlvbnM6IGNhYmFjPTEgcmVmPTMgZGVibG9jaz0xOjA6MCBhbmFseXNlPTB4MzoweDExMyBtZT1oZXggc3VibWU9NyBwc3k9MSBwc3lfcmQ9MS4wMDowLjAwIG1peGVkX3JlZj0xIG1lX3JhbmdlPTE2IGNocm9tYV9tZT0xIHRyZWxsaXM9MSA4eDhkY3Q9MSBjcW09MCBkZWFkem9uZT0yMSwxMSBmYXN0X3Bza2lwPTEgY2hyb21hX3FwX29mZnNldD0tMiB0aHJlYWRzPTMgbG9va2FoZWFkX3RocmVhZHM9MSBzbGljZWRfdGhyZWFkcz0wIG5yPTAgZGVjaW1hdGU9MSBpbnRlcmxhY2VkPTAgYmx1cmF5X2NvbXBhdD0wIGNvbnN0cmFpbmVkX2ludHJhPTAgYmZyYW1lcz0zIGJfcHlyYW1pZD0yIGJfYWRhcHQ9MSBiX2JpYXM9MCBkaXJlY3Q9MSB3ZWlnaHRiPTEgb3Blbl9nb3A9MCB3ZWlnaHRwPTIga2V5aW50PTI1MCBrZXlpbnRfbWluPTI1IHNjZW5lY3V0PTQwIGludHJhX3JlZnJlc2g9MCByY19sb29rYWhlYWQ9NDAgcmM9Y3JmIG1idHJlZT0xIGNyZj0yMy4wIHFjb21wPTAuNjAgcXBtaW49MCBxcG1heD02OSBxcHN0ZXA9NCBpcF9yYXRpbz0xLjQwIGFxPTE6MS4wMACAAAAAD2WIhAA3//728P4FNjuZQQAAAu5tb292AAAAbG12aGQAAAAAAAAAAAAAAAAAAAPoAAAAZAABAAABAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAhh0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAAGQAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAIAAAACAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAABkAAAAAAABAAAAAAGQbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAoAAAABABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABO21pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAPtzdGJsAAAAl3N0c2QAAAAAAAAAAQAAAIdhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAIAAgBIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAMWF2Y0MBZAAK/+EAGGdkAAqs2V+WXAWyAAADAAIAAAMAUB4kSUABAAZo6+PLIsAAAAAYc3R0cwAAAAAAAAABAAAAAQAABAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAAC9QAAAAEAAAAUc3RjbwAAAAAAAAABAAAAMAAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNTcuODMuMTAw";
+async function acquireWakeLock(){
+  if(!cookState) return;
+  const pill=document.getElementById("cook-wake-pill");
+  try{
+    if("wakeLock" in navigator){
+      cookState.wakeLock=await navigator.wakeLock.request("screen");
+      cookState.wakeLock.addEventListener("release",()=>{ if(cookState) cookState.wakeLock=null; if(pill) pill.style.display="none"; });
+      if(pill) pill.style.display="";
+      return;
+    }
+  }catch(e){}
+  try{
+    const v=document.getElementById("nosleep-video");
+    if(v){ if(!v.getAttribute("src")) v.setAttribute("src",NOSLEEP_MP4); const pr=v.play(); if(pr&&pr.then) pr.then(()=>{ if(cookState) cookState.noSleep=true; if(pill) pill.style.display=""; }).catch(()=>{}); }
+  }catch(e){}
+}
+function releaseWakeLock(){
+  try{ if(cookState&&cookState.wakeLock){ cookState.wakeLock.release(); cookState.wakeLock=null; } }catch(e){}
+  try{ const v=document.getElementById("nosleep-video"); if(v) v.pause(); }catch(e){}
+  const p=document.getElementById("cook-wake-pill"); if(p) p.style.display="none";
+}
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&cookState&&cookState.recipe&&!cookState.wakeLock) acquireWakeLock(); });
+
+// ── Speech output ──────────────────────────────────────────────────────────
+function cleanForSpeech(t){
+  return String(t||"")
+    .replace(/[🟡🔵🟢🟣🧀🫙🥔🔪🌿🥦🍳⏱✅⚠️🎙🔊]/g,"")
+    .replace(/CHEESE BOWL\s*[—:-]\s*/gi,"Cheese bowl: ")
+    .replace(/PANTRY CUP\s*[—:-]\s*/gi,"Pantry cup: ")
+    .replace(/STOVE SIDE\s*[—:-]\s*/gi,"Stove side: ")
+    .replace(/BOWL\s*(\d)\s*(\([^)]*\))?\s*[—:-]\s*/gi,(m,n)=>"Bowl "+n+": ")
+    .replace(/\s*\+\s*/g,", ")
+    .replace(/°F/g," degrees")
+    .replace(/\bmin\b/g,"minutes").replace(/\btbsp\b/g,"tablespoons").replace(/\btsp\b/g,"teaspoons").replace(/\boz\b/g,"ounces").replace(/\blbs?\b/g,"pounds")
+    .replace(/(\d)½/g,"$1 and a half").replace(/½/g,"half").replace(/¼/g,"a quarter").replace(/¾/g,"three quarters").replace(/⅓/g,"a third").replace(/⅔/g,"two thirds").replace(/⅛/g,"an eighth")
+    .replace(/[—–]/g,", ").replace(/\s{2,}/g," ").replace(/\s,/g,",").trim();
+}
+let _speakVoice=null;
+function pickVoice(){ try{ const vs=speechSynthesis.getVoices(); if(!vs.length) return null; return vs.find(v=>/Samantha/i.test(v.name))||vs.find(v=>v.lang==="en-US"&&/Google US|Alex|Ava|Allison|Zoe/i.test(v.name))||vs.find(v=>v.lang==="en-US")||vs[0]; }catch(e){ return null; } }
+function speak(text,opts){
+  if(!("speechSynthesis" in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(cleanForSpeech(text));
+    u.rate=(opts&&opts.rate)||1.0; u.lang="en-US";
+    if(!_speakVoice) _speakVoice=pickVoice(); if(_speakVoice) u.voice=_speakVoice;
+    u.onstart=()=>{ window._speaking=true; };
+    u.onend=u.onerror=()=>{ setTimeout(()=>{ window._speaking=false; },250); };
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+if("speechSynthesis" in window){ try{ speechSynthesis.onvoiceschanged=()=>{ _speakVoice=pickVoice(); }; }catch(e){} }
+let _readTimer=null;
+function speakCurrentStep(){
+  if(!cookState||!cookState.recipe) return;
+  const steps=(cookState.recipe.instructions||[]).filter(x=>!x.startsWith("──"));
+  const t=steps[cookState.step]; if(!t) return;
+  const scale=scaleFactors[cookState.recipe.id]||1;
+  const txt=scale===1?t:scaleAmountsInText(t,scale,true);
+  let out=cleanForSpeech(txt);
+  if(/^(Bowl \d|Cheese bowl|Pantry cup|Stove side)/.test(out)&&!/into one bowl|together/i.test(out)) out=out.replace(/\.\s*$/,"")+". All into one bowl.";
+  speak("Step "+(cookState.step+1)+". "+out);
+}
+function toggleReadAloud(){ state.readAloud=!state.readAloud; scheduleSave(); if(cookState) cookState._lastSpokenStep=cookState.step; renderCookScreen(); if(state.readAloud){ speakCurrentStep(); } else { try{speechSynthesis.cancel();}catch(e){} } }
+function updateVoiceButtons(){
+  const r=document.getElementById("cook-read-btn"); if(r){ r.classList.toggle("active",!!state.readAloud); r.innerHTML=(state.readAloud?"🔊":"🔈")+'<span class="vlbl">'+(state.readAloud?" Reading aloud":"")+'</span>'; }
+  const m=document.getElementById("cook-mic-btn"); if(m){ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; m.style.display=SR?"":"none"; const on=!!(cookState&&cookState.voiceOn); m.classList.toggle("on",on); m.classList.toggle("thinking",!!window._voiceThinking); m.innerHTML=on?'<span class="vdot"></span>🎙<span class="vlbl"> '+(window._voiceThinking?"Thinking…":"Listening")+'</span>':'🎙<span class="vlbl"> Voice</span>'; }
+}
+function showHeard(t){ const el=document.getElementById("cook-heard"); if(!el) return; el.textContent="heard: “"+t+"”"; el.style.display=""; clearTimeout(window._heardT); window._heardT=setTimeout(()=>{ el.style.display="none"; },4000); }
+
+// ── Speech recognition ─────────────────────────────────────────────────────
+let _rec=null, _lastFinal="", _lastFinalAt=0;
+function toggleVoice(){
+  if(!cookState) return;
+  if(cookState.voiceOn){ stopVoice(); speak("Voice off."); return; }
+  startVoice(true);
+}
+function startVoice(userTap){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR||!cookState) return;
+  cookState.voiceOn=true;
+  if(userTap&&!state.voiceTipSeen){ state.voiceTipSeen=true; scheduleSave(); cookState.showVoiceTip=true; }
+  renderCookScreen();
+  if(userTap) speak("Listening. Start every command with chef.");
+  const run=()=>{
+    if(!cookState||!cookState.voiceOn) return;
+    try{
+      _rec=new SR(); _rec.continuous=true; _rec.interimResults=true; _rec.lang="en-US";
+      _rec.onresult=(ev)=>{ for(let i=ev.resultIndex;i<ev.results.length;i++){ const r=ev.results[i]; if(!r.isFinal) continue; const txt=(r[0].transcript||"").trim(); if(!txt) continue; if(window._speaking) continue; const now=Date.now(); if(txt.toLowerCase()===_lastFinal&&now-_lastFinalAt<1500) continue; _lastFinal=txt.toLowerCase(); _lastFinalAt=now; handleVoiceText(txt); } };
+      _rec.onerror=(e)=>{ if(e.error==="not-allowed"||e.error==="service-not-allowed"){ stopVoice(); state.voiceAutoStart=false; scheduleSave(); alert("Microphone access was blocked. Allow the mic for this site in your browser settings, then tap 🎙 again."); } };
+      _rec.onend=()=>{ if(cookState&&cookState.voiceOn) setTimeout(run,300); };
+      _rec.start();
+    }catch(e){ setTimeout(()=>{ if(cookState&&cookState.voiceOn) run(); },800); }
+  };
+  run();
+}
+function stopVoice(){ if(cookState) cookState.voiceOn=false; try{ if(_rec){ _rec.onend=null; _rec.stop(); } }catch(e){} _rec=null; updateVoiceButtons(); }
+
+const NUM_WORDS={a:1,an:1,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,ninety:90,half:0.5};
+function wordsToNumber(s){ s=(s||"").trim().toLowerCase(); if(/^\d+(\.\d+)?$/.test(s)) return parseFloat(s); let total=0,found=false; s.split(/[\s-]+/).forEach(w=>{ if(NUM_WORDS[w]!==undefined){ total+=NUM_WORDS[w]; found=true; } }); return found?total:null; }
+// Returns {cmd,arg} or null when there is no wake word
+function parseVoiceCommand(raw){
+  let t=String(raw||"").toLowerCase().replace(/[.,!?'"’]/g," ").replace(/\s+/g," ").trim();
+  const wake=t.match(/^(?:ok |okay |hey |hi |yo )?(?:chef|shef|jeff|chefs|cheff)\b[\s,]*/);
+  if(!wake) return null;
+  t=t.slice(wake[0].length).trim();
+  if(!t) return {cmd:"ack"};
+  let m;
+  if(/^(stop listening|turn off|voice off|go to sleep)\b/.test(t)) return {cmd:"voiceoff"};
+  if(/^(mute|stop talking|quiet|shush|be quiet)\b/.test(t)) return {cmd:"mute"};
+  if(/^(help|what can i say|commands)\b/.test(t)) return {cmd:"help"};
+  if(/^(next( step)?|go on|done|continue|forward|move on)$/.test(t)) return {cmd:"next"};
+  if(/^(back|previous( step)?|go back|last step)$/.test(t)) return {cmd:"back"};
+  if(/^(repeat|read it|read that|say (that |it )?again|again|read( the)? step)$/.test(t)) return {cmd:"repeat"};
+  if(/^(close|hide)( the)? ingredients$|^hide$/.test(t)) return {cmd:"ingr_close"};
+  if(/^(show |open )?(the |me the )?ingredients?$/.test(t)) return {cmd:"ingr_open"};
+  if(/^(set |start )?(a |the )?timer (for )?half an hour$|^(set |start )?(a |the )?half hour timer$/.test(t)) return {cmd:"timer_set",arg:1800};
+  if(/^(set |start )?(a |the )?timer (for )?(an? |one )?minute$/.test(t)) return {cmd:"timer_set",arg:60};
+  if((m=t.match(/^(?:set |start )?(?:a |the )?timer (?:for )?(.+?)\s*(minutes?|mins?|min|seconds?|secs?|hours?|hrs?)$/))||(m=t.match(/^(?:set |start )?(?:a |the |an )?(.+?)\s*(minutes?|mins?|min|seconds?|secs?|hours?|hrs?) timer$/))){ const n=wordsToNumber(m[1]); if(n!==null){ const u=m[2]; return {cmd:"timer_set",arg:Math.round(n*(u.startsWith("h")?3600:u.startsWith("m")?60:1))}; } }
+  if(/^(set |start )?(a |the )?timer for half an hour$/.test(t)) return {cmd:"timer_set",arg:1800};
+  if(/^(set |start )?(a |the )?timer for an? minute$/.test(t)) return {cmd:"timer_set",arg:60};
+  if(/^(start|go|begin)( the| my| a)? timer$|^start( the)? timer$|^go$|^start$/.test(t)) return {cmd:"timer_start"};
+  if(/^(pause|pause( the)? timer|stop( the)? timer|hold)$/.test(t)) return {cmd:"timer_pause"};
+  if(/^reset( the)? timer$|^reset$/.test(t)) return {cmd:"timer_reset"};
+  if((m=t.match(/^(?:how much time|how long|how much longer|time left|how much is left|what s left|whats left)(?: is left| left| is there| do i have| to go)?(?: on (?:the )?(.+))?$/))) return {cmd:"timer_left",arg:(m[1]||"").trim()};
+  if(/^(what step am i on|where am i|which step|what step)/.test(t)) return {cmd:"where"};
+  if(/^(scale )?(half|half recipe|halve it|cut it in half)$/.test(t)) return {cmd:"scale",arg:0.5};
+  if(/^(scale )?(double|double it|double recipe|two x)$/.test(t)) return {cmd:"scale",arg:2};
+  if(/^(full recipe|normal|scale normal|one x|reset scale)$/.test(t)) return {cmd:"scale",arg:1};
+  if((m=t.match(/^(?:how much|how many|how much of the|how many of the|what about the|what about)\s+(.+?)(?:\s+(?:do i need|is there|goes in|do we need|again))?$/))) return {cmd:"amount",arg:m[1].replace(/^(the|of|some)\s+/,"").trim()};
+  return {cmd:"ask",arg:t};
+}
+window.parseVoiceCommand=parseVoiceCommand;
+
+function voiceFindIngredients(q){
+  if(!cookState||!cookState.recipe) return [];
+  q=q.toLowerCase().replace(/s$/,"");
+  const scale=scaleFactors[cookState.recipe.id]||1;
+  return (cookState.recipe.ingredients||[]).filter(l=>l&&!l.startsWith("---")).filter(l=>{ const kws=ingrKeywords(l); return kws.some(k=>k.startsWith(q)||q.startsWith(k)||(q.length>3&&k.includes(q))); }).map(l=>scale===1?l:scaleAmountsInText(l,scale));
+}
+async function voiceAsk(q){
+  if(!cookState||!cookState.recipe) return;
+  window._voiceThinking=true; updateVoiceButtons(); speak("Let me check.");
+  const r=cookState.recipe; const steps=(r.instructions||[]).filter(x=>!x.startsWith("──"));
+  const sys=`You are a cooking assistant speaking to someone who is mid-recipe with their hands busy. Recipe: ${r.name}. Ingredients: ${(r.ingredients||[]).filter(x=>!x.startsWith("---")).join("; ")}. They are on step ${cookState.step+1} of ${steps.length}: "${steps[cookState.step]||""}". Answer in at most 2 short sentences, plain spoken English, no lists, no markdown, no emoji. Be specific and decisive.`;
+  try{
+    chatHistory.push({role:"user",content:"🎙 "+q});
+    const data=await callClaude({model:"claude-sonnet-4-6",max_tokens:220,system:sys,messages:[{role:"user",content:q}]});
+    const reply=(data.content&&data.content[0]&&data.content[0].text)||"I couldn't get an answer.";
+    chatHistory.push({role:"assistant",content:reply});
+    speak(reply);
+  }catch(e){ speak("Sorry, I couldn't reach the assistant."); }
+  window._voiceThinking=false; updateVoiceButtons();
+}
+function formatTimerSpoken(s){ s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60; const parts=[]; if(h) parts.push(h+(h===1?" hour":" hours")); if(m) parts.push(m+(m===1?" minute":" minutes")); if(ss&&!h) parts.push(ss+" seconds"); return parts.join(" ")||"zero seconds"; }
+function handleVoiceText(txt){
+  if(!cookState||!cookState.recipe) return;
+  const c=parseVoiceCommand(txt); if(!c) return;
+  showHeard(txt);
+  const steps=(cookState.recipe.instructions||[]).filter(x=>!x.startsWith("──"));
+  const t=cookState.timers&&cookState.timers[cookState.step];
+  switch(c.cmd){
+    case "ack": speak("Yes?"); break;
+    case "voiceoff": stopVoice(); speak("Voice off."); break;
+    case "mute": try{speechSynthesis.cancel();}catch(e){} break;
+    case "help": speak("Say chef, then: next, back, repeat, ingredients, start timer, pause, set a timer for 8 minutes, how much time is left, how much garlic, what step am I on, scale half, or ask me any cooking question."); break;
+    case "next": if(window._voiceThinking) break; if(cookState.step>=steps.length) break; cookNext(); if(!state.readAloud) speak(cookState.step>=steps.length?"That's it. All done.":"Step "+(cookState.step+1)+"."); break;
+    case "back": cookPrev(); if(!state.readAloud) speak("Step "+(cookState.step+1)+"."); break;
+    case "repeat": speakCurrentStep(); break;
+    case "ingr_open": cookState.showIngr=true; renderCookScreen(); speak("Ingredients."); break;
+    case "ingr_close": cookState.showIngr=false; renderCookScreen(); break;
+    case "timer_start": if(!t){ speak("No timer on this step. Say set a timer for, and a number of minutes."); break; } if(t.running){ speak("Already running, "+formatTimerSpoken(t.seconds)+" left."); break; } toggleTimer(cookState.step); speak("Timer started, "+formatTimerSpoken(t._original||t.seconds)+"."); break;
+    case "timer_pause": { const running=Object.entries(cookState.timers||{}).filter(([i,x])=>x&&x.running); if(t&&t.running){ toggleTimer(cookState.step); speak("Paused."); } else if(running.length===1){ toggleTimer(Number(running[0][0])); speak("Paused "+(running[0][1].label||"timer")+"."); } else speak(running.length?"Which timer? Go to that step and say pause.":"No timer running."); break; }
+    case "timer_reset": if(t){ resetTimer(cookState.step,t._original||t.seconds); speak("Timer reset."); } else speak("No timer here."); break;
+    case "timer_set": { const secs=c.arg; const existing=cookState.timers[cookState.step]; if(existing&&existing.interval) clearInterval(existing.interval); cookState.timers[cookState.step]={seconds:secs,_original:secs,running:false,interval:null,endsAt:0,done:false,label:(existing&&existing.label)||timerLabel(steps[cookState.step]||"",cookState.recipe,"")}; renderCookScreen(); toggleTimer(cookState.step); speak("Timer started, "+formatTimerSpoken(secs)+"."); break; }
+    case "timer_left": { const all=Object.entries(cookState.timers||{}).filter(([i,x])=>x&&(x.running||x.done)); let pick=null; if(c.arg){ const q=c.arg.replace(/^the /,""); pick=all.find(([i,x])=>(x.label||"").toLowerCase().includes(q))||null; } if(!pick&&t&&(t.running||t.done)) pick=[String(cookState.step),t]; if(pick){ const x=pick[1]; speak(x.done?(x.label||"Timer")+" is done.":formatTimerSpoken(x.seconds)+" left on "+(x.label||"the timer")+"."); } else if(all.length){ speak(all.map(([i,x])=>(x.label||"Step "+(Number(i)+1))+": "+(x.done?"done":formatTimerSpoken(x.seconds))).join(". ")); } else speak("No timers running."); break; }
+    case "where": speak("Step "+(cookState.step+1)+" of "+steps.length+". "+cleanForSpeech(steps[cookState.step]||"")); break;
+    case "scale": scaleFactors[cookState.recipe.id]=c.arg; renderCookScreen(); speak(c.arg===0.5?"Half recipe.":c.arg===2?"Double recipe.":"Full recipe."); break;
+    case "amount": { const hits=voiceFindIngredients(c.arg); if(hits.length) speak(hits.slice(0,3).map(cleanForSpeech).join(". ")); else speak("I don't see "+c.arg+" in this recipe."); break; }
+    case "ask": voiceAsk(c.arg); break;
+  }
+}
+
 function toggleTimer(stepIdx){
   if(stepIdx===undefined) stepIdx=cookState.step;
   const t=cookState.timers&&cookState.timers[stepIdx]; if(!t) return;
@@ -11818,7 +12027,7 @@ function toggleTimer(stepIdx){
     t.seconds=Math.max(0,Math.round((t.endsAt-Date.now())/1000));
     if(cookState.step===stepIdx){ const el=document.getElementById("cook-timer-display"); if(el){ el.textContent=formatTimer(t.seconds); } }
     const pill=document.getElementById("cook-timer-pill-"+stepIdx); if(pill) pill.textContent=formatTimer(t.seconds);
-    if(t.seconds<=0){ clearInterval(t.interval); t.running=false; t.done=true; timerBeep(); if(cookState.step!==stepIdx||true) renderCookScreen(); }
+    if(t.seconds<=0){ clearInterval(t.interval); t.running=false; t.done=true; timerBeep(); if(state.readAloud||(cookState&&cookState.voiceOn)) setTimeout(()=>speak("Timer done: "+(t.label||"step "+(stepIdx+1))+"."),700); renderCookScreen(); }
   },500);
   renderCookScreen();
 }
