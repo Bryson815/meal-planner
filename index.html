@@ -648,6 +648,16 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
   .nav-sub{font-size:11px}
   .days-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
   .days-grid .day-card{margin-bottom:0}
+  /* narrow day columns: label + actions on line 1, emoji + full recipe name on line 2 */
+  .days-grid .plan-slot-row{flex-wrap:wrap!important;row-gap:6px;padding:8px 10px 10px!important}
+  .days-grid .plan-slot-row > span:first-of-type{width:auto!important;flex:1 1 auto}
+  .days-grid .plan-slot-row > span:nth-of-type(2){order:2;font-size:20px!important}
+  .days-grid .plan-slot-row .slot-main{order:3;flex:1 1 calc(100% - 34px)!important;min-width:0}
+  .days-grid .plan-slot-row .slot-main .plan-recipe-name{font-size:13.5px!important;-webkit-line-clamp:3!important}
+  .days-grid .plan-slot-row .slot-main > div:first-child{flex-wrap:wrap;row-gap:3px}
+  .days-grid .plan-slot-row .slot-actions{order:1;margin-left:auto}
+  .days-grid .side-line{padding-left:12px!important;padding-right:8px!important}
+  .days-grid .plan-move-pop{margin-left:0!important}
   .stat-val{font-size:26px}
   .stat-box{padding:16px 14px}
 }
@@ -8387,14 +8397,14 @@ function renderPlan() {
       if (entry && entry.leftoverOf) {
         const src = allRecipes.find(r => r.id === entry.leftoverOf);
         return `
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:4px;border:1px dashed rgba(255,255,255,0.18);position:relative;">
+          <div class="plan-slot-row" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:10px;margin-bottom:4px;border:1px dashed rgba(255,255,255,0.18);position:relative;">
             <span style="font-size:10px;font-weight:700;color:var(--dim);width:58px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.7px;padding-left:6px;">${slot.label}</span>
             <span style="font-size:18px;flex-shrink:0">🔁</span>
-            <div style="flex:1;min-width:0" onclick="${src?`viewRecipeById('${src.id}')`:""}">
-              <div style="font-size:13px;font-weight:700;color:#cbd5e1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Leftovers: ${esc(src?src.name:"")}</div>
+            <div class="slot-main" style="flex:1;min-width:0;cursor:pointer" onclick="${src?`viewRecipeById('${src.id}')`:""}">
+              <div style="display:flex"><div class="plan-recipe-name" style="font-size:13px;font-weight:700;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25">Leftovers: ${esc(src?src.name:"")}</div></div>
               <div style="font-size:11px;color:var(--dim);margin-top:1px">no cooking · nothing to buy</div>
             </div>
-            <div style="display:flex;gap:4px;flex-shrink:0">
+            <div class="slot-actions" style="display:flex;gap:4px;flex-shrink:0">
               <button onclick="openPlanMove('${day}','${slot.key}')" title="Move to another day" style="padding:3px 8px;border-radius:6px;border:1px solid ${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.12)"};background:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.12)":"transparent"};color:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"#34d399":"var(--dim)"};font-size:11px;cursor:pointer;padding:3px 6px">⇄</button>
               <button onclick="openDaySlotPicker('${day}','${slot.key}')" title="Pick a different recipe" style="padding:3px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
               <button onclick="removeDaySlot('${day}','${slot.key}')" style="padding:3px 6px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-size:11px;cursor:pointer">✕</button>
@@ -8407,7 +8417,7 @@ function renderPlan() {
             <div style="position:absolute;left:0;top:0;bottom:0;width:2.5px;background:${slot.color};opacity:0.6;border-radius:2px 0 0 2px;"></div>
             <span style="font-size:10px;font-weight:700;color:${slot.color};width:58px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.7px;padding-left:6px;">${slot.label}</span>
             <span style="font-size:18px;flex-shrink:0">${recipe.emoji||"🍽️"}</span>
-            <div style="flex:1;min-width:0" onclick="viewRecipeById('${recipe.id}')" style="cursor:pointer;flex:1;min-width:0">
+            <div class="slot-main" onclick="viewRecipeById('${recipe.id}')" style="cursor:pointer;flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;min-width:0">
                 <div class="plan-recipe-name" style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:-0.1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25">${esc(recipe.name)}</div>
                 ${recipe.protein ? '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--green);flex-shrink:0">'+recipe.protein+'g</span>' : ""}
@@ -8416,7 +8426,7 @@ function renderPlan() {
               </div>
               <div style="font-size:11px;color:var(--dim);margin-top:1px">${esc(timeLabel(recipe,true))}</div>
             </div>
-            <div style="display:flex;gap:4px;flex-shrink:0">
+            <div class="slot-actions" style="display:flex;gap:4px;flex-shrink:0">
               <button onclick="openPlanMove('${day}','${slot.key}')" title="Move to another day" style="padding:3px 8px;border-radius:6px;border:1px solid ${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.12)"};background:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.12)":"transparent"};color:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"#34d399":"var(--dim)"};font-size:11px;cursor:pointer;padding:3px 6px">⇄</button>
               <button onclick="openDaySlotPicker('${day}','${slot.key}')" title="Pick a different recipe" style="padding:3px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
               <button onclick="removeDaySlot('${day}','${slot.key}')" style="padding:3px 6px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-size:11px;cursor:pointer">✕</button>
