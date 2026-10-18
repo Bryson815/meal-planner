@@ -7380,7 +7380,7 @@ function renderDinnerCard(dinner, i, total) {
 // ═══════════════════════════════════════════════════════════════════════════
 // SMART PLAN — two-week planner with leftover chains and ingredient overlap
 // ═══════════════════════════════════════════════════════════════════════════
-const PLAN_DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const PLAN_DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 let planWeekView = "this"; // "this" | "next"
 
 // Plan entries live at "Day_slot" keys: { recipeId, section } or { leftoverOf, section:"dinner", label }
@@ -7462,7 +7462,7 @@ function smartPlan(opts) {
   // Which day indexes get a dinner this week: fill from a preference order
   function slotPlanForWeek(w) {
     const base = w * 7;
-    const pref = opts.adultNights > 0 ? ["Sunday","Monday","Tuesday","Wednesday","Saturday","Thursday","Friday"] : ["Sunday","Monday","Tuesday","Wednesday","Thursday","Saturday","Friday"]; // Fri is the default eat-out night; Sat is the adults night
+    const pref = opts.adultNights > 0 ? ["Monday","Tuesday","Wednesday","Thursday","Saturday","Sunday","Friday"] : ["Monday","Tuesday","Wednesday","Thursday","Sunday","Saturday","Friday"]; // Fri is the default eat-out night; Sat is the adults night; Sunday is the big-cook night that feeds next week
     const chosen = [];
     pref.forEach(d => { if (chosen.length < opts.dinners) chosen.push(base + PLAN_DAYS.indexOf(d)); });
     // adult nights: Saturday first, then Friday
@@ -7651,7 +7651,7 @@ function renderPlan() {
   const el = document.getElementById("page-plan");
   if (!el) return;
 
-  const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   const allRecipes = [...state.dinners,...state.breakfasts,...state.lunches,...state.desserts].filter(r=>r&&r.id);
 
   const plan = normalizePlan(activePlan());
@@ -7735,7 +7735,7 @@ function renderPlan() {
     return `
       <div class="day-card" style="background:linear-gradient(145deg,rgba(255,255,255,0.045),rgba(255,255,255,0.02));border-radius:16px;margin-bottom:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.07);position:relative;">
         <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.05);position:relative;">
-          <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--green);margin-bottom:3px;opacity:0.8">${{Sunday:"BATCH DAY",Monday:"WEEKDAY",Tuesday:"WEEKDAY",Wednesday:"MID-WEEK",Thursday:"WEEKDAY",Friday:"FRIDAY",Saturday:"WEEKEND"}[day] || "WEEKDAY"}</div>
+          <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--green);margin-bottom:3px;opacity:0.8">${{Monday:"WEEKDAY",Tuesday:"WEEKDAY",Wednesday:"MID-WEEK",Thursday:"WEEKDAY",Friday:"FRIDAY",Saturday:"WEEKEND",Sunday:"SUNDAY · BATCH DAY"}[day] || "WEEKDAY"}</div>
           <div style="font-size:15px;font-weight:800;letter-spacing:-0.3px;color:var(--text)">${day}</div>
         </div>
         <div style="padding:8px 10px">
@@ -8000,7 +8000,7 @@ function renderVault() {
 }
 
 function quickAssignToWeek(recipeId) {
-  const DAYS = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   // Find first unassigned day
   const section = state.dinners.some(r=>r&&r.id===recipeId) ? "dinner" : state.breakfasts.some(r=>r&&r.id===recipeId) ? "breakfast" : "lunch";
   const plan = (typeof activePlan==="function") ? activePlan() : (state.weekPlan = state.weekPlan||{});
