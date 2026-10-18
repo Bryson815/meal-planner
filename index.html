@@ -743,6 +743,9 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
   .chat-fab{display:none !important}
   body.sheet-open .chat-fab,body.modal-open .chat-fab{display:none !important}
   body.modal-open .bottom-bar{display:none !important}
+  body.sheet-open .bottom-bar{display:none !important}
+  .sp-modal{z-index:600 !important}
+  .sp-modal .sp-box{padding-bottom:calc(20px + env(safe-area-inset-bottom)) !important}
   .modal-sticky-actions{z-index:470 !important}
   .grocery-item button{min-width:40px;min-height:40px}
   .stat-box{padding:12px 8px !important}
@@ -1971,7 +1974,7 @@ const DEFAULT_DESSERT = [DESSERT_LIBRARY[0]];
 
 const DEFAULT_DINNERS = [
   {
-    id:"d1", leftoverFor:["d2","l1"], day:"Sunday", emoji:"🍗", calories:560, protein:48, audience:"family",
+    id:"d1", leftoverFor:["d2","l1"], day:"Sunday", emoji:"🍗", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true, calories:560, protein:48, audience:"family",
     kidNote:"Pull a few thighs and potatoes off the pan BEFORE the balsamic-y veg get tossed together if the girls are picky about sauce. Potatoes and carrots are the sure things — serve with ketchup or ranch for dipping. Shred extra chicken for lunch tacos.",
     equipment:["Large rimmed sheet pan (or two)","Instant-read thermometer","Tongs","3 prep bowls"],
     activeTime:"15 min", totalTime:"50 min",
@@ -2017,7 +2020,7 @@ const DEFAULT_DINNERS = [
     tips:"ACID FINISH: Squeeze fresh lemon juice over everything right when it comes out of the oven — before serving. It wakes up all the roasted flavors dramatically. | MAILLARD / CRISPY SKIN: Patting the chicken completely dry is non-negotiable. Moisture is the enemy of browning — any water on the skin steams instead of sears. Dry chicken = golden crispy skin. | SINGLE LAYER: Don't crowd the vegetables on the pan or they'll steam instead of caramelize. Use two pans if needed. | RESTING: The 5 min rest after cooking lets juices redistribute — cutting immediately makes them run out onto the board."
   },
   {
-    id:"d2", usesLeftoversFrom:["d1"], day:"Tuesday", emoji:"🥬", calories:380, protein:40, audience:"family",
+    id:"d2", usesLeftoversFrom:["d1"], day:"Tuesday", emoji:"🥬", proteinType:"chicken", vegServings:3, vegForward:true, noSide:true, calories:380, protein:40, audience:"family",
     kidNote:"Lettuce cups are a hard sell for a 5-year-old — serve the filling over rice as a 'chicken rice bowl' for the girls, lettuce for the adults. Skip the sriracha in the pot; it goes on adult plates only. Water chestnuts are the fun crunchy part — let them pick those out.",
     equipment:["Large skillet (12-inch)","Box grater","Instant-read thermometer","Colander (water chestnuts)","4 prep bowls"],
     activeTime:"20 min", totalTime:"20 min",
@@ -2073,7 +2076,7 @@ const DEFAULT_DINNERS = [
     tips:"INTERNAL TEMP: Ground chicken/turkey goes to 160°F — ground meat is where we hold the line. At HIGH heat this happens in 6-8 min. | PAT DRY: Pat the ground meat dry before browning if it looks wet — excess moisture causes steaming not browning. | FOND: After browning the meat, scrape up any fond before adding the sauce. | ACID BALANCE: The rice wine vinegar is your acid here — taste the filling before serving and if it tastes flat, add another small splash of vinegar. It cuts through the richness of the hoisin. | MAILLARD: Same rule as ground turkey in Bolognese — leave it undisturbed 3 min to brown before breaking up. Browned turkey has dramatically more flavor than grey steamed turkey. | SALT CHECK: Hoisin is already salty — taste before adding any extra salt. | SAUCE TRICK: Mix the sauce in a small bowl before it goes in the pan so it coats everything evenly the moment it hits the heat."
   },
   {
-    id:"d3", leftoverDays:4, day:"Thursday", emoji:"🍝", calories:490, protein:44, audience:"family",
+    id:"d3", leftoverDays:4, day:"Thursday", emoji:"🍝", proteinType:"turkey", vegServings:3, vegForward:true, noSide:true, calories:490, protein:44, audience:"family",
     kidNote:"The veg is invisible — this is the easiest hidden-veg win in the vault. Plain buttered Brami on the side for anyone who rejects red sauce that night. Parmesan bowl on the table (Lucy's move). Sauce freezes in 2-cup portions for emergency dinners.",
     equipment:["Large Dutch oven or deep skillet","Large pot (pasta)","Colander","Box grater","4 prep bowls"],
     activeTime:"15 min", totalTime:"35 min",
@@ -2132,7 +2135,7 @@ const DEFAULT_DINNERS = [
     id:"dinner4",
     audience:"family",
     name:"Italian Steak Skewers with Salsa Verde",
-    emoji:"🥩",
+    emoji:"🥩", proteinType:"beef", vegServings:1,
     equipment:["Cast iron skillet or grill pan","Food processor (salsa verde)","Metal or soaked wooden skewers","Microplane","2 prep bowls"],
     day:"Saturday",
     calories:380,
@@ -2193,7 +2196,7 @@ const DEFAULT_DINNERS = [
     id:"dinner5", leftoverFor:["dinner6"],
     audience:"family",
     name:"Slow Cooker Chicken Tacos",
-    emoji:"🌮",
+    emoji:"🌮", proteinType:"chicken", vegServings:1,
     equipment:["Slow cooker with lid","Two forks (shredding)","1 prep bowl"],
     day:"Tuesday",
     calories:320,
@@ -2245,7 +2248,7 @@ const DEFAULT_DINNERS = [
     id:"dinner6", usesLeftoversFrom:["dinner5"],
     audience:"family",
     name:"Chicken Burrito Bowls",
-    emoji:"🥣",
+    emoji:"🥣", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true,
     equipment:["Cast iron or large skillet","Small saucepan with lid (beans)","Pot with lid (grains)","Instant-read thermometer","Box grater","3 prep bowls"],
     day:"Wednesday",
     calories:420,
@@ -2303,7 +2306,7 @@ const DEFAULT_DINNERS = [
     id:"dinner7", leftoverFor:["dinner39"],
     audience:"family",
     name:"Sheet Pan Salmon with Roasted Veg",
-    emoji:"🐟",
+    emoji:"🐟", proteinType:"fish", vegServings:2, vegForward:true, noSide:true,
     equipment:["Large sheet pan","Instant-read thermometer","Pastry brush","2 prep bowls"],
     day:"Thursday",
     calories:380,
@@ -2361,7 +2364,7 @@ const DEFAULT_DINNERS = [
     id:"dinner8",
     audience:"family",
     name:"Greek Chicken Bowls",
-    emoji:"🫒",
+    emoji:"🫒", proteinType:"chicken", vegServings:3, vegForward:true, noSide:true,
     equipment:["Cast iron skillet","Whisk","Box grater","1 prep bowl + marinating container"],
     day:"Friday",
     calories:410,
@@ -2422,7 +2425,7 @@ const DEFAULT_DINNERS = [
     id:"dinner9", leftoverDays:4,
     audience:"adults",
     name:"Slow Cooker Turkey Chili",
-    emoji:"🌶️",
+    emoji:"🌶️", proteinType:"turkey", vegServings:3, vegForward:true, noSide:true,
     equipment:["Slow cooker with lid","Large skillet (browning)","Box grater","Colander","3 prep bowls"],
     day:"Sunday",
     calories:340,
@@ -2488,7 +2491,7 @@ const DEFAULT_DINNERS = [
     id:"dinner10", leftoverFor:["dinner42"],
     audience:"adults",
     name:"Reverse Sear Beef Tenderloin",
-    emoji:"🥩",
+    emoji:"🥩", proteinType:"beef", vegServings:1,
     equipment:["Wire rack over sheet pan","Probe or instant-read thermometer","Cast iron skillet","Small saucepan (jus)","3 prep bowls"],
     day:"Saturday",
     calories:480,
@@ -2566,7 +2569,7 @@ const DEFAULT_DINNERS = [
     id:"dinner11",
     audience:"adults",
     name:"Marcella Hazan Tomato Butter Sauce with Brami",
-    emoji:"🍅",
+    emoji:"🍅", proteinType:"veg", vegServings:1, vegForward:true, noSide:true,
     equipment:["Medium saucepan (3–4 qt)","Large pot (pasta)","Colander","Box grater","1 prep bowl"],
     day:"Wednesday",
     calories:380,
@@ -2620,7 +2623,7 @@ const DEFAULT_DINNERS = [
     id:"dinner12", leftoverFor:["dinner42","dinner44"],
     audience:"adults",
     name:"Kenji's French Onion Soup",
-    emoji:"🧅",
+    emoji:"🧅", proteinType:"veg", vegServings:2, vegForward:true, noSide:true,
     equipment:["Large Dutch oven","Oven-safe soup bowls (crocks)","Sheet pan (for bowls under broiler)","Box grater","4 prep bowls"],
     day:"Sunday",
     calories:420,
@@ -2689,7 +2692,7 @@ const DEFAULT_DINNERS = [
     id:"dinner13",
     audience:"family",
     name:"Samin Nosrat Buttermilk Roast Chicken",
-    emoji:"🍗",
+    emoji:"🍗", proteinType:"chicken", vegServings:0,
     equipment:["Wire rack over sheet pan (or cast iron skillet)","Instant-read thermometer","Gallon zip bag or large container (brine)","1 prep bowl"],
     day:"Saturday",
     calories:390,
@@ -2743,7 +2746,7 @@ const DEFAULT_DINNERS = [
     id:"dinner14",
     audience:"family",
     name:"Kenji's Crispy Cast Iron Chicken Thighs",
-    emoji:"🍳",
+    emoji:"🍳", proteinType:"chicken", vegServings:0,
     equipment:["Cast iron skillet (10–12 inch)","Instant-read thermometer","Tongs","Paper towels","1 prep bowl"],
     day:"Tuesday",
     calories:340,
@@ -2790,7 +2793,7 @@ const DEFAULT_DINNERS = [
     audience:"family",
     name:"Kenji's Smash Burgers",
     originalIngredients:["1 lb 80/20 ground beef — fat is everything in a smash burger, do not use lean","American cheese slices (Kraft singles — they melt perfectly)","Martin's Potato Rolls","Diced white onion (pressed into patty while smashing)","Yellow mustard","Dill pickle slices","Special sauce: 2 tbsp mayo + 1 tbsp ketchup + 1 tsp mustard + 1 tsp pickle juice","Butter for toasting the buns"],
-    emoji:"🍔",
+    emoji:"🍔", proteinType:"beef", vegServings:0, noSide:true,
     equipment:["Cast iron skillet or griddle","Stiff metal spatula or burger press","Parchment squares","1 prep bowl"],
     day:"Friday",
     calories:520,
@@ -2844,7 +2847,7 @@ const DEFAULT_DINNERS = [
     id:"dinner16",
     audience:"adults",
     name:"Alison Roman's Spiced Chickpea & Spinach Stew",
-    emoji:"🫘",
+    emoji:"🫘", proteinType:"veg", vegServings:3, vegForward:true, noSide:true,
     equipment:["Large Dutch oven or wide pot","Colander (chickpeas)","Can opener","2 prep bowls"],
     day:"Thursday",
     calories:320,
@@ -2906,7 +2909,7 @@ const DEFAULT_DINNERS = [
     id:"dinner17",
     audience:"family",
     name:"Sheet Pan Chicken Fajitas",
-    emoji:"🌶️",
+    emoji:"🌶️", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true,
     equipment:["Large sheet pan","Instant-read thermometer","Small skillet (warming tortillas)","2 prep bowls"],
     day:"Tuesday",
     calories:350,
@@ -2966,7 +2969,7 @@ const DEFAULT_DINNERS = [
     audience:"adults",
     name:"Honey Garlic Salmon",
     originalIngredients:["4 salmon fillets, skin-on","3 tbsp honey","3 cloves garlic, minced","3 tbsp soy sauce (full sodium)","1 tbsp rice wine vinegar","1 tbsp sesame oil","2 tbsp butter for searing (gives richer crust vs avocado oil)","Sesame seeds and green onions to finish"],
-    emoji:"🍯",
+    emoji:"🍯", proteinType:"fish", vegServings:0,
     equipment:["Cast iron or nonstick skillet","Instant-read thermometer","Fish spatula","Paper towels","1 prep bowl (glaze)"],
     day:"Wednesday",
     calories:360,
@@ -3020,7 +3023,7 @@ const DEFAULT_DINNERS = [
     id:"dinner19",
     audience:"adults",
     name:"Shakshuka",
-    emoji:"🍳",
+    emoji:"🍳", proteinType:"egg", vegServings:2, vegForward:true, noSide:true,
     equipment:["Large oven-safe skillet or Dutch oven with lid","Small bowl or ramekin (cracking eggs)","2 prep bowls"],
     day:"Sunday",
     calories:280,
@@ -3085,7 +3088,7 @@ const DEFAULT_DINNERS = [
     id:"dinner20", leftoverDays:4,
     audience:"family",
     name:"Slow Cooker Chicken Tikka Masala",
-    emoji:"🍛",
+    emoji:"🍛", proteinType:"chicken", vegServings:1,
     equipment:["Slow cooker with lid","Box grater (ginger)","Can opener","1 prep bowl"],
     day:"Thursday",
     calories:380,
@@ -3147,7 +3150,7 @@ const DEFAULT_DINNERS = [
     id:"dinner21", leftoverFor:["dinner58"],
     audience:"family",
     name:"Serious Eats Turkey Meatballs",
-    emoji:"🍝",
+    emoji:"🍝", proteinType:"turkey", vegServings:1,
     equipment:["Large skillet (12-inch) with lid","Box grater","Instant-read thermometer","Sheet pan or plate for formed meatballs","3 prep bowls"],
     day:"Monday",
     calories:340,
@@ -3216,7 +3219,7 @@ const DEFAULT_DINNERS = [
     id:"dinner22", leftoverDays:4,
     audience:"adults",
     name:"White Bean & Turkey Sausage Stew",
-    emoji:"🫘",
+    emoji:"🫘", proteinType:"turkey", vegServings:3, vegForward:true, noSide:true,
     equipment:["Large Dutch oven","Colander (beans)","Instant-read thermometer","Can opener","2 prep bowls"],
     day:"Wednesday",
     calories:360,
@@ -3277,7 +3280,7 @@ const DEFAULT_DINNERS = [
     id:"dinner23",
     audience:"family",
     name:"Kenji's Ground Turkey Tacos",
-    emoji:"🌮",
+    emoji:"🌮", proteinType:"turkey", vegServings:2,
     equipment:["Large cast iron or skillet (12-inch)","Box grater","Small skillet or burner for charring tortillas","3 prep bowls"],
     day:"Tuesday",
     calories:310,
@@ -3349,7 +3352,7 @@ const DEFAULT_DINNERS = [
     id:"dinner24",
     audience:"adults",
     name:"NYT Slow Cooker Short Ribs",
-    emoji:"🥩",
+    emoji:"🥩", proteinType:"beef", vegServings:1,
     equipment:["Slow cooker with lid","Large cast iron or Dutch oven (searing)","Fine-mesh strainer","Small saucepan (reducing sauce)","Tongs","4 prep bowls"],
     day:"Sunday",
     calories:580,
@@ -3420,7 +3423,7 @@ const DEFAULT_DINNERS = [
     id:"dinner25",
     audience:"family",
     name:"Baked Chicken Parmesan",
-    emoji:"🍅",
+    emoji:"🍅", proteinType:"chicken", vegServings:1,
     equipment:["Sheet pan + parchment","Meat mallet or heavy pan","Instant-read thermometer","Oven-safe skillet (optional, for finishing)","Box grater","4 prep bowls"],
     day:"Tuesday",
     calories:450,
@@ -3492,7 +3495,7 @@ const DEFAULT_DINNERS = [
     audience:"family",
     name:"Cottage Cheese Chicken Fettuccine Alfredo",
     originalIngredients:["1.5 cups heavy cream (no substitution — this is what makes Alfredo Alfredo)","4 tbsp unsalted butter","1 cup freshly grated Parmesan Reggiano (block, not pre-grated)","3 cloves garlic, minced","Fresh fettuccine (dried works but fresh is traditional)","Pinch of nutmeg","Salt and white pepper","Fresh parsley to finish","Note: Traditional Alfredo is just butter + Parmesan + pasta water — no cream cheese, no cottage cheese"],
-    emoji:"🍝",
+    emoji:"🍝", proteinType:"chicken", vegServings:0,
     equipment:["Blender","Large skillet (12-inch)","Large pot (pasta)","Colander","Microplane","Instant-read thermometer","1 prep bowl"],
     day:"Wednesday",
     calories:420,
@@ -3560,7 +3563,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner27",
     name:"Garlic Butter Beef & Potato Bowl",
-    emoji:"🥣",
+    emoji:"🥣", proteinType:"beef", vegServings:1,
     equipment:["Sheet pan","Large skillet","Instant-read thermometer","Box grater","3 prep bowls"],
     audience:"family",
     day:"Tuesday",
@@ -3636,7 +3639,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner28",
     name:"Big Mac Burger Bowls",
-    emoji:"🍔",
+    emoji:"🍔", proteinType:"beef", vegServings:2, vegForward:true, noSide:true,
     equipment:["Sheet pan","Large skillet","Instant-read thermometer","Small bowl (special sauce)","3 prep bowls"],
     audience:"family",
     day:"Friday",
@@ -3712,7 +3715,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner29",
     name:"Lemon Herb Baked Cod",
-    emoji:"🐟",
+    emoji:"🐟", proteinType:"fish", vegServings:2,
     equipment:["Sheet pan + parchment","Instant-read thermometer","Microplane (zest)","Pastry brush","1 prep bowl"],
     audience:"adults",
     day:"Wednesday",
@@ -3761,7 +3764,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner30",
     name:"Chicken Piccata",
-    emoji:"🍋",
+    emoji:"🍋", proteinType:"chicken", vegServings:0,
     equipment:["Large skillet (12-inch)","Meat mallet or heavy pan","Instant-read thermometer","Foil (tenting)","4 prep bowls"],
     audience:"family",
     day:"Tuesday",
@@ -3820,7 +3823,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner31",
     name:"Thai Basil Chicken (Pad Krapow Gai)",
-    emoji:"🌿",
+    emoji:"🌿", proteinType:"chicken", vegServings:1,
     equipment:["Wok or large skillet (12-inch)","Rice cooker or pot with lid","Small skillet (fried eggs)","Instant-read thermometer","2 prep bowls"],
     audience:"adults",
     day:"Wednesday",
@@ -3876,7 +3879,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner32",
     name:"Pasta Carbonara",
-    emoji:"🍝",
+    emoji:"🍝", proteinType:"pork", vegServings:1,
     equipment:["Large pot (pasta)","Large skillet (12-inch)","Heatproof mixing bowl","Whisk","Microplane or box grater","Tongs","1 prep bowl"],
     audience:"family",
     day:"Thursday",
@@ -3919,7 +3922,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner33",
     name:"Shrimp Scampi",
-    emoji:"🦐",
+    emoji:"🦐", proteinType:"shellfish", vegServings:0,
     equipment:["Large skillet (12-inch)","Large pot (pasta)","Colander","Microplane (zest)","4 prep bowls"],
     audience:"family",
     day:"Friday",
@@ -3979,7 +3982,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner34",
     name:"Korean Beef Bulgogi",
-    emoji:"🥩",
+    emoji:"🥩", proteinType:"beef", vegServings:1,
     equipment:["Cast iron skillet or outdoor grill","Box grater (pear/ginger)","Whisk","Tongs","Marinating container or zip bag"],
     audience:"family",
     day:"Saturday",
@@ -4032,7 +4035,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner35",
     name:"Pan Sauce Pork Tenderloin",
-    emoji:"🥩",
+    emoji:"🥩", proteinType:"pork", vegServings:3,
     equipment:["Oven-safe skillet (12-inch)","Instant-read thermometer","Whisk","Foil (tenting)","4 prep bowls"],
     audience:"family",
     day:"Sunday",
@@ -4099,7 +4102,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner36",
     name:"Ahi Tuna Poke Bowl",
-    emoji:"🐟",
+    emoji:"🐟", proteinType:"fish", vegServings:2, vegForward:true, noSide:true,
     equipment:["Rice cooker or pot with lid","Whisk","Sharp knife (sushi-grade slicing)","Box grater (ginger)","2 prep bowls"],
     audience:"adults",
     day:"Saturday",
@@ -4167,7 +4170,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner37",
     name:"High Protein Pizza (Fit Flour Dough)",
-    emoji:"🍕",
+    emoji:"🍕", proteinType:"veg", vegServings:0,
     equipment:["Sheet pan + parchment (or pizza stone)","Large mixing bowl","Rolling pin or oiled hands","Box grater","2 prep bowls"],
     audience:"family",
     day:"Friday",
@@ -4239,7 +4242,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner38",
     name:"High Protein Greek Yogurt Naan",
-    emoji:"🫓",
+    emoji:"🫓", proteinType:"veg", vegServings:0,
     equipment:["Cast iron skillet","Large mixing bowl","Rolling pin","Pastry brush","Clean kitchen towel","2 prep bowls"],
     audience:"family",
     day:"Sunday",
@@ -4297,7 +4300,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner39", usesLeftoversFrom:["dinner7","dinner18"],
     name:"Leftover Salmon Burgers",
-    emoji:"🐟",
+    emoji:"🐟", proteinType:"fish", vegServings:1,
     equipment:["Cast iron or nonstick skillet","Fish spatula","Parchment-lined plate","1 prep bowl"],
     audience:"family",
     day:"Tuesday",
@@ -4355,7 +4358,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner40",
     name:"Blended Mushroom Burgers (Turkey or Beef)",
-    emoji:"🍔",
+    emoji:"🍔", proteinType:"turkey", vegServings:3,
     equipment:["Food processor or box grater","Cast iron skillet (12-inch)","Instant-read thermometer","Plate (cooling mushrooms)","2 prep bowls"],
     audience:"family",
     day:"Saturday",
@@ -4428,7 +4431,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner41", leftoverFor:["lunch5","l2"],
     name:"RecTeq Smoked Turkey Breast",
-    emoji:"🦃",
+    emoji:"🦃", proteinType:"turkey", vegServings:0,
     equipment:["RecTeq pellet grill","Probe thermometer (leave-in) or instant-read","Large pot (brine)","Wire rack + sheet pan","Foil (tenting)","2 prep bowls"],
     audience:"family",
     day:"Sunday",
@@ -4506,7 +4509,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner42", usesLeftoversFrom:["dinner10"],
     name:"Steak Sandwiches with Caramelized Onions & Au Jus",
-    emoji:"🥖",
+    emoji:"🥖", proteinType:"beef", vegServings:1, noSide:true,
     equipment:["Large skillet (12-inch) or wide pot (onions)","Small saucepan (au jus)","Cast iron or second skillet (steak/toast)","3 prep bowls"],
     audience:"adults",
     day:"Saturday",
@@ -4579,7 +4582,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner44",
     name:"French Onion Soup + Steak Sandwiches (Combined Cook)",
-    emoji:"🧅",
+    emoji:"🧅", proteinType:"beef", vegServings:2, vegForward:true, noSide:true,
     equipment:["Your largest Dutch oven (10 onions)","Small saucepan (au jus)","Skillet (steak + toast)","Oven-safe soup bowls + sheet pan","Box grater","6 prep bowls"],
     audience:"adults",
     day:"Saturday",
@@ -4674,7 +4677,7 @@ const DEFAULT_DINNERS = [
   ,{
     id:"dinner45", leftoverFor:["lunch9"],
     name:"Best Broccoli Cheddar Soup",
-    emoji:"🥦",
+    emoji:"🥦", proteinType:"veg", vegServings:2, vegForward:true, noSide:true,
     equipment:["Dutch oven with lid","Box grater","Immersion blender (or regular blender)","Sheet pan + parchment","4 prep bowls + 1 large measuring cup"],
     audience:"family",
     day:"Saturday",
@@ -4774,7 +4777,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner46", leftoverFor:["dinner57"],
     name:"Crispy Baked Chicken Tenders + 3 Dips",
-    emoji:"🍗",
+    emoji:"🍗", proteinType:"chicken", vegServings:0,
     audience:"family",
     day:"Tuesday",
     calories:420,
@@ -4836,7 +4839,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner47", quick:true,
     name:"One-Pot Cheesy Taco Pasta",
-    emoji:"🌮",
+    emoji:"🌮", proteinType:"turkey", vegServings:2,
     audience:"family",
     day:"Wednesday",
     calories:520,
@@ -4901,7 +4904,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner48",
     name:"Breakfast-for-Dinner Sheet Pan Night",
-    emoji:"🥞",
+    emoji:"🥞", proteinType:"chicken", vegServings:1, noSide:true,
     audience:"family",
     day:"Friday",
     calories:480,
@@ -4961,7 +4964,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner49",
     name:"Chicken Meatball Spaghetti",
-    emoji:"🍝",
+    emoji:"🍝", proteinType:"chicken", vegServings:1,
     audience:"family",
     day:"Monday",
     calories:540,
@@ -5027,7 +5030,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner50",
     name:"Baked Mac & Cheese (Protein-Boosted)",
-    emoji:"🧀",
+    emoji:"🧀", proteinType:"veg", vegServings:0,
     audience:"family",
     day:"Sunday",
     calories:620,
@@ -5103,7 +5106,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner51", quick:true,
     name:"Hidden-Veg Chicken Quesadillas",
-    emoji:"🫓",
+    emoji:"🫓", proteinType:"chicken", vegServings:1,
     audience:"family",
     day:"Thursday",
     calories:450,
@@ -5157,7 +5160,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner52",
     name:"Kevin's Korean BBQ Chicken Rice Bowls",
-    emoji:"🍚",
+    emoji:"🍚", proteinType:"chicken", vegServings:2,
     audience:"family",
     quick:true,
     day:"Monday",
@@ -5211,7 +5214,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner53",
     name:"Teriyaki Meatball Bowls",
-    emoji:"🍡",
+    emoji:"🍡", proteinType:"chicken", vegServings:2,
     audience:"family",
     quick:true,
     day:"Tuesday",
@@ -5261,7 +5264,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner54",
     name:"Rotisserie Chicken Enchilada Skillet",
-    emoji:"🫔",
+    emoji:"🫔", proteinType:"chicken", vegServings:2, vegForward:true, noSide:true,
     audience:"family",
     quick:true,
     sharedAnchor:"rotisserie",
@@ -5326,7 +5329,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner55",
     name:"Dumpling Night",
-    emoji:"🥟",
+    emoji:"🥟", proteinType:"chicken", vegServings:2,
     audience:"family",
     quick:true,
     day:"Thursday",
@@ -5385,7 +5388,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner56",
     name:"Salmon Burger Bowls or Buns",
-    emoji:"🍔",
+    emoji:"🍔", proteinType:"fish", vegServings:2, vegForward:true, noSide:true,
     audience:"family",
     quick:true,
     day:"Friday",
@@ -5438,7 +5441,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner57",
     name:"Rotisserie Chicken Caesar Wraps",
-    emoji:"🌯",
+    emoji:"🌯", proteinType:"chicken", vegServings:1, noSide:true,
     audience:"family",
     quick:true,
     sharedAnchor:"rotisserie",
@@ -5485,7 +5488,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner58",
     name:"Italian Meatball Subs",
-    emoji:"🥖",
+    emoji:"🥖", proteinType:"chicken", vegServings:0,
     audience:"family",
     quick:true,
     usesLeftoversFrom:["dinner21"],
@@ -5541,7 +5544,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner59",
     name:"Sheet Pan Nugget \"Fajitas\"",
-    emoji:"🌮",
+    emoji:"🌮", proteinType:"chicken", vegServings:2,
     audience:"family",
     quick:true,
     day:"Tuesday",
@@ -5593,7 +5596,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner60",
     name:"Pesto Gnocchi with Chicken Sausage",
-    emoji:"🍃",
+    emoji:"🍃", proteinType:"chicken", vegServings:1,
     audience:"family",
     quick:true,
     day:"Wednesday",
@@ -5652,7 +5655,7 @@ const DEFAULT_DINNERS = [
   {
     id:"dinner61",
     name:"Rotisserie Chicken Quesadilla Night",
-    emoji:"🧀",
+    emoji:"🧀", proteinType:"chicken", vegServings:0, noSide:true,
     audience:"family",
     quick:true,
     sharedAnchor:"rotisserie",
@@ -6663,6 +6666,7 @@ async function loadFromSupabase() {
         if (plan.sauces) state.sauces = plan.sauces;
         if (plan.weekPlan) state.weekPlan = normalizePlan(plan.weekPlan);
         if (plan.nextWeekPlan) state.nextWeekPlan = normalizePlan(plan.nextWeekPlan);
+        if (plan.prepDone) state.prepDone = plan.prepDone;
         if (plan.cookHistory) state.cookHistory = plan.cookHistory;
         if (plan.groceryNotes) state.groceryNotes = plan.groceryNotes;
       setSyncStatus("saved");
@@ -6674,7 +6678,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{} };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -6715,6 +6719,7 @@ function loadFromLocal() {
     if (saved.sauces) state.sauces = saved.sauces;
     if (saved.weekPlan) state.weekPlan = normalizePlan(saved.weekPlan);
     if (saved.nextWeekPlan) state.nextWeekPlan = normalizePlan(saved.nextWeekPlan);
+    if (saved.prepDone) state.prepDone = saved.prepDone;
     if (saved.cookHistory) state.cookHistory = saved.cookHistory;
     if (saved.groceryNotes) state.groceryNotes = saved.groceryNotes;
   } catch(e) {}
@@ -6985,6 +6990,7 @@ function viewRecipe(section, id) {
         <div style="color:var(--dim);font-size:13px;margin-top:4px;margin-bottom:10px">${esc(item.description)}</div>
         ${item.audience ? `<div style="margin-bottom:8px"><span class="tag ${item.audience==='adults'?'tag-amber':'tag-pink'}">${item.audience==='adults'?'🍷 Adults night':'👨‍👩‍👧‍👧 Family'}</span></div>` : ''}
         ${item.kidNote ? `<div class="info-box" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.07);margin-bottom:10px"><span class="info-label" style="color:#f472b6">👧 KIDS:</span>${esc(item.kidNote)}</div>` : ''}
+        ${(function(){ const sd=(section==="dinner")?sideForRecipe(item.id):null; if(!sd) return ""; return `<details class="info-box" style="border-color:rgba(134,239,172,0.35);background:rgba(16,185,129,0.06);margin-bottom:10px;padding:10px 12px"><summary style="cursor:pointer;font-weight:700;color:#86efac;list-style:none">🥦 Tonight's side: ${esc(sd.name)} <span style="font-weight:400;color:var(--dim);font-size:12px">· ${sd.method==="oven"?"oven":sd.method==="stove"?"stovetop":sd.method==="micro"?"microwave":"no cook"} · tap for steps</span></summary><div style="margin-top:8px;font-size:13px;color:var(--muted)"><div style="margin-bottom:6px">${sd.ingredients.map(esc).join(" · ")}</div>${sd.steps.map((st,i)=>`<div style="padding:3px 0"><b style="color:var(--text)">${i+1}.</b> ${esc(st)}</div>`).join("")}${sd.kidNote?`<div style="margin-top:6px;color:#f472b6">👧 ${esc(sd.kidNote)}</div>`:""}</div></details>`; })()}
         <button class="desk-only" onclick="window.chatContext=arguments[0];openChatAssistant(arguments[0]);renderChatMessages()" onmousedown="(function(){const allR=[...state.dinners,...state.breakfasts,...state.lunches,...state.desserts];window.chatContext=allR.find(r=>r&&r.id==='${item.id}');})()" style="width:100%;margin-top:8px;padding:10px;border-radius:12px;border:1px solid rgba(16,185,129,0.3);background:transparent;color:var(--green);font-weight:600;font-size:14px;cursor:pointer">
         👨‍🍳 Ask About This Recipe
       </button>
@@ -7475,6 +7481,75 @@ function daysSinceCooked(id) {
   return isNaN(d) ? 999 : Math.floor((Date.now() - d) / 86400000);
 }
 
+
+// ── 5-minute vegetable sides (auto-attached to dinners by the planner) ──
+const SIDES = [
+  { id:"side-roast-broccoli", name:"Roasted Broccoli", emoji:"🥦", method:"oven", cuisine:["any"], vegServings:2,
+    ingredients:["1 large head broccoli (about 5 cups florets)","1½ tbsp olive or avocado oil","½ tsp kosher salt","½ lemon","2 tbsp grated Parmesan (optional)"],
+    steps:["Oven 425°F. Cut 1 head broccoli into florets, toss on a sheet pan with 1½ tbsp oil + ½ tsp salt.","Roast 15 min uncovered until edges are crisp and browned — don't stir.","Squeeze ½ lemon over, scatter 2 tbsp Parmesan. Serve hot."],
+    kidNote:"Crispy edges are the hook. Serve a few 'broccoli chips' with ranch for dipping." },
+  { id:"side-cucumber-salad", name:"Cucumber Rice-Vinegar Salad", emoji:"🥒", method:"raw", cuisine:["asian","any"], vegServings:1,
+    ingredients:["2 Persian cucumbers (or 1 English), sliced thin","2 tbsp rice vinegar","½ tsp sugar","¼ tsp kosher salt","1 tsp sesame seeds (optional)"],
+    steps:["Slice 2 cucumbers into thin coins into a bowl.","Add 2 tbsp rice vinegar + ½ tsp sugar + ¼ tsp salt. Toss, sit 5 min.","Sprinkle 1 tsp sesame seeds. Serve cold."],
+    kidNote:"Skip the sesame for the girls — plain vinegar cucumbers are a kid favorite." },
+  { id:"side-buttered-peas", name:"Buttered Peas", emoji:"🟢", method:"micro", cuisine:["american","any"], vegServings:1,
+    ingredients:["2 cups frozen peas","1 tbsp butter","¼ tsp kosher salt","Squeeze of lemon (optional)"],
+    steps:["Microwave 2 cups frozen peas with 1 tbsp water, covered, 4 min.","Drain. Stir in 1 tbsp butter + ¼ tsp salt. Lemon if you like."],
+    kidNote:"The safest green on the planet. Lucy can eat them with a spoon." },
+  { id:"side-green-beans", name:"Green Beans with Lemon + Almonds", emoji:"🫛", method:"stove", cuisine:["american","med","any"], vegServings:2,
+    ingredients:["12 oz green beans, trimmed (bagged is fine)","1 tbsp butter","2 tbsp sliced almonds","½ lemon","¼ tsp kosher salt"],
+    steps:["Boil 12 oz green beans in salted water 4 min, uncovered. Drain.","Same pan: melt 1 tbsp butter, toast 2 tbsp almonds 1 min. Add beans, toss 1 min.","Squeeze ½ lemon, ¼ tsp salt."],
+    kidNote:"Pull a handful of plain beans out before the almonds for the girls — dip in ketchup if that's what it takes." },
+  { id:"side-glazed-carrots", name:"Honey-Glazed Carrots", emoji:"🥕", method:"stove", cuisine:["american","any"], vegServings:2,
+    ingredients:["1 lb carrots, cut into coins (or 1 bag baby carrots)","1 tbsp butter","1 tbsp honey","¼ tsp kosher salt","⅓ cup water"],
+    steps:["Carrots + ⅓ cup water + 1 tbsp butter + ¼ tsp salt in a skillet. Lid on, medium, 6 min.","Lid off. Add 1 tbsp honey, cook 2–3 min until the water's gone and carrots are glazed."],
+    kidNote:"Sweet and soft — a reliable yes." },
+  { id:"side-sweet-potato", name:"Roasted Sweet Potato Cubes", emoji:"🍠", method:"oven", cuisine:["american","mex","any"], vegServings:2,
+    ingredients:["2 medium sweet potatoes, ¾-inch cubes","1½ tbsp avocado oil","½ tsp kosher salt","½ tsp smoked paprika (adults) or cinnamon (kids)"],
+    steps:["Oven 425°F. Toss 2 cubed sweet potatoes with 1½ tbsp oil + ½ tsp salt on a sheet pan.","Roast 20 min, flip once at 10, until browned.","Dust half with paprika, half with a pinch of cinnamon."],
+    kidNote:"Cinnamon half is the kid half. Call them 'sweet potato fries'." },
+  { id:"side-salad", name:"Simple Side Salad", emoji:"🥗", method:"raw", cuisine:["any"], vegServings:1,
+    ingredients:["1 bag mixed greens or chopped romaine","1 cup cherry tomatoes, halved","½ cucumber, sliced","3 tbsp Bolthouse Ranch or Primal Kitchen Greek dressing"],
+    steps:["Greens + 1 cup tomatoes + ½ cucumber in a bowl.","Dress with 3 tbsp dressing right before serving. Toss."],
+    kidNote:"Deconstruct: tomatoes and cucumbers in a pile with ranch to dip. Greens optional." },
+  { id:"side-steam-broccoli", name:"Steam-Bag Broccoli + Parmesan", emoji:"🥦", method:"micro", cuisine:["any"], vegServings:2,
+    ingredients:["1 steam-in-bag broccoli florets (12 oz)","1 tbsp butter","3 tbsp grated Parmesan","Pinch kosher salt"],
+    steps:["Microwave the bag per package (about 5 min).","Tip into a bowl, toss with 1 tbsp butter + 3 tbsp Parmesan + pinch of salt."],
+    kidNote:"Cheese on broccoli is the Lemmon house rule. Let Lucy add her own." },
+  { id:"side-spinach", name:"Garlic Sautéed Spinach", emoji:"🍃", method:"stove", cuisine:["med","american","any"], vegServings:2,
+    ingredients:["10 oz baby spinach (1 big bag)","1 tbsp olive oil","2 cloves garlic, sliced","¼ tsp kosher salt","Squeeze of lemon"],
+    steps:["Olive oil + 2 sliced garlic cloves in a large skillet over medium 1 min.","Add the whole bag of spinach in batches, toss 2–3 min until just wilted. ¼ tsp salt, squeeze of lemon."],
+    kidNote:"Honest note: kids rarely take this one. It's for the adults — give the girls peas or cucumbers instead." },
+  { id:"side-corn", name:"Corn with Butter + Tajín", emoji:"🌽", method:"micro", cuisine:["mex","american","any"], vegServings:1,
+    ingredients:["2 cups frozen corn (or 3 ears, kernels cut off)","1 tbsp butter","¼ tsp kosher salt","Tajín for the adults","Lime wedge"],
+    steps:["Microwave 2 cups corn with 1 tbsp water, covered, 3 min. Drain.","Stir in 1 tbsp butter + ¼ tsp salt. Plate the kids' portion. Tajín + lime on the adults'."],
+    kidNote:"Sweet corn with butter — zero resistance." },
+  { id:"side-broccoli-rice", name:"Cheesy Broccoli Rice", emoji:"🧀", method:"stove", cuisine:["american","any"], vegServings:2,
+    ingredients:["1 cup jasmine rice","3 cups broccoli, chopped small (leftover chopped broccoli is perfect)","1 cup sharp cheddar, shredded","1 tbsp butter","½ tsp kosher salt"],
+    steps:["Cook 1 cup rice per package, lid on. In the last 5 min, pile 3 cups chopped broccoli on top and re-cover.","Off heat: fold in 1 cup cheddar + 1 tbsp butter + ½ tsp salt. Lid on 2 min to melt."],
+    kidNote:"The soup in rice form. This is the side the girls ask for." },
+  { id:"side-edamame", name:"Edamame with Flaky Salt", emoji:"🫘", method:"micro", cuisine:["asian","any"], vegServings:1,
+    ingredients:["1 bag frozen edamame in pods (12 oz)","Flaky salt","Optional: 1 tsp Bachan's or soy sauce"],
+    steps:["Microwave the bag per package (about 4 min) or boil 3 min.","Toss with flaky salt. Adults: drizzle 1 tsp Bachan's."],
+    kidNote:"Pods are a toy. Kids pop them themselves — a guaranteed vegetable." },
+];
+const SIDES_BY_ID = {}; SIDES.forEach(x => SIDES_BY_ID[x.id] = x);
+function sideCuisineOf(r){ const n=((r&&r.name)||"").toLowerCase(); if(/korean|thai|teriyaki|bulgogi|poke|dumpling|lettuce cup|basil|asian/.test(n)) return "asian"; if(/taco|burrito|fajita|enchilada|quesadilla|mexican|nugget "fajita|salsa/.test(n)) return "mex"; if(/greek|chickpea|piccata|scampi|shakshuka|cod|lemon herb|mediterranean|salmon/.test(n)) return "med"; return "american"; }
+function sideMethodUsed(r){ const txt=((r&&r.instructions)||[]).join(" ").toLowerCase(); return { oven:/\b(oven|bake|roast|broil|sheet pan)\b/.test(txt), stove:/\b(skillet|saucepan|dutch oven|simmer|sauté|saute|sear|boil)\b/.test(txt) }; }
+// Pick a side that fits the dinner's cuisine and doesn't fight for the same burner/oven
+function pickSide(recipe, exclude){
+  if(!recipe || recipe.noSide) return null;
+  const cz=sideCuisineOf(recipe), used=sideMethodUsed(recipe);
+  const ok=SIDES.filter(x=>!(exclude||[]).includes(x.id));
+  const scored=ok.map(x=>{ let sc=0; if(x.cuisine.includes(cz)) sc+=10; if(x.cuisine.includes("any")) sc+=3; if(used.oven && x.method==="oven") sc-=8; if(used.stove && x.method==="stove") sc-=3; if(x.method==="micro"||x.method==="raw") sc+=2; sc+=Math.random()*2; return {x,sc}; }).sort((a,b)=>b.sc-a.sc);
+  return scored.length?scored[0].x.id:null;
+}
+function cycleSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e||!e.recipeId) return; const r=byIdAll(e.recipeId); const next=pickSide(Object.assign({},r,{noSide:false}),[e.side]); e.side=next||e.side; planSet(plan,day,slot,e); scheduleSave(); renderPlan(); }
+function removeSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e) return; delete e.side; e.noSide=true; planSet(plan,day,slot,e); scheduleSave(); renderPlan(); }
+function addSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e||!e.recipeId) return; const r=byIdAll(e.recipeId); delete e.noSide; e.side=pickSide(Object.assign({},r,{noSide:false}),[]); planSet(plan,day,slot,e); scheduleSave(); renderPlan(); }
+// Which side is attached to a recipe anywhere on the visible/this-week plan?
+function sideForRecipe(recipeId){ for(const plan of [state.weekPlan||{}, state.nextWeekPlan||{}]){ for(const k of Object.keys(plan)){ const e=plan[k]; if(e&&e.recipeId===recipeId&&e.side&&SIDES_BY_ID[e.side]) return SIDES_BY_ID[e.side]; } } return null; }
+
 // Build the two-week dinner timeline as a flat array of 14 slots (index 0 = this Sunday)
 function smartPlan(opts) {
   opts = Object.assign({ dinners: 5, adultNights: 1, quickNights: 2, breakfasts: 2, lunches: 2, nextWeek: true, keepExisting: true }, opts || {});
@@ -7531,12 +7606,23 @@ function smartPlan(opts) {
     if (r.sharedAnchor) timeline.forEach((t, j) => { if (t.dinner && t.dinner.recipeId && Math.abs(j - idx) <= 3 && j !== idx) { const o = byId[t.dinner.recipeId]; if (o && o.sharedAnchor === r.sharedAnchor) s += 18; } });
     // leftover chain: this recipe uses leftovers from something placed 1–3 days earlier (crosses week boundary naturally)
     (r.usesLeftoversFrom || []).forEach(src => { for (let back = 1; back <= 3; back++) { const t = timeline[idx - back]; if (t && t.dinner && t.dinner.recipeId === src) s += 60; } });
-    // don't repeat the same protein word two nights running
-    const prev = timeline[idx - 1]; if (prev && prev.dinner && prev.dinner.recipeId) { const o = byId[prev.dinner.recipeId]; if (o && mainProtein(o) === mainProtein(r)) s -= 12; }
+    // don't repeat the same protein two nights running
+    const prev = timeline[idx - 1]; if (prev && prev.dinner && prev.dinner.recipeId) { const o = byId[prev.dinner.recipeId]; if (o && mainProtein(o) === mainProtein(r) && !(r.usesLeftoversFrom || []).includes(o.id)) s -= 30; }
+    // quiet variety targets for this week: ≥2 fish, ≤2 red meat, ≥1 veg-forward
+    const wk = Math.floor(idx / 7); const wkDinners = timeline.filter((t, j) => Math.floor(j / 7) === wk && t.dinner && t.dinner.recipeId).map(t => byId[t.dinner.recipeId]).filter(Boolean);
+    const fishN = wkDinners.filter(o => /fish|shellfish/.test(o.proteinType || "")).length;
+    const redN = wkDinners.filter(o => /beef|pork/.test(o.proteinType || "")).length;
+    const vegN = wkDinners.filter(o => o.vegForward).length;
+    const pt = r.proteinType || "";
+    if (/fish|shellfish/.test(pt)) { if (fishN < 2) s += 14; else s -= 22; }
+    if (/beef|pork/.test(pt) && redN >= 2) s -= 30;
+    // same protein within the last 2 days (beyond the consecutive-night check)
+    const two = timeline[idx - 2]; if (two && two.dinner && two.dinner.recipeId) { const o = byId[two.dinner.recipeId]; if (o && mainProtein(o) === mainProtein(r)) s -= 8; }
+    if (r.vegForward && vegN < 1) s += 10;
     s += Math.random() * 8;
     return s;
   }
-  function mainProtein(r) { const n = (r.name || "").toLowerCase(); return ["salmon","shrimp","cod","tuna","steak","beef","pork","turkey","chicken","meatball","bean","egg"].find(p => n.includes(p)) || "other"; }
+  function mainProtein(r) { if (r.proteinType) return r.proteinType; const n = (r.name || "").toLowerCase(); return ["salmon","shrimp","cod","tuna","steak","beef","pork","turkey","chicken","meatball","bean","egg"].find(p => n.includes(p)) || "other"; }
   function reasonFor(r, idx, wantAdult, wantQuick) {
     const reasons = [];
     (r.usesLeftoversFrom || []).forEach(src => { for (let back = 1; back <= 3; back++) { const t = timeline[idx - back]; if (t && t.dinner && t.dinner.recipeId === src) reasons.push("🔁 uses leftovers from " + (byId[src] ? byId[src].name.split(" ").slice(0, 3).join(" ") : "earlier") + " (" + t.day.slice(0, 3) + ")"); } });
@@ -7567,7 +7653,7 @@ function smartPlan(opts) {
     const pool = dinners.filter(r => !used.has(r.id));
     if (!pool.length) continue;
     const best = pool.map(r => ({ r, s: scoreDinner(r, i, wantAdult, wantQuick) })).sort((a, b) => b.s - a.s)[0].r;
-    t.dinner = { recipeId: best.id, section: "dinner" }; t.dinnerReason = reasonFor(best, i, wantAdult, wantQuick);
+    t.dinner = { recipeId: best.id, section: "dinner" }; const sd = pickSide(best, []); if (sd) t.dinner.side = sd; t.dinnerReason = reasonFor(best, i, wantAdult, wantQuick);
   }
 
   // Breakfasts & lunches per week: pick by rating/recency; lunches that use a placed dinner's leftovers get priority and land 1–2 days after
@@ -7594,8 +7680,8 @@ function smartPlan(opts) {
 }
 
 let smartPlanDraft = null;
-function showAutoplanOptions() { renderSmartPlanModal("options"); const m = document.getElementById("autoplan-modal"); if (m) m.style.display = "flex"; }
-function closeAutoplanModal() { const m = document.getElementById("autoplan-modal"); if (m) m.style.display = "none"; }
+function showAutoplanOptions() { renderSmartPlanModal("options"); const m = document.getElementById("autoplan-modal"); if (m) m.style.display = "flex"; document.body.classList.add("sheet-open"); }
+function closeAutoplanModal() { const m = document.getElementById("autoplan-modal"); if (m) m.style.display = "none"; document.body.classList.remove("sheet-open"); }
 function spOpt(name, fallback) { const el = document.getElementById("sp-" + name); if (!el) return fallback; if (el.type === "checkbox") return el.checked; const v = parseInt(el.textContent || el.value); return isNaN(v) ? fallback : v; }
 function runSmartPlan() {
   const opts = { dinners: spOpt("dinners", 5), adultNights: spOpt("adult", 1), quickNights: spOpt("quick", 2), breakfasts: spOpt("breakfasts", 2), lunches: spOpt("lunches", 2), nextWeek: spOpt("next", true), keepExisting: spOpt("keep", true) };
@@ -7611,7 +7697,7 @@ function swapSmartPlanSlot(i) {
   const pool = (state.dinners || []).filter(r => r && r.id && isActive(r.id) && !used.has(r.id) && r.id !== current && ((r.audience || "family") === (wantAdult ? "adults" : "family")));
   if (!pool.length) return;
   const pick = pool[Math.floor(Math.random() * pool.length)];
-  t.dinner = { recipeId: pick.id, section: "dinner" }; t.dinnerReason = "↻ swapped in"; t.locked = false;
+  t.dinner = { recipeId: pick.id, section: "dinner" }; const sd = pickSide(pick, []); if (sd) t.dinner.side = sd; t.dinnerReason = "↻ swapped in"; t.locked = false;
   renderSmartPlanModal("preview");
 }
 function byIdAll(id) { return [...(state.dinners||[]), ...(state.breakfasts||[]), ...(state.lunches||[]), ...(state.desserts||[])].find(r => r && r.id === id); }
@@ -7622,7 +7708,7 @@ function acceptSmartPlan() {
   const nextW = keep ? normalizePlan(Object.assign({}, state.nextWeekPlan || {})) : {};
   smartPlanDraft.timeline.forEach(t => {
     const plan = t.week === 0 ? thisW : nextW;
-    if (t.dinner) planSet(plan, t.day, "dinner", t.dinner.leftoverOf ? { leftoverOf: t.dinner.leftoverOf, section: "dinner" } : { recipeId: t.dinner.recipeId, section: "dinner" });
+    if (t.dinner) planSet(plan, t.day, "dinner", t.dinner.leftoverOf ? { leftoverOf: t.dinner.leftoverOf, section: "dinner" } : Object.assign({ recipeId: t.dinner.recipeId, section: "dinner" }, t.dinner.side ? { side: t.dinner.side } : {}));
     if (t.breakfast) planSet(plan, t.day, "breakfast", { recipeId: t.breakfast.recipeId, section: "breakfast" });
     if (t.lunch) planSet(plan, t.day, "lunch", { recipeId: t.lunch.recipeId, section: "lunch" });
   });
@@ -7667,7 +7753,7 @@ function renderSmartPlanModal(mode) {
       let dinnerHtml = `<div style="color:var(--dim);font-size:13px">— no dinner (eat out / leftovers)</div>`;
       if (t.dinner && t.dinner.leftoverOf) { const src = byIdAll(t.dinner.leftoverOf); dinnerHtml = `<div style="font-size:14px;font-weight:700;color:#cbd5e1">🔁 Leftovers: ${esc(src ? src.name : "")}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div>`; }
       else if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r) dinnerHtml = `<div style="display:flex;align-items:center;gap:8px"><span style="font-size:20px">${r.emoji || "🍽️"}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text)">${esc(r.name)}${r.quick ? ' <span style="font-size:10px;background:rgba(245,158,11,0.15);color:#fbbf24;border-radius:999px;padding:1px 6px;font-weight:800">⚡</span>' : ""}${(r.audience === "adults") ? ' <span style="font-size:10px;background:rgba(244,114,182,0.15);color:#f472b6;border-radius:999px;padding:1px 6px;font-weight:800">🍷</span>' : ""}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div></div></div>`; }
-      const sides = [t.breakfast ? "🌅 " + ((byIdAll(t.breakfast.recipeId) || {}).name || "") : "", t.lunch ? "☀️ " + ((byIdAll(t.lunch.recipeId) || {}).name || "") + (t.lunch.reason && /leftover/.test(t.lunch.reason) ? " 🔁" : "") : ""].filter(Boolean).join(" · ");
+      const sides = [t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side] ? "🥦 + " + SIDES_BY_ID[t.dinner.side].name : "", t.breakfast ? "🌅 " + ((byIdAll(t.breakfast.recipeId) || {}).name || "") : "", t.lunch ? "☀️ " + ((byIdAll(t.lunch.recipeId) || {}).name || "") + (t.lunch.reason && /leftover/.test(t.lunch.reason) ? " 🔁" : "") : ""].filter(Boolean).join(" · ");
       return `<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px">
         <div style="width:38px;flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--green);padding-top:3px">${t.day.slice(0, 3).toUpperCase()}</div>
         <div style="flex:1;min-width:0">${dinnerHtml}${sides ? `<div style="font-size:12px;color:#94a3b8;margin-top:4px">${esc(sides)}</div>` : ""}</div>
@@ -7685,6 +7771,93 @@ function renderSmartPlanModal(mode) {
       <button onclick="runSmartPlan()" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--text);font-size:14px;cursor:pointer">🎲 Reshuffle</button>
       <button onclick="acceptSmartPlan()" style="flex:2;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-weight:800;font-size:15px;cursor:pointer">✅ Accept plan</button>
     </div>`;
+}
+
+
+// ── "Tonight?" — if today's dinner is empty, 3 quick picks you can make with what's on hand ──
+function todayPlanDay(){ return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()]; }
+function pantryMatchScore(r){
+  const keys=[...recipeKeySet(r)]; if(!keys.length) return 0.5;
+  const have=keys.filter(k=>{
+    if(STAPLES_RE.test(k)) return true;
+    if(typeof condimentOwned==="function"&&condimentOwned(k)) return true;
+    return Object.keys(state.pantry||{}).some(pid=>state.pantry[pid]==="have"&&pid.replace(/^p-/,"").replace(/-/g," ").split(" ").some(w=>w.length>3&&k.includes(w)));
+  }).length;
+  return have/keys.length;
+}
+function tonightPicks(){
+  const pool=(state.dinners||[]).filter(r=>r&&r.id&&r.quick&&isActive(r.id));
+  return pool.map(r=>{ const rt=(state.ratings||{})[r.id]||{}; const ds=daysSinceCooked(r.id); let sc=pantryMatchScore(r)*60+(rt.stars||0)*6+(rt.favorite?10:0); if(ds<7) sc-=30; else if(ds<14) sc-=12; if((r.audience||"family")==="adults") sc-=8; return {r,sc}; }).sort((a,b)=>b.sc-a.sc).slice(0,3).map(x=>x.r);
+}
+function renderTonightCard(plan, allRecipes){
+  if(planWeekView!=="this") return "";
+  const today=todayPlanDay(); if(planGet(plan,today,"dinner")) return "";
+  const picks=tonightPicks(); if(!picks.length) return "";
+  return `<div style="background:linear-gradient(135deg,rgba(245,158,11,0.10),rgba(245,158,11,0.04));border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:12px 14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#fbbf24;margin-bottom:2px">🌙 NOTHING PLANNED TONIGHT (${today.toUpperCase()})</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Ready in ~20 min with what you have:</div>
+    <div style="display:flex;flex-direction:column;gap:6px">${picks.map(r=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.04)">
+      <span style="font-size:22px;flex-shrink:0">${r.emoji||"🍽️"}</span>
+      <div style="flex:1;min-width:0;cursor:pointer" onclick="viewRecipeById('${r.id}')"><div style="font-size:14px;font-weight:700;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25">${esc(r.name)}</div><div style="font-size:11px;color:var(--dim)">⏱ ${esc(timeLabel(r,true))} · ${(r.audience||"family")==="adults"?"🍷":"👪"}${pantryMatchScore(r)>=0.7?" · 🧺 mostly on hand":""}</div></div>
+      <button onclick="planTonight('${r.id}')" style="flex-shrink:0;padding:8px 12px;border-radius:10px;border:none;background:var(--green);color:#0a0f1a;font-weight:800;font-size:13px;cursor:pointer;min-height:40px">Plan it</button>
+    </div>`).join("")}</div>
+  </div>`;
+}
+function planTonight(recipeId){ const today=todayPlanDay(); const r=byIdAll(recipeId); const e={recipeId,section:"dinner"}; const sd=pickSide(r,[]); if(sd) e.side=sd; planSet(state.weekPlan=state.weekPlan||{},today,"dinner",e); scheduleSave(); planWeekView="this"; renderPlan(); }
+
+// ── Sunday prep list — built from the visible week's plan ──
+function weekKeyOf(){ return planWeekView==="next"?"next":"this"; }
+function buildPrepList(plan){
+  const dayOf={}; const recipes=[];
+  PLAN_DAYS.forEach(day=>["breakfast","lunch","dinner"].forEach(slot=>{ const e=planGet(plan,day,slot); if(!e) return; if(e.recipeId){ const r=byIdAll(e.recipeId); if(r){ recipes.push({r,day,slot}); dayOf[r.id]=day; } } if(e.side&&SIDES_BY_ID[e.side]){ const sd=SIDES_BY_ID[e.side]; recipes.push({r:{id:sd.id,name:sd.name,ingredients:sd.ingredients,instructions:sd.steps},day,slot:"side"}); } }));
+  const short=d=>d.slice(0,3);
+  const groups={ sauces:[], chop:[], marinate:[], thaw:[], ahead:[] };
+  // (a) sauces referenced by planned recipes
+  (DEFAULT_SAUCES||state.sauces||[]).forEach(sc=>{ const nm=sc.name.toLowerCase(); const users=recipes.filter(x=>(x.r.ingredients||[]).some(l=>typeof l==="string"&&l.toLowerCase().includes(nm)&&!/\bor\b/i.test(l.replace(new RegExp(nm,"i"),""))&&!/optional|fun twist|if you like|for a change/i.test(l))); if(users.length) groups.sauces.push({text:`Make ${sc.name} (${sc.batchNote?"½ batch":"small batch"})`, detail:users.map(u=>short(u.day)+" "+u.r.name).join(", "), key:"sauce-"+sc.id}); });
+  // (b) chop/grate across recipes
+  const chopRules=[
+    {re:/(\d+(?:\.\d+)?|½|¼|¾|an?|one|two|three|four)\s+(large |medium |small |yellow |sweet |red )*onions?\b/i, label:"Dice onions", unit:"onion"},
+    {re:/(\d+)\s+cloves?\s+garlic/i, label:"Mince garlic", unit:"cloves"},
+    {re:/(\d+(?:\.\d+)?)\s+(large |medium )?carrots?\b/i, label:"Peel + grate/dice carrots", unit:"carrots"},
+    {re:/(\d+(?:\.\d+)?)\s*oz\s+(?:sharp |white |aged )?(cheddar|gruy[eè]re|parmesan|mozzarella|monterey jack|pepper jack)/i, label:"Grate cheese", unit:"oz", nounIdx:2},
+    {re:/(\d+(?:\.\d+)?)\s+(?:heads?|cups?)\s+(?:fresh )?broccoli/i, label:"Cut broccoli", unit:""},
+    {re:/(\d+)\s+(?:bell )?peppers?\b/i, label:"Slice bell peppers", unit:"peppers"},
+  ];
+  const words={"a":1,"an":1,"one":1,"two":2,"three":3,"four":4,"½":0.5,"¼":0.25,"¾":0.75};
+  chopRules.forEach(rule=>{ let total=0; const who=[]; recipes.forEach(x=>{ (x.r.ingredients||[]).forEach(ing=>{ if(typeof ing!=="string") return; const m=ing.match(rule.re); if(!m) return; let n=parseFloat(m[1]); if(isNaN(n)) n=words[(m[1]||"").toLowerCase()]||1; total+=n; who.push(short(x.day)+" "+x.r.name); }); }); if(total>0 && who.length>=1){ const n=Math.ceil(total-0.01); const qty=rule.unit==="oz"?`${Math.round(total)} oz`:rule.unit===""?`${n} cup${n===1?"":"s"}`:`${n} ${rule.unit}${n===1||/s$/.test(rule.unit)?"":"s"}`; groups.chop.push({text:`${rule.label} — ${qty}`, detail:[...new Set(who)].join(", "), key:"chop-"+rule.label}); } });
+  // (c) marinate/brine the night before
+  recipes.forEach(x=>{ const txt=(x.r.instructions||[]).join(" ").toLowerCase(); if(/\b(marinat|brine|dry brine)/.test(txt)&&x.slot==="dinner"){ const idx=PLAN_DAYS.indexOf(x.day); const prev=idx>0?PLAN_DAYS[idx-1]:"the night before"; groups.marinate.push({text:`${/brine/.test(txt)?"Brine":"Marinate"} for ${x.r.name}`, detail:`${short(prev)} night → cook ${short(x.day)}`, key:"mar-"+x.r.id}); } });
+  // (d) thaw frozen proteins
+  recipes.forEach(x=>{ (x.r.ingredients||[]).forEach(ing=>{ if(typeof ing!=="string") return; if(/\bfrozen\b/i.test(ing)&&/salmon burger|meatball|shrimp|chicken|just bare|tenderloin|steak|turkey|salmon|cod/i.test(ing)&&!/corn|peas|edamame|broccoli|rice|berries|cauliflower|veg/i.test(ing)){ const idx=PLAN_DAYS.indexOf(x.day); const prev=idx>0?PLAN_DAYS[idx-1]:"Sunday"; groups.thaw.push({text:`Move to fridge: ${ing.split(/[,—(]/)[0].trim()}`, detail:`${short(prev)} → ${short(x.day)} ${x.r.name}`, key:"thaw-"+x.r.id+"-"+ing.slice(0,12)}); } }); });
+  // (e) cook ahead: rice/grains, slow cooker
+  recipes.forEach(x=>{ const n=(x.r.name||"").toLowerCase(); const txt=(x.r.instructions||[]).join(" ").toLowerCase(); if(/slow cooker/.test(n)) groups.ahead.push({text:`Slow cooker morning-of: ${x.r.name}`, detail:`${short(x.day)} — load it before work`, key:"ahead-"+x.r.id}); else if(/\b(jasmine|sushi|brown) rice\b|\bcook (the )?rice\b|quinoa|farro/.test(txt)&&x.slot!=="side") groups.ahead.push({text:`Cook rice/grain ahead for ${x.r.name}`, detail:`${short(x.day)} — or use frozen rice pouches`, key:"ahead-"+x.r.id}); });
+  return groups;
+}
+function openPrepList(){ const m=document.getElementById("prep-modal"); if(!m) return; renderPrepList(); m.style.display="flex"; document.body.classList.add("sheet-open"); }
+function closePrepList(){ const m=document.getElementById("prep-modal"); if(m) m.style.display="none"; document.body.classList.remove("sheet-open"); }
+function togglePrepDone(key){ state.prepDone=state.prepDone||{}; const wk=weekKeyOf(); state.prepDone[wk]=state.prepDone[wk]||{}; state.prepDone[wk][key]=!state.prepDone[wk][key]; scheduleSave(); renderPrepList(); }
+function renderPrepList(){
+  const m=document.getElementById("prep-modal"); if(!m) return; const box=m.querySelector(".sp-box");
+  const plan=normalizePlan(activePlan()); const g=buildPrepList(plan); const done=((state.prepDone||{})[weekKeyOf()])||{};
+  const sec=(title,items)=>items.length?`<div style="font-size:11px;font-weight:800;letter-spacing:1px;color:var(--green);margin:12px 0 6px">${title}</div>`+items.map(it=>`<div onclick="togglePrepDone('${it.key.replace(/'/g,"")}')" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px;cursor:pointer;opacity:${done[it.key]?0.5:1}"><div style="width:22px;height:22px;border-radius:6px;border:2px solid ${done[it.key]?"var(--green)":"rgba(255,255,255,0.3)"};background:${done[it.key]?"var(--green)":"transparent"};color:#0a0f1a;font-weight:900;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">${done[it.key]?"✓":""}</div><div style="min-width:0"><div style="font-size:15px;font-weight:600;color:var(--text);${done[it.key]?"text-decoration:line-through":""}">${esc(it.text)}</div><div style="font-size:12px;color:var(--dim)">${esc(it.detail)}</div></div></div>`).join(""):"";
+  const total=Object.values(g).reduce((a,x)=>a+x.length,0);
+  box.innerHTML=`<div style="font-size:18px;font-weight:800;margin-bottom:2px">🧺 Sunday prep · ${planWeekView==="next"?"next week":"this week"}</div>
+    <div style="color:var(--dim);font-size:13px;margin-bottom:6px">${total?`${total} things you can knock out ahead. Tap to check off.`:"Nothing to prep ahead for this plan — it's all day-of."}</div>
+    ${sec("🥣 MAKE-AHEAD SAUCES",g.sauces)}${sec("🔪 CHOP & GRATE (do it once)",g.chop)}${sec("🧂 MARINATE / BRINE THE NIGHT BEFORE",g.marinate)}${sec("🧊 THAW",g.thaw)}${sec("🍚 COOK AHEAD",g.ahead)}
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button onclick="closePrepList()" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:14px;cursor:pointer">Close</button>
+      ${total?`<button onclick="cookPrepList()" style="flex:2;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-weight:800;font-size:15px;cursor:pointer">▶ Cook this list</button>`:""}
+    </div>`;
+}
+function cookPrepList(){
+  const plan=normalizePlan(activePlan()); const g=buildPrepList(plan); const done=((state.prepDone||{})[weekKeyOf()])||{};
+  const steps=[]; const push=(h,items)=>{ const left=items.filter(it=>!done[it.key]); if(!left.length) return; steps.push("── "+h+" ──"); left.forEach(it=>steps.push(it.text+". "+it.detail+".")); };
+  push("MAKE-AHEAD SAUCES",g.sauces); push("CHOP & GRATE",g.chop); push("MARINATE / BRINE",g.marinate); push("THAW",g.thaw); push("COOK AHEAD",g.ahead);
+  if(!steps.length){ alert("Everything's checked off."); return; }
+  closePrepList();
+  const synthetic={id:"prep-"+weekKeyOf(),name:"Sunday Prep",emoji:"🧺",ingredients:[],instructions:steps,tips:"",equipment:["Sheet of parchment for labels","Deli containers / zip bags","Box grater","Sharp knife"]};
+  cookState={recipe:synthetic,step:0,mode:"steps",showIngr:false,checkedIngr:{},timers:{},timer:{seconds:0,running:false,interval:null,_original:0}};
+  const overlay=document.getElementById("cook-overlay"); if(overlay){ overlay.style.display="flex"; const t=document.getElementById("cook-overlay-title"); if(t) t.textContent="🧺 Sunday Prep"; renderCookScreen(); }
 }
 
 function renderPlan() {
@@ -7711,6 +7884,21 @@ function renderPlan() {
   const optionsHtml = allRecipes.map(r =>
     `<option value="${r.id}">${r.emoji||"🍽️"} ${esc(r.name)}</option>`
   ).join("");
+
+  // Quiet variety targets for the visible week
+  const wkRecipes = cooked.map(d => allRecipes.find(r => r.id === planGet(plan, d, "dinner").recipeId)).filter(Boolean);
+  const fishN = wkRecipes.filter(r => /fish|shellfish/.test(r.proteinType||"")).length;
+  const redN = wkRecipes.filter(r => /beef|pork/.test(r.proteinType||"")).length;
+  const vegN = wkRecipes.reduce((a,r)=>a+(r.vegServings||0),0) + cooked.reduce((a,d)=>{ const e=planGet(plan,d,"dinner"); return a + ((e&&e.side&&SIDES_BY_ID[e.side])?SIDES_BY_ID[e.side].vegServings:0); },0);
+  const vegFwdN = wkRecipes.filter(r => r.vegForward).length;
+  const chk = (ok) => ok ? '<span style="color:var(--green)">✓</span>' : '';
+  const varietyStrip = cooked.length ? `<div class="variety-strip" style="display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:8px 12px;margin:-6px 0 14px;border-radius:10px;background:rgba(255,255,255,0.025);font-size:12px;color:var(--muted)">
+      <span title="Goal: 2 or more fish nights">🐟 Fish <b style="color:var(--text)">${fishN}</b> <span style="opacity:0.55">(2+)</span> ${chk(fishN>=2)}</span>
+      <span title="Goal: 2 or fewer red-meat nights">🥩 Red meat <b style="color:var(--text)">${redN}</b> <span style="opacity:0.55">(≤2)</span> ${chk(redN<=2)}</span>
+      <span title="Goal: about 2 vegetable servings per dinner">🥦 Veg servings <b style="color:var(--text)">${vegN}</b> <span style="opacity:0.55">(${cooked.length*2}+)</span> ${chk(vegN>=cooked.length*2)}</span>
+      <span title="Goal: at least one vegetable-forward dinner">🌿 Veg-forward <b style="color:var(--text)">${vegFwdN}</b> <span style="opacity:0.55">(1+)</span> ${chk(vegFwdN>=1)}</span>
+      <span title="Goal: 35g+ average protein per dinner">🍗 Protein avg <b style="color:var(--text)">${avgProt}g</b> ${chk(avgProt>=35)}</span>
+    </div>` : "";
 
 
   const MEAL_SLOTS = [
@@ -7750,7 +7938,7 @@ function renderPlan() {
             <span style="font-size:18px;flex-shrink:0">${recipe.emoji||"🍽️"}</span>
             <div style="flex:1;min-width:0" onclick="viewRecipeById('${recipe.id}')" style="cursor:pointer;flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:6px;min-width:0">
-                <div style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-0.1px">${esc(recipe.name)}</div>
+                <div class="plan-recipe-name" style="font-size:13px;font-weight:700;color:var(--text);letter-spacing:-0.1px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.25">${esc(recipe.name)}</div>
                 ${recipe.protein ? '<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:20px;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);color:var(--green);flex-shrink:0">'+recipe.protein+'g</span>' : ""}
                 ${recipe.quick ? '<span title="Quick" style="font-size:10px;font-weight:800;padding:1px 5px;border-radius:20px;background:rgba(245,158,11,0.12);color:#fbbf24;flex-shrink:0">⚡</span>' : ""}
                 ${recipe.audience==="adults" ? '<span title="Adults night" style="font-size:10px;font-weight:800;padding:1px 5px;border-radius:20px;background:rgba(244,114,182,0.12);color:#f472b6;flex-shrink:0">🍷</span>' : ""}
@@ -7761,7 +7949,10 @@ function renderPlan() {
               <button onclick="openDaySlotPicker('${day}','${slot.key}')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
               <button onclick="removeDaySlot('${day}','${slot.key}')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-size:11px;cursor:pointer">✕</button>
             </div>
-          </div>`;
+          </div>
+          ${slot.key==="dinner" ? (entry.side && SIDES_BY_ID[entry.side]
+            ? `<div class="side-line" style="display:flex;align-items:center;gap:6px;padding:4px 10px 6px 76px;margin:-2px 0 4px;font-size:12px;color:#86efac"><span style="flex:1;min-width:0">🥦 + ${esc(SIDES_BY_ID[entry.side].name)}</span><button onclick="cycleSide('${day}','${slot.key}')" title="Different side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">↻</button><button onclick="removeSide('${day}','${slot.key}')" title="No side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">✕</button></div>`
+            : (recipe.noSide ? "" : `<div class="side-line" style="padding:2px 10px 6px 76px;margin:-2px 0 4px;font-size:12px"><button onclick="addSide('${day}','${slot.key}')" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:2px 0;min-height:28px">🥦 + add a side</button></div>`)) : ""}`;
       } else {
         return `
           <div onclick="openDaySlotPicker('${day}','${slot.key}')"
@@ -7803,6 +7994,9 @@ function renderPlan() {
     <div id="autoplan-modal" class="sp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeAutoplanModal()">
       <div class="sp-box" style="background:#0f172a;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto"></div>
     </div>
+    <div id="prep-modal" class="sp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closePrepList()">
+      <div class="sp-box" style="background:#0f172a;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto"></div>
+    </div>
 
     <div style="margin-bottom:14px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
@@ -7815,6 +8009,7 @@ function renderPlan() {
         </div>
         <div style="display:flex;gap:8px">
           ${planWeekView==="next"&&Object.keys(state.nextWeekPlan||{}).length?`<button onclick="rollNextWeek()" style="padding:8px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.5);background:rgba(129,140,248,0.1);color:#a5b4fc;font-size:13px;font-weight:700;cursor:pointer">↻ Roll into this week</button>`:""}
+          ${assigned.length?`<button onclick="openPrepList()" style="padding:8px 14px;border-radius:20px;border:1px solid rgba(245,158,11,0.45);background:rgba(245,158,11,0.08);color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer">🧺 Prep list</button>`:""}
           <button onclick="showAutoplanOptions()" style="padding:8px 14px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer">✨ Plan my week</button>
         </div>
       </div>
@@ -7827,6 +8022,8 @@ function renderPlan() {
       <div class="stat-box"><div class="stat-icon">⏱️</div><div class="stat-val">${totalMins}</div><div class="stat-label">total mins</div></div>
       <div class="stat-box" onclick="showTab('grocery')" style="cursor:pointer"><div class="stat-icon">🛒</div><div class="stat-val">${assigned.length}</div><div class="stat-label">shop for</div></div>
     </div>
+    ${varietyStrip}
+    ${renderTonightCard(plan, allRecipes)}
 
     ${assigned.length > 0 ? `
     <button onclick="clearWeekPlan()" style="width:100%;padding:10px;border-radius:12px;border:1.5px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-weight:600;font-size:13px;cursor:pointer;margin-bottom:12px">
@@ -7991,6 +8188,7 @@ function renderVault() {
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
               ${stars?`<span style="font-size:11px;color:var(--amber)">${stars}</span>`:""}
               ${cookCount?`<span style="font-size:11px;color:var(--dim)">Made ${cookCount}x</span>`:""}
+              ${kidWinsBadge(r.id)?`<span style="font-size:11px;color:#f472b6">${kidWinsBadge(r.id)}</span>`:""}
               ${assignedDay?`<span style="font-size:11px;color:var(--green)">✅ ${assignedDay[0]}</span>`:""}
             </div>
           </div>
@@ -8113,8 +8311,14 @@ function getPlannedRecipes() {
   return out;
 }
 
+function plannedSides(){
+  const plans = state.groceryBothWeeks ? [state.weekPlan||{}, state.nextWeekPlan||{}] : [state.weekPlan||{}];
+  const seen=new Set(); const out=[];
+  plans.flatMap(p=>Object.values(p)).forEach(e=>{ if(e&&e.side&&SIDES_BY_ID[e.side]&&!seen.has(e.side)){ seen.add(e.side); const sd=SIDES_BY_ID[e.side]; out.push({id:sd.id,name:"Side: "+sd.name,ingredients:sd.ingredients}); } });
+  return out;
+}
 function buildSmartGroceryList() {
-  const planned = getPlannedRecipes();
+  const planned = [...getPlannedRecipes(), ...plannedSides()];
   const raw = [];
   planned.forEach(r => {
     let curSection = "";
@@ -8787,6 +8991,8 @@ function setAlexaStatus(type, msg) {
 const RATING_CHIPS = [
   "Kids loved it 👧❤️",
   "Kids refused 😬",
+  "Livia ate it 👧",
+  "Lucy ate it 👧",
   "Adults loved it 😍",
   "Make again soon 🔁",
   "Needs tweaking 🔧",
@@ -8796,6 +9002,20 @@ const RATING_CHIPS = [
   "Keeper recipe ⭐",
 ];
 
+
+
+// Kid chips keep a dated log so the Vault can show "Livia ×3 · Lucy ×1"
+const KID_CHIPS = { "Livia ate it 👧": "Livia", "Lucy ate it 👧": "Lucy" };
+function applyKidLog(cur, chip, turnedOn){
+  const kid = KID_CHIPS[chip]; if(!kid) return cur;
+  const today = new Date().toISOString().split("T")[0];
+  let log = (cur.kidLog||[]).filter(x=>x&&x.kid&&x.date);
+  if(turnedOn){ if(!log.some(x=>x.kid===kid&&x.date===today)) log.push({date:today,kid}); }
+  else log = log.filter(x=>!(x.kid===kid&&x.date===today));
+  return Object.assign({}, cur, { kidLog: log });
+}
+function kidWins(id){ const log=((state.ratings||{})[id]||{}).kidLog||[]; return { Livia: log.filter(x=>x.kid==="Livia").length, Lucy: log.filter(x=>x.kid==="Lucy").length }; }
+function kidWinsBadge(id, long){ const k=kidWins(id); if(!k.Livia&&!k.Lucy) return ""; return long ? `Kid wins: Livia ${k.Livia} · Lucy ${k.Lucy}` : `👧 L×${k.Livia} · Lu×${k.Lucy}`; }
 
 function isActive(id) {
   // Default is active — only false if explicitly set to false
@@ -8839,7 +9059,10 @@ function buildRatingHtml(id, section) {
     summaryHtml = '<div class="rating-summary">'
       + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
       + '<span class="tab-icon">' + starStr + '</span>' + dateStr
+      + (kidWinsBadge(id,true) ? '<span style="font-size:11px;color:#f472b6;font-weight:700">' + kidWinsBadge(id,true) + '</span>' : '')
       + '</div>' + chipsStr + noteStr + '</div>';
+  } else if (kidWinsBadge(id,true)) {
+    summaryHtml = '<div class="rating-summary"><span style="font-size:12px;color:#f472b6;font-weight:700">' + kidWinsBadge(id,true) + '</span></div>';
   }
 
   return `
@@ -8871,9 +9094,10 @@ function toggleChip(id, section, chip) {
   if (!state.ratings) state.ratings = {};
   const cur = state.ratings[id] || {};
   const chips = cur.chips || [];
+  const on = !chips.includes(chip);
   state.ratings[id] = {
-    ...cur,
-    chips: chips.includes(chip) ? chips.filter(c => c !== chip) : [...chips, chip],
+    ...applyKidLog(cur, chip, on),
+    chips: on ? [...chips, chip] : chips.filter(c => c !== chip),
     date: cur.date || new Date().toISOString()
   };
   scheduleSave();
@@ -8895,7 +9119,7 @@ function debounceSaveNote(id, section) {
 
 
 function doneSetStars(id,n){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,stars:n,date:new Date().toISOString()}; const h=(state.cookHistory||[]).find(x=>x.recipeId===id); if(h)h.rating=n; scheduleSave(); renderCookScreen(); }
-function doneToggleChip(id,chip){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const chips=cur.chips||[]; state.ratings[id]={...cur,chips:chips.includes(chip)?chips.filter(c=>c!==chip):[...chips,chip],date:cur.date||new Date().toISOString()}; scheduleSave(); renderCookScreen(); }
+function doneToggleChip(id,chip){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const chips=cur.chips||[]; const on=!chips.includes(chip); state.ratings[id]={...applyKidLog(cur,chip,on),chips:on?[...chips,chip]:chips.filter(c=>c!==chip),date:cur.date||new Date().toISOString()}; scheduleSave(); renderCookScreen(); }
 function doneSaveNote(id){ const el=document.getElementById("done-note"); if(!el||!el.value.trim())return; if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const log=cur.log||[]; log.unshift({date:new Date().toISOString().split("T")[0],text:el.value.trim()}); state.ratings[id]={...cur,log,note:el.value.trim(),date:cur.date||new Date().toISOString()}; scheduleSave(); el.value=""; const st=document.getElementById("done-note-status"); if(st){st.textContent="✅ Saved";} setTimeout(()=>renderCookScreen(),600); }
 // Unrated cooks from the last 3 days → nudge on the Plan tab
 function unratedRecentCooks(){ const cut=Date.now()-3*86400000; return (state.cookHistory||[]).filter(h=>{ const d=new Date(h.date+"T12:00:00").getTime(); if(d<cut)return false; const r=(state.ratings||{})[h.recipeId]; return !(r&&r.date&&new Date(r.date).getTime()>=d-43200000); }).filter((h,i,a)=>a.findIndex(x=>x.recipeId===h.recipeId)===i); }
@@ -11238,7 +11462,10 @@ function startCooking(section,id) {
   const list=section==="breakfast"?state.breakfasts:section==="lunch"?state.lunches:section==="dessert"?state.desserts:state.dinners;
   const recipe=list&&list.find(r=>r&&r.id===id);
   if(!recipe) return;
-  cookState={recipe,step:0,mode:"steps",showIngr:false,checkedIngr:{},timers:{},timer:{seconds:0,running:false,interval:null,_original:0}};
+  let cookRecipe=recipe;
+  const sd=(section==="dinner"||!section)?sideForRecipe(id):null;
+  if(sd){ cookRecipe=Object.assign({},recipe,{ ingredients:[...(recipe.ingredients||[]),"--- 🥦 SIDE: "+sd.name.toUpperCase()+" ---",...sd.ingredients], instructions:[...(recipe.instructions||[]),"── SIDE: "+sd.name.toUpperCase()+" ──",...sd.steps], equipment:[...(recipe.equipment||[]),...(sd.method==="oven"?["Sheet pan for the side"]:sd.method==="stove"?["Second skillet/saucepan for the side"]:[])] }); }
+  cookState={recipe:cookRecipe,step:0,mode:"steps",showIngr:false,checkedIngr:{},timers:{},timer:{seconds:0,running:false,interval:null,_original:0}};
   // Show cook overlay
   const overlay=document.getElementById("cook-overlay");
   if(overlay){
