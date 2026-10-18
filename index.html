@@ -778,7 +778,7 @@ window.addEventListener("unhandledrejection", function(e) {
 
 const DEFAULT_BREAKFASTS = [
   {
-    id:"b1", name:"Egg & Turkey Sausage Muffin Cups", calories:280, protein:24, emoji:"🥚", kidFriendly:false,
+    id:"b1", name:"Egg & Turkey Sausage Muffin Cups", calories:280, protein:24, emoji:"🥚", kidFriendly:false, activeTime:"15 min", totalTime:"40 min", prepTime:"15 min prep + 25 min bake",
     kidNote:"Kid-safe by design — mild, cheesy, hand-held. Skip the Pizza Party! topping on their half if they're spice-shy. 20 seconds in the microwave from the fridge. Serve with ketchup for dipping if that's what gets it eaten.",
     equipment:["Muffin tin (12-cup), greased","Medium skillet","Whisk + large measuring cup","2 prep bowls"],
     prepNote:"Make Sunday. Grab 2-3 on your way out. Reheat 45 sec. Keeps 5 days.",
@@ -817,7 +817,7 @@ const DEFAULT_BREAKFASTS = [
     tips:"SEASON WELL: Taste the egg mixture before pouring into the tins — it should taste well seasoned. Eggs need more seasoning than you think, especially cold out of the fridge. | SQUEEZE DRY: Skipping the zucchini squeeze is the #1 mistake — even a little extra moisture makes rubbery, wet muffins. Squeeze harder than you think you need to. | MAILLARD / BROWNING: For a slightly golden top, switch the oven to broil for the last 60-90 seconds. Watch closely — they go from golden to burnt fast. | SILICONE PAN: A silicone muffin pan releases these perfectly without any sticking. Worth $10 on Amazon."
   },
   {
-    id:"b2", name:"PB Banana Overnight Oats (Kids)", calories:320, protein:12, emoji:"🫙", kidFriendly:true,
+    id:"b2", name:"PB Banana Overnight Oats (Kids)", calories:320, protein:12, emoji:"🫙", kidFriendly:true, activeTime:"5 min", totalTime:"8 hr", prepTime:"5 min + overnight",
     kidNote:"Built for the girls. The spinach puree is optional if the green tint is a dealbreaker — the protein is already in the Fairlife and PB. Let them add their own banana slices in the morning.",
     equipment:["2 mason jars with lids"],
     prepNote:"Make 2 jars Sunday night. Hand to kids straight from the fridge.",
@@ -852,7 +852,7 @@ const DEFAULT_BREAKFASTS = [
     equipment:["5 mason jars with lids","Whisk"],
     calories:320,
     protein:22,
-    activeTime:"5 min",
+    activeTime:"5 min", totalTime:"8 hr 5 min",
     prepTime:"5 min + overnight",
     description:"Make 5 jars Sunday night, grab one every morning. Zero prep during the week. Creamy, filling, and genuinely delicious.",
     tags:["prep-ahead","batch","grab-and-go","high-protein"],
@@ -894,7 +894,7 @@ const DEFAULT_BREAKFASTS = [
     equipment:["5 mason jars with lids"],
     calories:290,
     protein:24,
-    activeTime:"5 min",
+    activeTime:"5 min", totalTime:"5 min",
     prepTime:"5 min Sunday — grab all week",
     description:"5 jars in 5 minutes Sunday. Fage 0% Greek yogurt layered with granola, berries and honey. 24g protein, zero morning effort.",
     tags:["prep-ahead","batch","grab-and-go","high-protein"],
@@ -935,7 +935,7 @@ const DEFAULT_BREAKFASTS = [
     equipment:["Large nonstick skillet","Whisk","Foil or parchment for wrapping","3 prep bowls"],
     calories:380,
     protein:34,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"20 min",
     prepTime:"20 min for a batch of 8 — freeze and microwave 90 sec each morning",
     description:"The ultimate grab-and-go batch breakfast. Make 8 on Sunday, freeze them all, microwave 90 seconds every morning. 34g protein, hot breakfast in 90 seconds.",
     tags:["prep-ahead","batch","grab-and-go","high-protein","freezer-friendly"],
@@ -998,7 +998,7 @@ const DEFAULT_BREAKFASTS = [
     day:"Saturday",
     calories:310,
     protein:28,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"20 min",
     prepTime:"5 min + 15 min cook",
     description:"The internet's favorite high-protein pancake — blender, 3 ingredients, incredibly fluffy. 28g protein per serving. Kids go crazy for these. Weekend family breakfast done right.",
     tags:["weekend","family","kid-friendly","high-protein"],
@@ -1052,7 +1052,7 @@ const DEFAULT_BREAKFASTS = [
     day:"Sunday",
     calories:280,
     protein:18,
-    activeTime:"10 min",
+    activeTime:"10 min", totalTime:"25 min",
     prepTime:"10 min + 15 min oven",
     description:"Feed the whole family at once with zero flipping. Everything goes in a sheet pan, oven does the work. Everyone adds their own toppings before baking. Weekend morning game changer.",
     tags:["weekend","family","kid-friendly","batch"],
@@ -1107,7 +1107,7 @@ const DEFAULT_BREAKFASTS = [
     day:"Sunday",
     calories:340,
     protein:36,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"15 min",
     prepTime:"15 min",
     description:"High-protein savory weekend breakfast for the whole family. Eggs + turkey sausage + spinach + cheese. Satisfying, quick, endlessly variable. The one everyone asks for.",
     tags:["weekend","family","kid-friendly","high-protein"],
@@ -1163,7 +1163,7 @@ const DEFAULT_BREAKFASTS = [
     day:"Sunday",
     calories:280,
     protein:48,
-    activeTime:"5 min",
+    activeTime:"5 min", totalTime:"30 min",
     prepTime:"5 min + 25 min bake",
     description:"½ cup Fit Flour + ½ cup Greek yogurt = 48g protein per serving. English muffin is the best shape — flat disc, fork-splits naturally, toasts beautifully, perfect for breakfast sandwiches. No yeast, no rise time, 30 min start to finish.",
     tags:["prep-ahead","batch","high-protein","kid-friendly"],
@@ -1248,6 +1248,7 @@ const DEFAULT_BREAKFASTS = [
     calories:120,
     protein:18,
     activeTime:"15 min",
+    totalTime:"15 min",
     prepTime:"15 min + freeze",
     description:"Ground chicken + 6 spices = better than anything you can buy. Make 20 patties Sunday, freeze them all. Pull one out and microwave 90 seconds any morning. Perfect size for Fit Flour bagel breakfast sandwiches.",
     tags:["prep-ahead","batch","freezer-friendly","high-protein"],
@@ -1300,7 +1301,7 @@ const DEFAULT_BREAKFASTS = [
 ];
 const DEFAULT_LUNCHES = [
   {
-    id:"l1", sharedAnchor:"rotisserie", usesLeftoversFrom:["d1"], quick:true, name:"Rotisserie Chicken Grain Bowls", calories:480, protein:42, emoji:"🍗", kidFriendly:true,
+    id:"l1", sharedAnchor:"rotisserie", usesLeftoversFrom:["d1"], quick:true, name:"Rotisserie Chicken Grain Bowls", calories:480, protein:42, emoji:"🍗", kidFriendly:true, activeTime:"10 min", totalTime:"10 min", prepTime:"10 min — no cooking",
     kidNote:"Deconstruct for the girls: chicken, grains, tomatoes and cucumber in separate piles on the plate with ranch for dipping. Skip the greens and dressing for them. Hummus on a cracker if they'll go for it.",
     equipment:["Box grater","Large bowl"],
     prepNote:"Pull chicken Sunday. Assemble in 3 min — no cooking.",
@@ -1335,7 +1336,7 @@ const DEFAULT_LUNCHES = [
     tips:"ACID: The Primal Kitchen Greek dressing already has lemon/vinegar — but if it tastes flat, an extra squeeze of fresh lemon right before eating makes a big difference. | SEASON THE GRAINS: Taste your farro or quinoa while warm and make sure it's well seasoned with salt — underseasoned grains make the whole bowl taste bland no matter how good the toppings are. | WARM GRAINS = better zucchini: Stir the grated zucchini into the grains while they're still hot — it wilts perfectly. Cold grains won't wilt it properly. | COMPONENTS SEPARATE: Keep chicken, grains, veg and dressing all in separate containers in the fridge — assembles in 3 min each day."
   },
   {
-    id:"l2", usesLeftoversFrom:["dinner41"], name:"Tomato Soup & Turkey Melts", calories:460, protein:34, emoji:"🍅", kidFriendly:true,
+    id:"l2", usesLeftoversFrom:["dinner41"], name:"Tomato Soup & Turkey Melts", calories:460, protein:34, emoji:"🍅", kidFriendly:true, activeTime:"15 min", totalTime:"15 min", prepTime:"15 min",
     kidNote:"This IS the kid lunch. Skip the pesto on their sandwiches (plain turkey + cheese), cut into triangles or strips for dipping into the soup. Splash of Fairlife in the soup makes it creamy and milder.",
     equipment:["Small saucepan with lid","Nonstick skillet","Spatula","1 prep bowl"],
     prepNote:"15 min total. Good for kids too on a school lunch day.",
@@ -1375,7 +1376,7 @@ const DEFAULT_LUNCHES = [
     equipment:["Large pot (pasta)","Colander","Box grater or Microplane","Large bowl"],
     calories:380,
     protein:38,
-    activeTime:"10 min",
+    activeTime:"10 min", totalTime:"10 min",
     prepTime:"10 min — uses Sunday leftover chicken",
     description:"Batch Sunday, grab all week. Brami pasta + rotisserie chicken + romaine + Parmesan + Caesar dressing. Dietitian-approved meal prep lunch — keeps 4 days in the fridge.",
     tags:["prep-ahead","batch","easy-lunch","high-protein"],
@@ -1415,7 +1416,7 @@ const DEFAULT_LUNCHES = [
     equipment:["Large bowl","Small bowl for sauce"],
     calories:340,
     protein:44,
-    activeTime:"5 min",
+    activeTime:"5 min", totalTime:"5 min",
     prepTime:"5 min assembly — uses leftover chicken",
     description:"Zero cooking if you have leftover chicken. Shredded chicken + Frank's + cauliflower rice + cottage cheese drizzle. One of the highest-protein lunches you can make.",
     tags:["prep-ahead","easy-lunch","high-protein","no-cook"],
@@ -1454,7 +1455,7 @@ const DEFAULT_LUNCHES = [
     equipment:["Parchment for wrapping"],
     calories:310,
     protein:32,
-    activeTime:"3 min",
+    activeTime:"3 min", totalTime:"3 min",
     prepTime:"3 min — no cooking required",
     description:"The easiest possible high-protein lunch. Zero cooking, 3 minutes, portable. Perfect for MK to grab from the fridge. Deli turkey + hummus + spinach + avocado in a thin tortilla.",
     tags:["no-cook","easy-lunch","grab-and-go","high-protein"],
@@ -1494,7 +1495,7 @@ const DEFAULT_LUNCHES = [
     equipment:["Large bowl","Small jar or bowl for dressing"],
     calories:320,
     protein:36,
-    activeTime:"8 min",
+    activeTime:"8 min", totalTime:"8 min",
     prepTime:"8 min — uses Sunday leftover chicken",
     description:"Bright, fresh, satisfying. Rotisserie chicken + cucumber + tomatoes + feta + Primal Kitchen Greek dressing. Uses your Sunday chicken leftovers. Feels like something from a nice café.",
     tags:["prep-ahead","easy-lunch","high-protein","no-cook"],
@@ -1536,6 +1537,7 @@ const DEFAULT_LUNCHES = [
     calories:290,
     protein:34,
     activeTime:"3 min",
+    totalTime:"3 min",
     prepTime:"3 min — zero cooking",
     description:"The fastest high-protein lunch possible. Zero cooking, 3 minutes, no dishes. Canned tuna + avocado + lemon + cucumber. Incredibly satisfying and portable.",
     tags:["no-cook","easy-lunch","grab-and-go","high-protein"],
@@ -1577,6 +1579,7 @@ const DEFAULT_LUNCHES = [
     calories:340,
     protein:22,
     activeTime:"5 min",
+    totalTime:"5 min",
     prepTime:"5 min assembly — make 3 at once",
     description:"The pizza Lunchable the girls asked for, without the preservatives and with real protein. Fit Flour English muffin halves or naan rounds, sauce in a dip cup, mozzarella, turkey pepperoni. They build it at school. At home, 2 minutes in the toaster oven makes a real mini pizza.",
     tags:["kid-lunch","no-cook","prep-ahead","lunchbox"],
@@ -1621,6 +1624,7 @@ const DEFAULT_LUNCHES = [
     calories:260,
     protein:10,
     activeTime:"10 min",
+    totalTime:"25 min",
     prepTime:"5 min prep + 20 min cook",
     description:"The side that goes with half the dinners in the vault — chicken tenders, pork tenderloin, salmon, meatballs. Jasmine rice with small-chopped broccoli steamed in for the last 5 minutes, sharp cheddar and butter folded in off heat. Uses up leftover chopped broccoli. The girls eat the broccoli because it is in cheese rice.",
     tags:["side","kid-friendly","uses-leftovers","one-pot"],
@@ -2019,7 +2023,7 @@ const DEFAULT_DINNERS = [
     day:"Saturday",
     calories:380,
     protein:42,
-    activeTime:"25 min",
+    activeTime:"25 min", totalTime:"55 min",
     prepTime:"30 min marinade + 25 min cook",
     hiddenVeg:"Parsley + anchovy in salsa verde — both invisible to kids",
     leftoverNote:"🔄 Leftover steak bites are incredible cold the next day sliced over a grain bowl with tzatziki.",
@@ -2080,7 +2084,7 @@ const DEFAULT_DINNERS = [
     day:"Tuesday",
     calories:320,
     protein:38,
-    activeTime:"10 min",
+    activeTime:"10 min", totalTime:"6 hr 10 min–8 hr 10 min",
     prepTime:"10 min + 6-8 hrs slow cooker",
     hiddenVeg:"Add a grated zucchini or carrot to the slow cooker — completely disappears into the chicken",
     leftoverNote:"🔄 Make a double batch — use leftovers for burrito bowls, quesadillas, or grain bowls later in the week.",
@@ -2132,7 +2136,7 @@ const DEFAULT_DINNERS = [
     day:"Wednesday",
     calories:420,
     protein:45,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"50 min",
     prepTime:"20 min + 30 min marinade",
     hiddenVeg:"Stir grated zucchini into warm rice/cauliflower rice — melts in completely",
     leftoverNote:"🔄 Use leftover Slow Cooker Taco chicken instead of cooking fresh — this becomes a 5-minute assembly.",
@@ -2190,7 +2194,7 @@ const DEFAULT_DINNERS = [
     day:"Thursday",
     calories:380,
     protein:42,
-    activeTime:"10 min",
+    activeTime:"10 min", totalTime:"25 min",
     prepTime:"10 min + 15 min roast",
     hiddenVeg:"Roasted zucchini and cherry tomatoes alongside — not hidden but most kids eat roasted veg",
     leftoverNote:"🔄 Leftover salmon is incredible flaked over a grain bowl the next day with tzatziki.",
@@ -2248,7 +2252,7 @@ const DEFAULT_DINNERS = [
     day:"Friday",
     calories:410,
     protein:44,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"1 hr 20 min",
     prepTime:"20 min + 1 hr marinade",
     hiddenVeg:"Spinach blended into tzatziki — completely invisible",
     leftoverNote:"🔄 Leftover chicken is incredible in a wrap with tzatziki and cucumber the next day.",
@@ -2309,7 +2313,7 @@ const DEFAULT_DINNERS = [
     day:"Sunday",
     calories:340,
     protein:42,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"6 hr 15 min–8 hr 15 min",
     prepTime:"15 min + 6-8 hrs slow cooker",
     hiddenVeg:"Grated zucchini + carrot cooked in — completely disappears. Blend in a handful of spinach puree for extra boost.",
     leftoverNote:"🔄 Makes 6-8 servings. Freezes perfectly in individual portions — future lunches and dinners done. Gets better on day 2 and 3.",
@@ -2375,7 +2379,7 @@ const DEFAULT_DINNERS = [
     day:"Saturday",
     calories:480,
     protein:52,
-    activeTime:"25 min",
+    activeTime:"25 min", totalTime:"4 hr 40 min–24 hr 55 min",
     prepTime:"Dry brine 4-24 hrs + 35-50 min oven + 5 min sear",
     hiddenVeg:"Serve with roasted veg on the side — this one is about the beef",
     leftoverNote:"🔄 Leftover tenderloin makes incredible French dip sandwiches — slice thin, warm briefly in homemade au jus, serve on a toasted baguette with Boar's Head American and caramelized onions.",
@@ -2453,7 +2457,7 @@ const DEFAULT_DINNERS = [
     day:"Wednesday",
     calories:380,
     protein:32,
-    activeTime:"5 min",
+    activeTime:"5 min", totalTime:"50 min",
     prepTime:"5 min + 45 min simmer (mostly hands-off)",
     hiddenVeg:"Add a grated zucchini or carrot to the sauce — completely disappears",
     leftoverNote:"🔄 Sauce keeps 5 days in fridge and freezes perfectly. Make a double batch and freeze half.",
@@ -2507,7 +2511,7 @@ const DEFAULT_DINNERS = [
     day:"Sunday",
     calories:420,
     protein:28,
-    activeTime:"30 min",
+    activeTime:"30 min", totalTime:"1½ hr–1 hr 45 min",
     prepTime:"30 min + 60-75 min caramelizing onions",
     hiddenVeg:"The onions themselves cook down to almost nothing — 4 lbs becomes a fraction of the volume",
     leftoverNote:"🔄 Soup base keeps 5 days in fridge and freezes perfectly without the bread and cheese topping. Make a big batch and freeze in portions.",
@@ -2576,7 +2580,7 @@ const DEFAULT_DINNERS = [
     day:"Saturday",
     calories:390,
     protein:46,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"9 hr",
     prepTime:"15 min + overnight marinade + 45 min roast",
     hiddenVeg:"Serve with roasted veg on the side",
     leftoverNote:"🔄 Leftover chicken is incredible in grain bowls, tacos, or sandwiches all week. Make extra.",
@@ -2630,7 +2634,7 @@ const DEFAULT_DINNERS = [
     day:"Tuesday",
     calories:340,
     protein:42,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"25 min",
     prepTime:"5 min + 20 min cook",
     hiddenVeg:"Serve with roasted veg or a simple salad",
     leftoverNote:"🔄 Best chicken thigh recipe for meal prep — reheat in a 400°F oven 5 min to re-crisp the skin.",
@@ -2677,7 +2681,7 @@ const DEFAULT_DINNERS = [
     day:"Friday",
     calories:520,
     protein:48,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"20 min",
     prepTime:"10 min + 10 min cook",
     hiddenVeg:"Add finely grated zucchini to the burger mix — disappears completely",
     leftoverNote:"🔄 Make extra patties and refrigerate — reheat in a hot cast iron 2 min per side.",
@@ -2731,7 +2735,7 @@ const DEFAULT_DINNERS = [
     day:"Thursday",
     calories:320,
     protein:18,
-    activeTime:"25 min",
+    activeTime:"25 min", totalTime:"35 min",
     prepTime:"25 min",
     hiddenVeg:"Spinach wilts completely into the stew",
     leftoverNote:"🔄 Gets significantly better on day 2. Make a double batch — freezes perfectly.",
@@ -2793,7 +2797,7 @@ const DEFAULT_DINNERS = [
     day:"Tuesday",
     calories:350,
     protein:40,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"40 min",
     prepTime:"15 min + 25 min roast",
     hiddenVeg:"Add grated zucchini to the pepper mix — roasts down invisibly",
     leftoverNote:"🔄 Leftover fajita filling is incredible in burrito bowls, quesadillas, or grain bowls the next day.",
@@ -2853,7 +2857,7 @@ const DEFAULT_DINNERS = [
     day:"Wednesday",
     calories:360,
     protein:44,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"15 min",
     prepTime:"15 min",
     hiddenVeg:"Serve with roasted broccoli or asparagus alongside",
     leftoverNote:"🔄 Leftover salmon is incredible cold over a grain bowl with tzatziki the next day.",
@@ -2907,7 +2911,7 @@ const DEFAULT_DINNERS = [
     day:"Sunday",
     calories:280,
     protein:22,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"35 min",
     prepTime:"20 min",
     hiddenVeg:"Spinach wilts into the sauce invisibly. Grated zucchini also works.",
     leftoverNote:"🔄 The tomato sauce base keeps 5 days in the fridge. Add fresh eggs when reheating.",
@@ -2972,7 +2976,7 @@ const DEFAULT_DINNERS = [
     day:"Thursday",
     calories:380,
     protein:44,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"4 hr 15 min–6 hr 15 min",
     prepTime:"15 min + 4-6 hrs slow cooker",
     hiddenVeg:"Add grated zucchini or carrot to the sauce — completely disappears",
     leftoverNote:"🔄 Gets dramatically better on day 2. Freezes perfectly. Make a big batch.",
@@ -3034,7 +3038,7 @@ const DEFAULT_DINNERS = [
     day:"Monday",
     calories:340,
     protein:38,
-    activeTime:"25 min",
+    activeTime:"25 min", totalTime:"35 min",
     prepTime:"25 min",
     hiddenVeg:"Grated zucchini and spinach in the meatball mix — completely invisible",
     leftoverNote:"🔄 Meatballs freeze perfectly cooked. Make a big batch, freeze in portions of 4-6. Future dinner in 10 min.",
@@ -3103,7 +3107,7 @@ const DEFAULT_DINNERS = [
     day:"Wednesday",
     calories:360,
     protein:38,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"30 min",
     prepTime:"20 min",
     hiddenVeg:"Kale or spinach wilts completely into the stew",
     leftoverNote:"🔄 Gets better every day. Make a big batch and eat all week — keeps 5 days in fridge, freezes perfectly.",
@@ -3164,7 +3168,7 @@ const DEFAULT_DINNERS = [
     day:"Tuesday",
     calories:310,
     protein:36,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"20 min",
     prepTime:"20 min",
     hiddenVeg:"Grated zucchini and carrot cook into the taco meat invisibly",
     leftoverNote:"🔄 Taco meat keeps 5 days in fridge. Use leftovers for burrito bowls, quesadillas, or taco salad.",
@@ -3236,7 +3240,7 @@ const DEFAULT_DINNERS = [
     day:"Sunday",
     calories:580,
     protein:48,
-    activeTime:"25 min",
+    activeTime:"25 min", totalTime:"6 hr 25 min–8 hr 25 min",
     prepTime:"25 min + 6-8 hrs slow cooker",
     hiddenVeg:"Carrots and celery cook into the braising liquid",
     leftoverNote:"🔄 Short rib meat shredded into pasta or served over polenta the next day is incredible. The braising liquid becomes an incredible sauce.",
@@ -3307,7 +3311,7 @@ const DEFAULT_DINNERS = [
     day:"Tuesday",
     calories:450,
     protein:52,
-    activeTime:"25 min",
+    activeTime:"25 min", totalTime:"45 min",
     prepTime:"25 min + 20 min bake",
     hiddenVeg:"Grate zucchini into the marinara sauce — completely disappears. Add spinach under the cheese before baking.",
     leftoverNote:"🔄 Leftover chicken parm reheats well in a 375°F oven for 10 min. Slice and serve over fresh pasta the next day.",
@@ -3379,7 +3383,7 @@ const DEFAULT_DINNERS = [
     day:"Wednesday",
     calories:420,
     protein:48,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"20 min",
     prepTime:"20 min",
     hiddenVeg:"Spinach stirred in at the end wilts completely. Grated zucchini blended into the sauce is invisible.",
     leftoverNote:"🔄 Alfredo sauce thickens significantly in the fridge — add a splash of pasta water or Fairlife milk when reheating and stir over low heat.",
@@ -3448,7 +3452,7 @@ const DEFAULT_DINNERS = [
     day:"Tuesday",
     calories:475,
     protein:42,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"45 min",
     prepTime:"15 min + 30 min roast",
     hiddenVeg:"Grate zucchini into the beef while browning — completely invisible",
     leftoverNote:"🔄 Excellent meal prep — keeps 4 days. Drizzle keeps separately for 5 days.",
@@ -3524,7 +3528,7 @@ const DEFAULT_DINNERS = [
     day:"Friday",
     calories:541,
     protein:46,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"40 min",
     prepTime:"15 min + 25 min roast",
     hiddenVeg:"Grate zucchini into the ground beef while browning — invisible",
     leftoverNote:"🔄 Great meal prep — keep sauce separate. Reheat beef and potatoes, add cold romaine right before eating.",
@@ -3600,7 +3604,7 @@ const DEFAULT_DINNERS = [
     day:"Wednesday",
     calories:180,
     protein:28,
-    activeTime:"10 min",
+    activeTime:"10 min", totalTime:"30 min",
     prepTime:"10 min + 20 min bake",
     hiddenVeg:"Add a layer of baby spinach under the cod on the baking sheet — wilts perfectly",
     leftoverNote:"🔄 Cod reheats well at 300°F for 8 min. Great flaked over a salad the next day.",
@@ -3649,7 +3653,7 @@ const DEFAULT_DINNERS = [
     day:"Tuesday",
     calories:420,
     protein:44,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"20 min",
     prepTime:"20 min",
     description:"One of the great Italian-American classics — thin chicken cutlets in a bright lemon-caper butter pan sauce. 20 minutes, restaurant quality, MK will love this one.",
     ingredients:[
@@ -3708,7 +3712,7 @@ const DEFAULT_DINNERS = [
     day:"Wednesday",
     calories:380,
     protein:42,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"15 min",
     prepTime:"15 min",
     description:"The best 15-minute meal you can make. Ground chicken, Thai basil, fish sauce, oyster sauce, over jasmine rice with a fried egg on top. Classic Thai street food. Genuinely addictive.",
     ingredients:[
@@ -3764,7 +3768,7 @@ const DEFAULT_DINNERS = [
     day:"Thursday",
     calories:580,
     protein:32,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"20 min",
     prepTime:"20 min",
     description:"The real Roman Carbonara — eggs, Pecorino Romano, guanciale, black pepper. No cream. No peas. No shortcuts. One of the greatest pasta dishes ever created and one of the most technically challenging to get right.",
     ingredients:[
@@ -3807,7 +3811,7 @@ const DEFAULT_DINNERS = [
     day:"Friday",
     calories:520,
     protein:38,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"20 min",
     prepTime:"20 min",
     description:"The fastest elegant dinner possible. Shrimp in a white wine garlic butter sauce over pasta. 20 minutes, genuinely impressive, the whole family will love it.",
     ingredients:[
@@ -3867,7 +3871,7 @@ const DEFAULT_DINNERS = [
     day:"Saturday",
     calories:480,
     protein:44,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"2 hr 20 min",
     prepTime:"20 min + 2 hr marinade",
     description:"Thin-sliced beef in a sweet-savory soy-pear marinade, cooked over high heat in minutes. One of the most addictive things you can make. Served over rice with banchan.",
     ingredients:[
@@ -3920,7 +3924,7 @@ const DEFAULT_DINNERS = [
     day:"Sunday",
     calories:380,
     protein:46,
-    activeTime:"25 min",
+    activeTime:"25 min", totalTime:"30 min",
     prepTime:"10 min + 20 min roast",
     description:"The weeknight dinner that looks like Sunday effort. Pork tenderloin seared and roasted, finished with a quick pan sauce — mustard and herbs, or apple and thyme, or balsamic. 35 min total.",
     ingredients:[
@@ -3987,7 +3991,7 @@ const DEFAULT_DINNERS = [
     day:"Saturday",
     calories:520,
     protein:44,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"50 min",
     prepTime:"20 min + 30 min marinade",
     description:"Restaurant-quality poke at home for a fraction of the price. The key is sushi-grade tuna from Fishmonger in the Highlands — 674 N Highland Ave, right near Candler Park. Pick it up fresh and you're 20 minutes away from the best bowl you've made.",
     ingredients:[
@@ -4055,7 +4059,7 @@ const DEFAULT_DINNERS = [
     day:"Friday",
     calories:520,
     protein:58,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"30 min",
     prepTime:"20 min + 10 min bake",
     hiddenVeg:"Add finely grated zucchini under the cheese — completely invisible",
     leftoverNote:"🔄 Dough freezes perfectly — make a double batch, freeze half in a ball wrapped in plastic. Thaw in the fridge overnight.",
@@ -4126,7 +4130,7 @@ const DEFAULT_DINNERS = [
     day:"Sunday",
     calories:160,
     protein:8,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"45 min",
     prepTime:"10 min + 15 min rest + 20 min cook",
     hiddenVeg:"Grate zucchini paper thin and fold into the dough — invisible, adds moisture",
     leftoverNote:"🔄 Freeze cooked naan between parchment sheets up to 3 months. Reheat in dry skillet 30 sec per side or microwave 20 sec wrapped in a damp paper towel.",
@@ -4184,7 +4188,7 @@ const DEFAULT_DINNERS = [
     day:"Tuesday",
     calories:340,
     protein:36,
-    activeTime:"15 min",
+    activeTime:"15 min", totalTime:"35 min",
     prepTime:"15 min + 20 min chill",
     leftoverNote:"🔄 The whole point — use leftover salmon from Sheet Pan Salmon, Honey Garlic Salmon, or Cedar Plank Salmon. Slightly overcooked salmon actually works better here since the patty format masks dryness completely.",
     description:"The smartest use of leftover salmon — flaked, seasoned, seared into a patty with a fresh crust. Two completely different meals from one Sunday salmon cook. Better than most restaurant salmon burgers.",
@@ -4242,7 +4246,7 @@ const DEFAULT_DINNERS = [
     day:"Saturday",
     calories:320,
     protein:38,
-    activeTime:"25 min",
+    activeTime:"25 min", totalTime:"40 min",
     prepTime:"25 min",
     description:"The James Beard Foundation's Blended Burger — sautéed shredded portobello mushrooms mixed into the meat. Turkey version: mushrooms add moisture and umami to lean meat. Beef version: mushrooms amplify existing beef flavor making 90/10 beef taste better than 80/20 alone. Two different burgers, one technique.",
     ingredients:[
@@ -4315,7 +4319,7 @@ const DEFAULT_DINNERS = [
     day:"Sunday",
     calories:280,
     protein:52,
-    activeTime:"20 min",
+    activeTime:"20 min", totalTime:"11 hr 20 min–12 hr 20 min",
     prepTime:"20 min + overnight brine + 3-4 hr smoke",
     leftoverNote:"🔄 Leftover smoked turkey is gold — Fox Bros-style sandwich (white bread + beef fat mayo or Kewpie + lettuce + tomato), grain bowls, White Bean Stew, or turkey salad. Keeps 5 days refrigerated. Smoke extra specifically for leftovers.",
     description:"Fox Bros-inspired smoked turkey breast on the RecTeq. Overnight brine makes it incredibly juicy, hickory or apple pellets get you 85-90% of the restaurant flavor. One of the most achievable BBQ restaurant recreations you can make at home.",
@@ -4393,7 +4397,7 @@ const DEFAULT_DINNERS = [
     day:"Saturday",
     calories:580,
     protein:48,
-    activeTime:"30 min",
+    activeTime:"30 min", totalTime:"1 hr 15 min–1½ hr",
     prepTime:"30 min + 45-60 min onion caramelization",
     description:"French dip-style steak sandwich — thinly sliced leftover or freshly cooked steak, deeply caramelized onions, Gruyere or provolone, toasted baguette, au jus for dipping. Make alongside French Onion Soup and split the caramelized onion batch — one cook, two restaurant-quality dishes.",
     leftoverNote:"Leftover RecTeq steak is perfect here — slightly overcooked steak sliced thin with au jus comes back completely. Plan to cook extra steak specifically for this.",
@@ -4466,7 +4470,7 @@ const DEFAULT_DINNERS = [
     day:"Saturday",
     calories:620,
     protein:50,
-    activeTime:"45 min",
+    activeTime:"45 min", totalTime:"1 hr 45 min",
     prepTime:"45 min + 60 min onion caramelization",
     description:"Both dishes cooked together efficiently — one big batch of caramelized onions split between the soup and the sandwiches. The onions take the longest so everything else builds around them. Two restaurant-quality adults dishes from one 90 min cook.",
     ingredients:[
@@ -4562,6 +4566,7 @@ const DEFAULT_DINNERS = [
     calories:480,
     protein:22,
     activeTime:"30 min",
+    totalTime:"55 min",
     prepTime:"15 min prep + 40 min cook",
     hiddenVeg:"Both carrots grated fine disappear completely. Broccoli stems peeled and diced add volume nobody notices.",
     leftoverNote:"Keeps 4 days refrigerated. Reheat GENTLY on low — never boil or the cheese breaks. Add a splash of milk to loosen. Does not freeze well (cream and cheese separate).",
@@ -4659,6 +4664,7 @@ const DEFAULT_DINNERS = [
     calories:420,
     protein:44,
     activeTime:"20 min",
+    totalTime:"33 min",
     prepTime:"15 min prep + 18 min oven",
     equipment:["Sheet pan + wire rack (or air fryer)","Instant-read thermometer","Tongs","3 shallow dishes for dredging","3 small dip bowls","2 prep bowls"],
     leftoverNote:"Keeps 3 days. Reheat in a 400°F oven or air fryer 5-6 min so the crust re-crisps — the microwave makes them soggy. Cold tenders sliced over a salad are a great lunch.",
@@ -4719,6 +4725,7 @@ const DEFAULT_DINNERS = [
     calories:520,
     protein:42,
     activeTime:"25 min",
+    totalTime:"30 min",
     prepTime:"10 min prep + 20 min cook",
     equipment:["Large Dutch oven or deep 12-inch skillet with lid","Box grater","Wooden spoon","3 prep bowls"],
     hiddenVeg:"Grate 1 zucchini into the meat as it browns — it melts into the sauce and nobody notices.",
@@ -4782,6 +4789,7 @@ const DEFAULT_DINNERS = [
     calories:480,
     protein:34,
     activeTime:"25 min",
+    totalTime:"45 min",
     prepTime:"15 min prep + 30 min total",
     equipment:["Rimmed sheet pan (18×13) + parchment","Cast iron or nonstick skillet","Instant-read thermometer","Large mixing bowl + whisk","Cutting board for fruit","Sheet pan or oven-safe plate to keep sausage warm","2 prep bowls"],
     leftoverNote:"Pancake squares freeze flat in a bag and toast like waffles. Cooked sausage patties keep 4 days and microwave in 60 seconds.",
@@ -4841,6 +4849,7 @@ const DEFAULT_DINNERS = [
     calories:540,
     protein:46,
     activeTime:"30 min",
+    totalTime:"45 min",
     prepTime:"20 min prep + 25 min cook",
     equipment:["Sheet pan + parchment","Large Dutch oven or deep skillet with lid","Large pot for pasta","Box grater","Instant-read thermometer","Cookie scoop (1 tbsp) or spoon","3 prep bowls"],
     hiddenVeg:"1 small zucchini grated and squeezed into the meatball mix — adds moisture and disappears completely.",
@@ -4905,6 +4914,7 @@ const DEFAULT_DINNERS = [
     calories:620,
     protein:34,
     activeTime:"35 min",
+    totalTime:"38 min",
     prepTime:"20 min prep + 18 min oven",
     equipment:["Large Dutch oven or 4-qt saucepan","9×13 baking dish","Large pot for pasta","Box grater","Blender (for the cottage cheese)","Whisk","4 prep bowls + 1 large measuring cup"],
     leftoverNote:"Keeps 4 days. Reheat portions in a 350°F oven with a splash of milk, covered with foil, 15 min — the microwave works in a pinch. Freezes OK for a month.",
@@ -4979,6 +4989,7 @@ const DEFAULT_DINNERS = [
     calories:450,
     protein:38,
     activeTime:"15 min",
+    totalTime:"20 min",
     prepTime:"10 min prep + 10 min cook",
     equipment:["Cast iron or 12-inch nonstick skillet","Box grater","Clean kitchen towel (to squeeze veg)","Wide spatula","Pizza cutter or chef's knife","2 small dip bowls","2 prep bowls"],
     hiddenVeg:"Grated zucchini and carrot, squeezed dry and mixed into the cheese — they melt in and the carrot just looks like cheddar.",
@@ -5032,6 +5043,7 @@ const DEFAULT_DINNERS = [
     calories:520,
     protein:38,
     activeTime:"15 min",
+    totalTime:"15 min",
     prepTime:"5 min prep + 10 min cook",
     equipment:["12-inch skillet","Microwave","2 prep bowls","Small bowl for sauce"],
     leftoverNote:"Keeps 3 days. Chicken and rice reheat well; slaw stays crisp if kept separate. Great cold-ish lunch bowl the next day.",
@@ -5084,6 +5096,7 @@ const DEFAULT_DINNERS = [
     calories:480,
     protein:34,
     activeTime:"12 min",
+    totalTime:"15 min",
     prepTime:"5 min prep + 10 min cook",
     equipment:["12-inch skillet with lid","Microwave","Small saucepan or cup for glaze","2 prep bowls"],
     leftoverNote:"Keeps 3 days. Meatballs and rice reheat well in the microwave with a splash of water. Broccoli goes soft — eat it the same night if you can.",
@@ -5133,6 +5146,7 @@ const DEFAULT_DINNERS = [
     calories:540,
     protein:42,
     activeTime:"20 min",
+    totalTime:"22 min",
     prepTime:"10 min prep + 12 min cook",
     equipment:["12-inch oven-safe skillet (cast iron ideal)","Box grater","Can opener","3 prep bowls"],
     leftoverNote:"Keeps 4 days and reheats beautifully — the tortillas soften into the sauce like real enchiladas. Lunch tomorrow, no question.",
@@ -5195,6 +5209,7 @@ const DEFAULT_DINNERS = [
     calories:460,
     protein:26,
     activeTime:"15 min",
+    totalTime:"15 min",
     prepTime:"5 min prep + 10 min cook",
     equipment:["12-inch nonstick skillet with lid","Microwave or small pot for edamame","Small bowls for dipping sauce","2 prep bowls"],
     leftoverNote:"Cooked dumplings keep 2 days; re-crisp in a dry nonstick pan. Edamame and cucumber salad keep 3 days.",
@@ -5252,6 +5267,7 @@ const DEFAULT_DINNERS = [
     calories:480,
     protein:34,
     activeTime:"15 min",
+    totalTime:"15 min",
     prepTime:"5 min prep + 10 min cook",
     equipment:["12-inch nonstick skillet","Instant-read thermometer (optional)","Toaster or second pan for buns","2 prep bowls"],
     leftoverNote:"Cooked burgers keep 2 days; flake cold over a salad for lunch. Don't refreeze.",
@@ -5305,6 +5321,7 @@ const DEFAULT_DINNERS = [
     calories:450,
     protein:38,
     activeTime:"10 min",
+    totalTime:"10 min",
     prepTime:"10 min, no cooking",
     equipment:["Large mixing bowl","Dry skillet for warming tortillas (optional)","Sharp knife"],
     leftoverNote:"Assemble only what you'll eat — dressed wraps go soggy in an hour. Leftover chicken and undressed kit keep 3 days.",
@@ -5349,6 +5366,7 @@ const DEFAULT_DINNERS = [
     calories:560,
     protein:36,
     activeTime:"15 min",
+    totalTime:"17 min",
     prepTime:"5 min prep + 12 min cook",
     equipment:["12-inch skillet with lid","Sheet pan","Bread knife","1 prep bowl"],
     leftoverNote:"Meatballs in sauce keep 4 days and reheat perfectly. Build subs fresh — assembled subs go soggy. Leftover sauce and meatballs over pasta is another dinner.",
@@ -5402,6 +5420,7 @@ const DEFAULT_DINNERS = [
     calories:500,
     protein:38,
     activeTime:"10 min",
+    totalTime:"23 min",
     prepTime:"5 min prep + 18 min oven",
     equipment:["Large sheet pan","Tongs","Small bowl for seasoning","1 prep bowl"],
     leftoverNote:"Keeps 3 days. Reheat nuggets in a 400°F oven or air fryer 5 min so they re-crisp; peppers reheat in the microwave.",
@@ -5452,6 +5471,7 @@ const DEFAULT_DINNERS = [
     calories:520,
     protein:30,
     activeTime:"18 min",
+    totalTime:"20 min",
     prepTime:"5 min prep + 15 min cook",
     equipment:["12-inch nonstick or cast iron skillet","Microplane or grater for Parmesan","2 prep bowls"],
     leftoverNote:"Keeps 3 days. Reheat in a skillet with a splash of water — the microwave makes gnocchi gummy. Cauliflower gnocchi leftovers are softer than fresh.",
@@ -5510,6 +5530,7 @@ const DEFAULT_DINNERS = [
     calories:520,
     protein:40,
     activeTime:"15 min",
+    totalTime:"17 min",
     prepTime:"5 min prep + 12 min cook",
     equipment:["12-inch cast iron or nonstick skillet","Pizza cutter or large knife","Spatula","1 prep bowl"],
     leftoverNote:"Quesadillas don't keep well — make only what you'll eat. Leftover chicken and cheese keep 3 days for a repeat.",
@@ -6597,7 +6618,7 @@ function tags(item) {
   const t = [];
   if (item.calories) t.push(`<span class="tag tag-green">${item.calories} cal</span>`);
   if (item.protein)  t.push(`<span class="tag tag-indigo">${item.protein}g protein</span>`);
-  if (item.activeTime) t.push(`<span class="tag tag-amber">⏱ ${esc(item.activeTime)}</span>`);
+  if (item.activeTime||item.totalTime) t.push(`<span class="tag tag-amber">⏱ ${esc(timeLabel(item))}</span>`);
   if (item.serves)   t.push(`<span class="tag tag-muted">${esc(item.serves)}</span>`);
   if (item.kidFriendly) t.push(`<span class="tag tag-pink">👧 Kid-friendly</span>`);
   if (item.prepNote) t.push(`<span class="tag tag-green">📦 Prep-ahead</span>`);
@@ -6755,6 +6776,14 @@ function scaleAmountsInText(text, scale, requireUnit) {
   });
 }
 
+
+// "⏱ 30 min active · 1 hr total" (omits total when equal to active)
+function timeLabel(r, short){
+  if(!r) return "";
+  const a=r.activeTime||"", t=r.totalTime||"";
+  if(a&&t&&a.replace(/\s/g,"")!==t.replace(/\s/g,"")) return short ? (a+" · "+t+" total") : (a+" active · "+t+" total");
+  return a||t;
+}
 function viewRecipe(section, id) {
   const list = section === "breakfast" ? state.breakfasts : section === "lunch" ? state.lunches : section === "dessert" ? state.desserts : state.dinners;
   const item = list.find(x => x.id === id);
@@ -6926,6 +6955,7 @@ function saveItem(section) {
     protein:      Number(f("ef-prot")) || 0,
     activeTime:   f("ef-active"),
     totalTime:    f("ef-total"),
+    totalTime:    f("ef-total"),
     serves:       f("ef-serves"),
     day:          f("ef-day") || undefined,
     kidFriendly:  (document.getElementById("ef-kids")||{}).checked || false,
@@ -6975,6 +7005,7 @@ function showEditModal(section, item) {
       <div><label class="form-label">Calories</label><input class="form-input" id="ef-cal" value="${item.calories||""}"></div>
       <div><label class="form-label">Protein (g)</label><input class="form-input" id="ef-prot" value="${item.protein||""}"></div>
       <div><label class="form-label">Active</label><input class="form-input" id="ef-active" value="${esc(item.activeTime||"")}"></div>
+      <div><label class="form-label">Total</label><input class="form-input" id="ef-total" value="${esc(item.totalTime||"")}"></div>
       <div><label class="form-label">Total</label><input class="form-input" id="ef-total" value="${esc(item.totalTime||"")}"></div>
     </div>
     ${daySelect}
@@ -7205,7 +7236,7 @@ function renderDinnerCard(dinner, i, total) {
         <div style="flex:1;min-width:0">
           <div style="color:var(--green);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">${esc(dinner.day)}</div>
           <div style="color:var(--text);font-size:18px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(dinner.name)}</div>
-          <div style="color:var(--dim);font-size:14px;margin-top:2px">${dinner.calories} cal · ${dinner.protein}g protein${dinner.activeTime?" · "+esc(dinner.activeTime):""}</div>
+          <div style="color:var(--dim);font-size:14px;margin-top:2px">${dinner.calories} cal · ${dinner.protein}g protein${(dinner.activeTime||dinner.totalTime)?" · "+esc(timeLabel(dinner,true)):""}</div>
           ${leftover}${swapBadge}${vegBadge}
         </div>
         <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0" onclick="event.stopPropagation()">
@@ -7559,7 +7590,7 @@ function renderPlan() {
                 ${recipe.quick ? '<span title="Quick" style="font-size:10px;font-weight:800;padding:1px 5px;border-radius:20px;background:rgba(245,158,11,0.12);color:#fbbf24;flex-shrink:0">⚡</span>' : ""}
                 ${recipe.audience==="adults" ? '<span title="Adults night" style="font-size:10px;font-weight:800;padding:1px 5px;border-radius:20px;background:rgba(244,114,182,0.12);color:#f472b6;flex-shrink:0">🍷</span>' : ""}
               </div>
-              <div style="font-size:11px;color:var(--dim);margin-top:1px">${recipe.activeTime||""}</div>
+              <div style="font-size:11px;color:var(--dim);margin-top:1px">${esc(timeLabel(recipe,true))}</div>
             </div>
             <div style="display:flex;gap:4px;flex-shrink:0">
               <button onclick="openDaySlotPicker('${day}','${slot.key}')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
@@ -7790,7 +7821,7 @@ function renderVault() {
               <div style="font-size:15px;font-weight:600;color:var(--text)">${esc(r.name)}</div>
               ${isFav?"<span style='font-size:14px'>⭐</span>":""}
             </div>
-            <div style="font-size:12px;color:var(--dim)">${r.audience==="adults"?'<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(245,158,11,0.12);color:#fbbf24;margin-right:4px">🍷</span>':r.audience==="family"?'<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(99,102,241,0.1);color:#818cf8;margin-right:4px">&#128106;</span>':""}${r.calories||""}cal · ${r.protein||""}g protein · ${r.activeTime||""}</div>
+            <div style="font-size:12px;color:var(--dim)">${r.audience==="adults"?'<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(245,158,11,0.12);color:#fbbf24;margin-right:4px">🍷</span>':r.audience==="family"?'<span style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(99,102,241,0.1);color:#818cf8;margin-right:4px">&#128106;</span>':""}${r.calories||""}cal · ${r.protein||""}g protein · ⏱ ${esc(timeLabel(r,true))}</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
               ${stars?`<span style="font-size:11px;color:var(--amber)">${stars}</span>`:""}
               ${cookCount?`<span style="font-size:11px;color:var(--dim)">Made ${cookCount}x</span>`:""}
@@ -8851,7 +8882,7 @@ function renderWeekPlanner() {
             <span style="font-size:24px">${recipe.emoji || "🍽️"}</span>
             <div>
               <div style="font-size:15px;font-weight:600;color:var(--text)">${esc(recipe.name)}</div>
-              <div style="font-size:12px;color:var(--dim)">${recipe.calories || ""} cal · ${recipe.protein || ""}g protein · ${recipe.activeTime || ""}</div>
+              <div style="font-size:12px;color:var(--dim)">${recipe.calories || ""} cal · ${recipe.protein || ""}g protein · ⏱ ${esc(timeLabel(recipe,true))}</div>
             </div>
           </div>` : `<div style="font-size:14px;color:var(--dim);margin-bottom:8px">Nothing planned</div>`}
         <select onchange="(function(e){ const [id,sec] = e.target.value.split('|'); assignDay('${day}', id||'', sec||''); })(event)"
