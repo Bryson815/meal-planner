@@ -7587,7 +7587,7 @@ function sideMethodUsed(r){ const txt=((r&&r.instructions)||[]).join(" ").toLowe
 function pickSide(recipe, exclude){
   if(!recipe || recipe.noSide) return null;
   const cz=sideCuisineOf(recipe), used=sideMethodUsed(recipe);
-  const ok=SIDES.filter(x=>!(exclude||[]).includes(x.id));
+  let ok=SIDES.filter(x=>!(exclude||[]).includes(x.id)); if(!ok.length) ok=SIDES.slice();
   const scored=ok.map(x=>{ let sc=0; if(x.cuisine.includes(cz)) sc+=10; if(x.cuisine.includes("any")) sc+=3; if(used.oven && x.method==="oven") sc-=8; if(used.stove && x.method==="stove") sc-=3; if(x.method==="micro"||x.method==="raw") sc+=2; sc+=Math.random()*2; return {x,sc}; }).sort((a,b)=>b.sc-a.sc);
   return scored.length?scored[0].x.id:null;
 }
@@ -7598,6 +7598,15 @@ function addSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,s
 function sideForRecipe(recipeId){ for(const plan of [state.weekPlan||{}, state.nextWeekPlan||{}]){ for(const k of Object.keys(plan)){ const e=plan[k]; if(e&&e.recipeId===recipeId&&e.side&&SIDES_BY_ID[e.side]) return SIDES_BY_ID[e.side]; } } return null; }
 
 // Build the two-week dinner timeline as a flat array of 14 slots (index 0 = this Sunday)
+
+// "italian seasoning or burlap & barrel her" → "Italian seasoning"; drops brand/alternative clauses and junk keys
+function cleanShareName(k) {
+  let n = String(k || "").split(/\s+or\s+|\s*\(|,|—|–| - /)[0].trim();
+  n = n.replace(/\b(jennie-o|kinder'?s|dan-o'?s|burlap & barrel|rao'?s|fairlife|fage|good culture|kirkland|costco|publix|kroger|whole foods|trader joe'?s|primal kitchen|siete|just bare|aidells|amylu|kettle & fire)\b/gi, "").replace(/\s{2,}/g, " ").trim();
+  n = n.replace(/^[\d.%\s\/½¼¾]+/, "").trim();
+  if (n.length < 3 || /^(salt|pepper|water|oil|olive oil|avocado oil|kosher salt|black pepper|salt and pepper|original|blend|seasoning|the blend)$/i.test(n)) return "";
+  return n.charAt(0).toUpperCase() + n.slice(1);
+}
 function smartPlan(opts) {
   opts = Object.assign({ dinners: 5, adultNights: 1, quickNights: 2, breakfasts: 2, lunches: 2, nextWeek: true, keepExisting: true }, opts || {});
   const weeks = opts.nextWeek ? 2 : 1;
@@ -7624,13 +7633,18 @@ function smartPlan(opts) {
   // Which day indexes get a dinner this week: fill from a preference order
   function slotPlanForWeek(w) {
     const base = w * 7;
-    const pref = opts.adultNights > 0 ? ["Monday","Tuesday","Wednesday","Thursday","Saturday","Sunday","Friday"] : ["Monday","Tuesday","Wednesday","Thursday","Sunday","Saturday","Friday"]; // Fri is the default eat-out night; Sat is the adults night; Sunday is the big-cook night that feeds next week
-    const chosen = [];
-    pref.forEach(d => { if (chosen.length < opts.dinners) chosen.push(base + PLAN_DAYS.indexOf(d)); });
-    // adult nights: Saturday first, then Friday
-    const adultIdx = ["Saturday","Friday","Thursday"].map(d => base + PLAN_DAYS.indexOf(d)).filter(i => chosen.includes(i)).slice(0, opts.adultNights);
-    // quick nights: Mon–Thu, latest first (busiest end of week)
-    const quickIdx = ["Thursday","Tuesday","Wednesday","Monday"].map(d => base + PLAN_DAYS.indexOf(d)).filter(i => chosen.includes(i) && !adultIdx.includes(i)).slice(0, opts.quickNights);
+    const D = d => base + PLAN_DAYS.indexOf(d);
+    const total = Math.max(0, Math.min(7, opts.dinners));
+    const nAdult = Math.min(opts.adultNights, total);
+    const nQuick = Math.min(opts.quickNights, Math.max(0, total - nAdult));
+    const chosen = [], adultIdx = [], quickIdx = [];
+    // 1) adults nights: Saturday, then Friday, then Thursday
+    ["Saturday","Friday","Thursday"].forEach(d => { if (adultIdx.length < nAdult) { adultIdx.push(D(d)); chosen.push(D(d)); } });
+    // 2) quick nights: busiest weeknights first
+    ["Thursday","Tuesday","Wednesday","Monday"].forEach(d => { if (quickIdx.length < nQuick && !chosen.includes(D(d))) { quickIdx.push(D(d)); chosen.push(D(d)); } });
+    // 3) the rest: Mon→Thu, then Sunday (big-cook night that feeds next week), then Sat, then Fri (default eat-out night)
+    ["Monday","Tuesday","Wednesday","Thursday","Sunday","Saturday","Friday"].forEach(d => { if (chosen.length < total && !chosen.includes(D(d))) chosen.push(D(d)); });
+    chosen.sort((a, b) => a - b);
     return { chosen, adultIdx, quickIdx };
   }
   const weekSlots = []; for (let w = 0; w < weeks; w++) weekSlots.push(slotPlanForWeek(w));
@@ -7675,7 +7689,7 @@ function smartPlan(opts) {
     (r.usesLeftoversFrom || []).forEach(src => { for (let back = 1; back <= 3; back++) { const t = timeline[idx - back]; if (t && t.dinner && t.dinner.recipeId === src) reasons.push("🔁 uses leftovers from " + (byId[src] ? byId[src].name.split(" ").slice(0, 3).join(" ") : "earlier") + " (" + t.day.slice(0, 3) + ")"); } });
     if (r.sharedAnchor) timeline.forEach((t, j) => { if (t.dinner && t.dinner.recipeId && Math.abs(j - idx) <= 3 && j !== idx) { const o = byId[t.dinner.recipeId]; if (o && o.sharedAnchor === r.sharedAnchor) reasons.push("🍗 same rotisserie bird as " + t.day.slice(0, 3)); } });
     const mine = keysOf(r); const sharedWith = [];
-    timeline.forEach((t, j) => { if (t.dinner && t.dinner.recipeId && Math.abs(j - idx) <= 3 && j !== idx) { const o = byId[t.dinner.recipeId]; if (!o) return; const sh = [...keysOf(o)].filter(k => mine.has(k)); if (sh.length >= 2) sharedWith.push(t.day.slice(0, 3) + ": " + sh.slice(0, 3).join(", ")); } });
+    timeline.forEach((t, j) => { if (t.dinner && t.dinner.recipeId && Math.abs(j - idx) <= 3 && j !== idx) { const o = byId[t.dinner.recipeId]; if (!o) return; const sh = [...keysOf(o)].filter(k => mine.has(k)).map(cleanShareName).filter(Boolean); const uniq = [...new Set(sh)]; if (uniq.length >= 2) sharedWith.push(t.day.slice(0, 3) + ": " + uniq.slice(0, 3).join(", ")); } });
     if (sharedWith.length) reasons.push("🧺 shares " + sharedWith[0]);
     if (wantAdult) reasons.push("🍷 adults night"); if (wantQuick && r.quick) reasons.push("⚡ quick night");
     const rt = (state.ratings || {})[r.id] || {}; if (rt.favorite) reasons.push("⭐ favorite");
@@ -7700,7 +7714,7 @@ function smartPlan(opts) {
     const pool = dinners.filter(r => !used.has(r.id));
     if (!pool.length) continue;
     const best = pool.map(r => ({ r, s: scoreDinner(r, i, wantAdult, wantQuick) })).sort((a, b) => b.s - a.s)[0].r;
-    t.dinner = { recipeId: best.id, section: "dinner" }; const sd = pickSide(best, []); if (sd) t.dinner.side = sd; t.dinnerReason = reasonFor(best, i, wantAdult, wantQuick);
+    t.dinner = { recipeId: best.id, section: "dinner" }; const usedSides = timeline.filter((t2, j2) => Math.floor(j2 / 7) === Math.floor(i / 7) && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(best, usedSides); if (sd) t.dinner.side = sd; t.dinnerReason = reasonFor(best, i, wantAdult, wantQuick);
   }
 
   // Breakfasts & lunches per week: pick by rating/recency; lunches that use a placed dinner's leftovers get priority and land 1–2 days after
@@ -7744,7 +7758,7 @@ function swapSmartPlanSlot(i) {
   const pool = (state.dinners || []).filter(r => r && r.id && isActive(r.id) && !used.has(r.id) && r.id !== current && ((r.audience || "family") === (wantAdult ? "adults" : "family")));
   if (!pool.length) return;
   const pick = pool[Math.floor(Math.random() * pool.length)];
-  t.dinner = { recipeId: pick.id, section: "dinner" }; const sd = pickSide(pick, []); if (sd) t.dinner.side = sd; t.dinnerReason = "↻ swapped in"; t.locked = false;
+  t.dinner = { recipeId: pick.id, section: "dinner" }; const usedSides2 = timeline.filter(t2 => t2 !== t && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(pick, usedSides2); if (sd) t.dinner.side = sd; t.dinnerReason = "↻ swapped in"; t.locked = false;
   renderSmartPlanModal("preview");
 }
 function byIdAll(id) { return [...(state.dinners||[]), ...(state.breakfasts||[]), ...(state.lunches||[]), ...(state.desserts||[])].find(r => r && r.id === id); }
@@ -7781,7 +7795,7 @@ function renderSmartPlanModal(mode) {
     box.innerHTML = `
       <div style="font-size:18px;font-weight:800;margin-bottom:2px">✨ Plan my week</div>
       <div style="color:var(--dim);font-size:13px;margin-bottom:14px">Builds around leftovers and shared ingredients. You'll see the plan before anything is saved.</div>
-      ${row("🌙", "Dinners to cook", stepperHtml("sp-dinners", 5, 0, 7, "#818cf8"), "rgba(99,102,241,0.08)")}
+      ${row("🌙", "Dinners to cook <span style=\"font-weight:400;color:var(--dim);font-size:12px\">(total — adults &amp; quick nights count toward it)</span>", stepperHtml("sp-dinners", 5, 0, 7, "#818cf8"), "rgba(99,102,241,0.08)")}
       ${row("🍷", "Adults-night dinners (Fri/Sat)", stepperHtml("sp-adult", 1, 0, 3, "#f472b6"), "rgba(244,114,182,0.08)")}
       ${row("⚡", "Quick nights (Mon–Thu)", stepperHtml("sp-quick", 2, 0, 4, "#fbbf24"), "rgba(245,158,11,0.08)")}
       ${row("🌅", "Breakfasts", stepperHtml("sp-breakfasts", 2, 0, 5, "#fbbf24"), "rgba(245,158,11,0.06)")}
