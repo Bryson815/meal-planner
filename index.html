@@ -786,6 +786,9 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
 .cook-voice-btn.thinking{opacity:0.7}
 .cook-nav-voice{display:none}
 @media (max-width:767px){ #cook-wake-pill,#cook-heard,.cook-voice-btn{display:none !important} .cook-nav-voice{display:block !important} }
+.plan-drop-hot{outline:2px dashed #34d399 !important;outline-offset:-2px;background:rgba(16,185,129,0.10) !important}
+body[class*="plan-dragging-"] .plan-slot-row,body[class*="plan-dragging-"] .plan-slot-empty{transition:outline 0.1s}
+@media (max-width:1023px){.plan-slot-row{-webkit-user-drag:none}}
 </style>
 </head>
 <body>
@@ -6580,6 +6583,7 @@ let state = {
   weekPlan: {},
   nextWeekPlan: {},
   lunchbox: { plan:{}, feedback:{}, packed:{}, hasThermos:false, schoolDays:["Monday","Tuesday","Wednesday","Thursday","Friday"], noSchool:[] },
+  planDefaults: { cookDays:["Monday","Tuesday","Wednesday","Thursday","Saturday"], adultDays:["Saturday"], quickDays:["Tuesday","Thursday"] },
   cookHistory: [],
   groceryNotes: {},
   vaultSort: "name",
@@ -6682,6 +6686,7 @@ async function loadFromSupabase() {
         if (plan.sauces) state.sauces = plan.sauces;
         if (plan.weekPlan) state.weekPlan = normalizePlan(plan.weekPlan);
         if (plan.nextWeekPlan) state.nextWeekPlan = normalizePlan(plan.nextWeekPlan);
+        if (plan.planDefaults && plan.planDefaults.cookDays) state.planDefaults = plan.planDefaults;
         if (plan.prepDone) state.prepDone = plan.prepDone;
         if (plan.lunchbox && typeof plan.lunchbox === "object") state.lunchbox = plan.lunchbox;
         if (plan.cookHistory) state.cookHistory = plan.cookHistory;
@@ -6695,7 +6700,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{} };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{}, planDefaults: state.planDefaults||null };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -6736,6 +6741,7 @@ function loadFromLocal() {
     if (saved.sauces) state.sauces = saved.sauces;
     if (saved.weekPlan) state.weekPlan = normalizePlan(saved.weekPlan);
     if (saved.nextWeekPlan) state.nextWeekPlan = normalizePlan(saved.nextWeekPlan);
+    if (saved.planDefaults && saved.planDefaults.cookDays) state.planDefaults = saved.planDefaults;
     if (saved.prepDone) state.prepDone = saved.prepDone;
     if (saved.lunchbox && typeof saved.lunchbox === "object") state.lunchbox = saved.lunchbox;
     if (saved.cookHistory) state.cookHistory = saved.cookHistory;
@@ -7609,6 +7615,18 @@ function cleanShareName(k) {
 }
 function smartPlan(opts) {
   opts = Object.assign({ dinners: 5, adultNights: 1, quickNights: 2, breakfasts: 2, lunches: 2, nextWeek: true, keepExisting: true }, opts || {});
+  // Day arrays win; numeric opts (older callers) are converted to days with the classic preference order
+  if (!Array.isArray(opts.cookDays)) {
+    const total = Math.max(0, Math.min(7, opts.dinners)), nAdult = Math.min(opts.adultNights, total), nQuick = Math.min(opts.quickNights, Math.max(0, total - nAdult));
+    const cook = [], adult = [], quick = [];
+    ["Saturday","Friday","Thursday"].forEach(d => { if (adult.length < nAdult) { adult.push(d); cook.push(d); } });
+    ["Thursday","Tuesday","Wednesday","Monday"].forEach(d => { if (quick.length < nQuick && !cook.includes(d)) { quick.push(d); cook.push(d); } });
+    ["Monday","Tuesday","Wednesday","Thursday","Sunday","Saturday","Friday"].forEach(d => { if (cook.length < total && !cook.includes(d)) cook.push(d); });
+    opts.cookDays = cook; opts.adultDays = adult; opts.quickDays = quick;
+  }
+  opts.adultDays = (opts.adultDays || []).filter(d => opts.cookDays.includes(d));
+  opts.quickDays = (opts.quickDays || []).filter(d => opts.cookDays.includes(d) && !opts.adultDays.includes(d));
+  opts.dinners = opts.cookDays.length; opts.adultNights = opts.adultDays.length; opts.quickNights = opts.quickDays.length;
   const weeks = opts.nextWeek ? 2 : 1;
   const dinners = (state.dinners || []).filter(r => r && r.id && isActive(r.id));
   const breakfasts = (state.breakfasts || []).filter(r => r && r.id && isActive(r.id));
@@ -7634,17 +7652,9 @@ function smartPlan(opts) {
   function slotPlanForWeek(w) {
     const base = w * 7;
     const D = d => base + PLAN_DAYS.indexOf(d);
-    const total = Math.max(0, Math.min(7, opts.dinners));
-    const nAdult = Math.min(opts.adultNights, total);
-    const nQuick = Math.min(opts.quickNights, Math.max(0, total - nAdult));
-    const chosen = [], adultIdx = [], quickIdx = [];
-    // 1) adults nights: Saturday, then Friday, then Thursday
-    ["Saturday","Friday","Thursday"].forEach(d => { if (adultIdx.length < nAdult) { adultIdx.push(D(d)); chosen.push(D(d)); } });
-    // 2) quick nights: busiest weeknights first
-    ["Thursday","Tuesday","Wednesday","Monday"].forEach(d => { if (quickIdx.length < nQuick && !chosen.includes(D(d))) { quickIdx.push(D(d)); chosen.push(D(d)); } });
-    // 3) the rest: Mon→Thu, then Sunday (big-cook night that feeds next week), then Sat, then Fri (default eat-out night)
-    ["Monday","Tuesday","Wednesday","Thursday","Sunday","Saturday","Friday"].forEach(d => { if (chosen.length < total && !chosen.includes(D(d))) chosen.push(D(d)); });
-    chosen.sort((a, b) => a - b);
+    const chosen = opts.cookDays.map(D).sort((a, b) => a - b);
+    const adultIdx = opts.adultDays.map(D);
+    const quickIdx = opts.quickDays.map(D);
     return { chosen, adultIdx, quickIdx };
   }
   const weekSlots = []; for (let w = 0; w < weeks; w++) weekSlots.push(slotPlanForWeek(w));
@@ -7737,15 +7747,81 @@ function smartPlan(opts) {
     let placedB = timeline.slice(base, base + 7).filter(t => t.breakfast).length;
     bDays.forEach(i => { if (placedB >= opts.breakfasts) return; const t = timeline[i]; if (!t || t.breakfast) return; const pool = breakfasts.filter(r => !usedB.has(r.id)); if (!pool.length) return; const best = pool.map(r => ({ r, s: scoreSide(r) })).sort((a, b) => b.s - a.s)[0].r; t.breakfast = { recipeId: best.id, section: "breakfast", reason: t.day === "Sunday" ? "🌅 batch-cook Sunday" : "🌅 breakfast" }; usedB.add(best.id); placedB++; });
   }
-  return { timeline, opts };
+  return { timeline, opts, reasonFor };
 }
 
+
+// ── Cook-night defaults (persisted) ──
+function planDefaultsGet() {
+  const d = state.planDefaults && Array.isArray(state.planDefaults.cookDays) ? state.planDefaults : { cookDays:["Monday","Tuesday","Wednesday","Thursday","Saturday"], adultDays:["Saturday"], quickDays:["Tuesday","Thursday"] };
+  state.planDefaults = { cookDays: d.cookDays.slice(), adultDays: (d.adultDays||[]).slice(), quickDays: (d.quickDays||[]).slice() };
+  return state.planDefaults;
+}
+function togglePlanDay(kind, day) {
+  const d = planDefaultsGet();
+  const flip = (arr) => { const i = arr.indexOf(day); if (i >= 0) arr.splice(i, 1); else arr.push(day); };
+  if (kind === "cook") { flip(d.cookDays); if (!d.cookDays.includes(day)) { d.adultDays = d.adultDays.filter(x => x !== day); d.quickDays = d.quickDays.filter(x => x !== day); } }
+  else if (kind === "adult") { flip(d.adultDays); if (d.adultDays.includes(day)) { if (!d.cookDays.includes(day)) d.cookDays.push(day); d.quickDays = d.quickDays.filter(x => x !== day); } }
+  else if (kind === "quick") { flip(d.quickDays); if (d.quickDays.includes(day)) { if (!d.cookDays.includes(day)) d.cookDays.push(day); d.adultDays = d.adultDays.filter(x => x !== day); } }
+  scheduleSave(); renderSmartPlanModal("options");
+}
+function dayChipsHtml(kind, selected, color, small) {
+  const sz = small ? "font-size:11px;padding:6px 0;" : "font-size:13px;padding:9px 0;";
+  return `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:8px">${PLAN_DAYS.map(d => { const on = selected.includes(d); return `<button onclick="togglePlanDay('${kind}','${d}')" style="${sz}border-radius:9px;border:1.5px solid ${on ? color : "rgba(255,255,255,0.12)"};background:${on ? color + "26" : "transparent"};color:${on ? color : "var(--dim)"};font-weight:800;cursor:pointer;min-height:${small ? 30 : 38}px">${d.slice(0, 3)}</button>`; }).join("")}</div>`;
+}
+// ── Preview: move / swap a night ──
+let spMoveOpen = null;
+function spOpenMove(i) { spMoveOpen = (spMoveOpen === i) ? null : i; renderSmartPlanModal("preview"); }
+function spMoveTo(from, to) {
+  const d = smartPlanDraft; if (!d || from === to) { spMoveOpen = null; renderSmartPlanModal("preview"); return; }
+  const a = d.timeline[from], b = d.timeline[to]; if (!a || !b) return;
+  const tmp = { dinner: b.dinner, reason: b.dinnerReason };
+  b.dinner = a.dinner; b.dinnerReason = a.dinnerReason || "→ moved here"; b.locked = true;
+  a.dinner = tmp.dinner; a.dinnerReason = tmp.dinner ? (tmp.reason || "⇄ swapped") : ""; a.locked = !!tmp.dinner;
+  [a, b].forEach(t => { if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r && typeof d.reasonFor === "function") { const rr = d.reasonFor(r, d.timeline.indexOf(t), (r.audience === "adults"), !!r.quick); t.dinnerReason = rr ? rr + " · moved" : "→ moved here"; } } });
+  // the target becomes a cook night for future runs
+  const pd = planDefaultsGet(); if (!pd.cookDays.includes(b.day)) { pd.cookDays.push(b.day); scheduleSave(); }
+  spMoveOpen = null; renderSmartPlanModal("preview");
+}
+// ── Calendar: move / swap an entry (same slot) within or across weeks ──
+let planMoveOpen = null; // {day, slot}
+
+function planMovePopoverHtml(day, slot) {
+  const otherWeek = planWeekView === "next" ? "this" : "next";
+  const cur = activePlan();
+  const chip = (wk, dd) => { const taken = !!planGet(wk === "this" ? (state.weekPlan||{}) : (state.nextWeekPlan||{}), dd, slot); const isCur = wk === planWeekView && dd === day; return `<button onclick="event.stopPropagation();planMoveEntry('${planWeekView}','${day}','${slot}','${wk}','${dd}')" ${isCur?"disabled":""} style="padding:7px 0;border-radius:8px;border:1.5px solid ${isCur?"rgba(16,185,129,0.6)":taken?"rgba(255,255,255,0.22)":"rgba(255,255,255,0.1)"};background:${isCur?"rgba(16,185,129,0.15)":"transparent"};color:${isCur?"#34d399":taken?"var(--text)":"var(--dim)"};font-size:11px;font-weight:800;cursor:pointer;min-height:36px">${dd.slice(0,3)}${taken&&!isCur?'<span style="display:block;font-size:8px;font-weight:600;color:var(--dim)">swap</span>':""}</button>`; };
+  return `<div class="plan-move-pop" onclick="event.stopPropagation()" style="margin:-2px 0 6px;padding:8px 10px;border-radius:10px;background:rgba(16,185,129,0.06);border:1px dashed rgba(16,185,129,0.35)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:11px;color:var(--dim)">Move ${slot} to… (a taken day swaps)</span><button onclick="planMoveOpen=null;renderPlan()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px">✕</button></div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${PLAN_DAYS.map(dd => chip(planWeekView, dd)).join("")}</div>
+    <div style="font-size:10px;font-weight:800;letter-spacing:0.8px;color:#818cf8;margin:8px 0 4px">→ ${otherWeek.toUpperCase()} WEEK</div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${PLAN_DAYS.map(dd => chip(otherWeek, dd)).join("")}</div>
+  </div>`;
+}
+function openPlanMove(day, slot) { planMoveOpen = (planMoveOpen && planMoveOpen.day === day && planMoveOpen.slot === slot) ? null : { day, slot }; renderPlan(); }
+function planMoveEntry(fromWeek, fromDay, slot, toWeek, toDay) {
+  const planOf = w => w === "next" ? (state.nextWeekPlan = state.nextWeekPlan || {}) : (state.weekPlan = state.weekPlan || {});
+  const A = planOf(fromWeek), B = planOf(toWeek);
+  if (fromWeek === toWeek && fromDay === toDay) { planMoveOpen = null; renderPlan(); return; }
+  const a = planGet(A, fromDay, slot), b = planGet(B, toDay, slot);
+  if (!a) { planMoveOpen = null; renderPlan(); return; }
+  planSet(B, toDay, slot, a);
+  planSet(A, fromDay, slot, b || null);
+  planMoveOpen = null; scheduleSave(); renderPlan();
+}
+// desktop drag & drop
+let planDrag = null;
+function planDragStart(ev, week, day, slot) { planDrag = { week, day, slot }; try { ev.dataTransfer.setData("text/plain", day); ev.dataTransfer.effectAllowed = "move"; } catch (e) {} document.body.classList.add("plan-dragging-" + slot); }
+function planDragEnd() { planDrag = null; document.body.className = document.body.className.replace(/plan-dragging-\w+/g, "").trim(); }
+function planDragOver(ev, slot) { if (planDrag && planDrag.slot === slot) { ev.preventDefault(); ev.currentTarget.classList.add("plan-drop-hot"); } }
+function planDragLeave(ev) { ev.currentTarget.classList.remove("plan-drop-hot"); }
+function planDrop(ev, week, day, slot) { ev.preventDefault(); ev.currentTarget.classList.remove("plan-drop-hot"); if (!planDrag || planDrag.slot !== slot) return; const d = planDrag; planDragEnd(); planMoveEntry(d.week, d.day, slot, week, day); }
 let smartPlanDraft = null;
 function showAutoplanOptions() { renderSmartPlanModal("options"); const m = document.getElementById("autoplan-modal"); if (m) m.style.display = "flex"; document.body.classList.add("sheet-open"); }
 function closeAutoplanModal() { const m = document.getElementById("autoplan-modal"); if (m) m.style.display = "none"; document.body.classList.remove("sheet-open"); }
 function spOpt(name, fallback) { const el = document.getElementById("sp-" + name); if (!el) return fallback; if (el.type === "checkbox") return el.checked; const v = parseInt(el.textContent || el.value); return isNaN(v) ? fallback : v; }
 function runSmartPlan() {
-  const opts = { dinners: spOpt("dinners", 5), adultNights: spOpt("adult", 1), quickNights: spOpt("quick", 2), breakfasts: spOpt("breakfasts", 2), lunches: spOpt("lunches", 2), nextWeek: spOpt("next", true), keepExisting: spOpt("keep", true) };
+  const pd = planDefaultsGet();
+  const opts = { cookDays: pd.cookDays.slice(), adultDays: pd.adultDays.slice(), quickDays: pd.quickDays.slice(), breakfasts: spOpt("breakfasts", 2), lunches: spOpt("lunches", 2), nextWeek: spOpt("next", true), keepExisting: spOpt("keep", true) };
   smartPlanDraft = smartPlan(opts);
   renderSmartPlanModal("preview");
 }
@@ -7758,7 +7834,7 @@ function swapSmartPlanSlot(i) {
   const pool = (state.dinners || []).filter(r => r && r.id && isActive(r.id) && !used.has(r.id) && r.id !== current && ((r.audience || "family") === (wantAdult ? "adults" : "family")));
   if (!pool.length) return;
   const pick = pool[Math.floor(Math.random() * pool.length)];
-  t.dinner = { recipeId: pick.id, section: "dinner" }; const usedSides2 = timeline.filter(t2 => t2 !== t && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(pick, usedSides2); if (sd) t.dinner.side = sd; t.dinnerReason = "↻ swapped in"; t.locked = false;
+  t.dinner = { recipeId: pick.id, section: "dinner" }; const usedSides2 = smartPlanDraft.timeline.filter(t2 => t2 !== t && t2.dinner && t2.dinner.side).map(t2 => t2.dinner.side); const sd = pickSide(pick, usedSides2); if (sd) t.dinner.side = sd; t.dinnerReason = "↻ swapped in"; t.locked = false;
   renderSmartPlanModal("preview");
 }
 function byIdAll(id) { return [...(state.dinners||[]), ...(state.breakfasts||[]), ...(state.lunches||[]), ...(state.desserts||[])].find(r => r && r.id === id); }
@@ -7795,9 +7871,10 @@ function renderSmartPlanModal(mode) {
     box.innerHTML = `
       <div style="font-size:18px;font-weight:800;margin-bottom:2px">✨ Plan my week</div>
       <div style="color:var(--dim);font-size:13px;margin-bottom:14px">Builds around leftovers and shared ingredients. You'll see the plan before anything is saved.</div>
-      ${row("🌙", "Dinners to cook <span style=\"font-weight:400;color:var(--dim);font-size:12px\">(total — adults &amp; quick nights count toward it)</span>", stepperHtml("sp-dinners", 5, 0, 7, "#818cf8"), "rgba(99,102,241,0.08)")}
-      ${row("🍷", "Adults-night dinners (Fri/Sat)", stepperHtml("sp-adult", 1, 0, 3, "#f472b6"), "rgba(244,114,182,0.08)")}
-      ${row("⚡", "Quick nights (Mon–Thu)", stepperHtml("sp-quick", 2, 0, 4, "#fbbf24"), "rgba(245,158,11,0.08)")}
+      ${(function(){ const pd = planDefaultsGet(); const block = (icon, label, sub, kind, sel, color, small, bg) => `<div style="padding:10px 14px;background:${bg};border-radius:12px;margin-bottom:8px"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div style="display:flex;align-items:center;gap:8px"><span>${icon}</span><span style="font-size:14px;font-weight:600;color:var(--text)">${label}</span></div><span style="font-size:12px;color:var(--dim)">${sub}</span></div>${dayChipsHtml(kind, sel, color, small)}</div>`;
+        return block("🌙", "Cook nights", "tap to toggle · " + pd.cookDays.length + " selected", "cook", pd.cookDays, "#818cf8", false, "rgba(99,102,241,0.08)")
+             + block("🍷", "Adults night(s)", pd.adultDays.length ? pd.adultDays.map(d=>d.slice(0,3)).join(", ") : "none", "adult", pd.adultDays, "#f472b6", true, "rgba(244,114,182,0.08)")
+             + block("⚡", "Quick nights", pd.quickDays.length ? pd.quickDays.map(d=>d.slice(0,3)).join(", ") : "none", "quick", pd.quickDays, "#fbbf24", true, "rgba(245,158,11,0.08)"); })()}
       ${row("🌅", "Breakfasts", stepperHtml("sp-breakfasts", 2, 0, 5, "#fbbf24"), "rgba(245,158,11,0.06)")}
       ${row("☀️", "Lunches", stepperHtml("sp-lunches", 2, 0, 5, "#34d399"), "rgba(16,185,129,0.08)")}
       ${toggle("sp-next", "Plan next week too (leftovers carry over)", true)}
@@ -7818,14 +7895,15 @@ function renderSmartPlanModal(mode) {
       return `<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px">
         <div style="width:38px;flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--green);padding-top:3px">${t.day.slice(0, 3).toUpperCase()}</div>
         <div style="flex:1;min-width:0">${dinnerHtml}${sides ? `<div style="font-size:12px;color:#94a3b8;margin-top:4px">${esc(sides)}</div>` : ""}</div>
-        ${t.dinner && t.dinner.recipeId ? `<button onclick="swapSmartPlanSlot(${i})" title="Pick something else" style="flex-shrink:0;padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">↻ swap</button>` : ""}
-      </div>`;
+        ${t.dinner ? `<div style="display:flex;gap:4px;flex-shrink:0">${t.dinner.recipeId ? `<button onclick="swapSmartPlanSlot(${i})" title="Pick something else" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">↻ swap</button>` : ""}<button onclick="spOpenMove(${i})" title="Move to another day" style="padding:6px 10px;border-radius:8px;border:1px solid ${spMoveOpen===i?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.14)"};background:${spMoveOpen===i?"rgba(16,185,129,0.12)":"transparent"};color:${spMoveOpen===i?"#34d399":"var(--muted)"};font-size:12px;cursor:pointer">→ move</button></div>` : ""}
+      </div>
+      ${spMoveOpen===i ? `<div style="margin:-2px 0 8px 48px;padding:8px 10px;border-radius:10px;background:rgba(16,185,129,0.06);border:1px dashed rgba(16,185,129,0.35)"><div style="font-size:11px;color:var(--dim);margin-bottom:6px">Move to… (a taken day swaps)</div>${[0,1].filter(ww => ww===0 || d.opts.nextWeek).map(ww => `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px"><span style="font-size:10px;font-weight:800;letter-spacing:0.8px;color:${ww===0?"#34d399":"#818cf8"};width:34px">${ww===0?"THIS":"NEXT"}</span>${PLAN_DAYS.map((dd, k) => { const j = ww*7+k; const tt = d.timeline[j]; const taken = tt && tt.dinner; return `<button onclick="spMoveTo(${i},${j})" ${j===i?"disabled":""} style="padding:6px 0;width:40px;border-radius:8px;border:1.5px solid ${j===i?"rgba(16,185,129,0.6)":taken?"rgba(255,255,255,0.22)":"rgba(255,255,255,0.1)"};background:${j===i?"rgba(16,185,129,0.15)":"transparent"};color:${j===i?"#34d399":taken?"var(--text)":"var(--dim)"};font-size:11px;font-weight:800;cursor:pointer">${dd.slice(0,3)}${taken&&j!==i?"<span style=\"display:block;font-size:8px;font-weight:600;color:var(--dim)\">swap</span>":""}</button>`; }).join("")}</div>`).join("")}</div>` : ""}`;
     }).join("");
     return `<div style="font-size:12px;font-weight:800;letter-spacing:1px;color:${w === 0 ? "#34d399" : "#818cf8"};margin:${w === 0 ? "0" : "14px"} 0 8px">${w === 0 ? "THIS WEEK" : "NEXT WEEK"}</div>${rows}`;
   };
   box.innerHTML = `
     <div style="font-size:18px;font-weight:800;margin-bottom:2px">Here's the plan</div>
-    <div style="color:var(--dim);font-size:13px;margin-bottom:12px">Tap ↻ to re-pick a night. Nothing is saved until you accept.</div>
+    <div style="color:var(--dim);font-size:13px;margin-bottom:12px">↻ re-picks a night · → move moves or swaps it. Nothing is saved until you accept.</div>
     <div style="max-height:52vh;overflow-y:auto;padding-right:4px">${weekHtml(0)}${d.opts.nextWeek ? weekHtml(1) : ""}</div>
     <div style="display:flex;gap:8px;margin-top:12px">
       <button onclick="renderSmartPlanModal('options')" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:14px;cursor:pointer">← Options</button>
@@ -7986,14 +8064,15 @@ function renderPlan() {
               <div style="font-size:11px;color:var(--dim);margin-top:1px">no cooking · nothing to buy</div>
             </div>
             <div style="display:flex;gap:4px;flex-shrink:0">
-              <button onclick="openDaySlotPicker('${day}','${slot.key}')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
-              <button onclick="removeDaySlot('${day}','${slot.key}')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-size:11px;cursor:pointer">✕</button>
+              <button onclick="openPlanMove('${day}','${slot.key}')" title="Move to another day" style="padding:3px 8px;border-radius:6px;border:1px solid ${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.12)"};background:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.12)":"transparent"};color:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"#34d399":"var(--dim)"};font-size:11px;cursor:pointer;padding:3px 6px">⇄</button>
+              <button onclick="openDaySlotPicker('${day}','${slot.key}')" title="Pick a different recipe" style="padding:3px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
+              <button onclick="removeDaySlot('${day}','${slot.key}')" style="padding:3px 6px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-size:11px;cursor:pointer">✕</button>
             </div>
-          </div>`;
+          </div>${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key ? planMovePopoverHtml(day, slot.key) : ""}`;
       }
       if (recipe) {
         return `
-          <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:${slot.bg};border-radius:10px;margin-bottom:4px;border:1px solid ${slot.border};position:relative;overflow:hidden;">
+          <div class="plan-slot-row" draggable="true" ondragstart="planDragStart(event,planWeekView,'${day}','${slot.key}')" ondragend="planDragEnd()" ondragover="planDragOver(event,'${slot.key}')" ondragleave="planDragLeave(event)" ondrop="planDrop(event,planWeekView,'${day}','${slot.key}')" style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:${slot.bg};border-radius:10px;margin-bottom:4px;border:1px solid ${slot.border};position:relative;overflow:hidden;">
             <div style="position:absolute;left:0;top:0;bottom:0;width:2.5px;background:${slot.color};opacity:0.6;border-radius:2px 0 0 2px;"></div>
             <span style="font-size:10px;font-weight:700;color:${slot.color};width:58px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.7px;padding-left:6px;">${slot.label}</span>
             <span style="font-size:18px;flex-shrink:0">${recipe.emoji||"🍽️"}</span>
@@ -8007,19 +8086,20 @@ function renderPlan() {
               <div style="font-size:11px;color:var(--dim);margin-top:1px">${esc(timeLabel(recipe,true))}</div>
             </div>
             <div style="display:flex;gap:4px;flex-shrink:0">
-              <button onclick="openDaySlotPicker('${day}','${slot.key}')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
-              <button onclick="removeDaySlot('${day}','${slot.key}')" style="padding:3px 8px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-size:11px;cursor:pointer">✕</button>
+              <button onclick="openPlanMove('${day}','${slot.key}')" title="Move to another day" style="padding:3px 8px;border-radius:6px;border:1px solid ${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.12)"};background:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"rgba(16,185,129,0.12)":"transparent"};color:${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key?"#34d399":"var(--dim)"};font-size:11px;cursor:pointer;padding:3px 6px">⇄</button>
+              <button onclick="openDaySlotPicker('${day}','${slot.key}')" title="Pick a different recipe" style="padding:3px 6px;border-radius:6px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:11px;cursor:pointer">↔</button>
+              <button onclick="removeDaySlot('${day}','${slot.key}')" style="padding:3px 6px;border-radius:6px;border:1px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-size:11px;cursor:pointer">✕</button>
             </div>
           </div>
           ${slot.key==="dinner" ? (entry.side && SIDES_BY_ID[entry.side]
             ? `<div class="side-line" style="display:flex;align-items:center;gap:6px;padding:4px 10px 6px 76px;margin:-2px 0 4px;font-size:12px;color:#86efac"><span style="flex:1;min-width:0">🥦 + ${esc(SIDES_BY_ID[entry.side].name)}</span><button onclick="cycleSide('${day}','${slot.key}')" title="Different side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">↻</button><button onclick="removeSide('${day}','${slot.key}')" title="No side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">✕</button></div>`
-            : (recipe.noSide ? "" : `<div class="side-line" style="padding:2px 10px 6px 76px;margin:-2px 0 4px;font-size:12px"><button onclick="addSide('${day}','${slot.key}')" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:2px 0;min-height:28px">🥦 + add a side</button></div>`)) : ""}`;
+            : (recipe.noSide ? "" : `<div class="side-line" style="padding:2px 10px 6px 76px;margin:-2px 0 4px;font-size:12px"><button onclick="addSide('${day}','${slot.key}')" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:2px 0;min-height:28px">🥦 + add a side</button></div>`)) : ""}${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key ? planMovePopoverHtml(day, slot.key) : ""}`;
       } else {
         return `
-          <div onclick="openDaySlotPicker('${day}','${slot.key}')"
+          <div onclick="openDaySlotPicker('${day}','${slot.key}')" class="plan-slot-empty" ondragover="planDragOver(event,'${slot.key}')" ondragleave="planDragLeave(event)" ondrop="planDrop(event,planWeekView,'${day}','${slot.key}')"
             style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:rgba(255,255,255,0.02);border-radius:10px;margin-bottom:4px;border:1px dashed rgba(255,255,255,0.08);cursor:pointer">
             <span style="font-size:11px;font-weight:700;color:var(--dim);width:60px;flex-shrink:0;text-transform:uppercase;letter-spacing:0.5px">${slot.label}</span>
-            <span style="font-size:13px;color:var(--dim)">+ Add ${slot.label.toLowerCase()}</span>
+            <span style="font-size:13px;color:var(--dim)">${slot.key==="dinner" && !planDefaultsGet().cookDays.includes(day) ? '<span style="color:rgba(148,163,184,0.7);font-style:italic">Eat out / leftovers</span> <span style="opacity:0.6">· tap to add</span>' : "+ Add " + slot.label.toLowerCase()}</span>
           </div>`;
       }
     }).join("");
