@@ -789,6 +789,7 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
 .plan-drop-hot{outline:2px dashed #34d399 !important;outline-offset:-2px;background:rgba(16,185,129,0.10) !important}
 body[class*="plan-dragging-"] .plan-slot-row,body[class*="plan-dragging-"] .plan-slot-empty{transition:outline 0.1s}
 @media (max-width:1023px){.plan-slot-row{-webkit-user-drag:none}}
+@media (max-width:767px){.sp-row{flex-wrap:wrap}.sp-row .sp-row-actions{width:100%;justify-content:flex-end;order:3;margin-top:4px}.sp-row .sp-row-actions button{min-height:38px;padding:6px 12px !important}}
 </style>
 </head>
 <body>
@@ -902,7 +903,7 @@ window.addEventListener("unhandledrejection", function(e) {
 
 const DEFAULT_BREAKFASTS = [
   {
-    id:"b1", name:"Egg & Turkey Sausage Muffin Cups", calories:280, protein:24, emoji:"🥚", kidFriendly:false, activeTime:"15 min", totalTime:"40 min", prepTime:"15 min prep + 25 min bake",
+    id:"b1", breakfastFor:["andrew","kids"], grabAndGo:true, batch:true, reheat:"Makes 12 · 2–3 per serving · microwave 45 sec from the fridge, 90 sec from frozen", name:"Egg & Turkey Sausage Muffin Cups", calories:280, protein:24, emoji:"🥚", kidFriendly:false, activeTime:"15 min", totalTime:"40 min", prepTime:"15 min prep + 25 min bake",
     kidNote:"Kid-safe by design — mild, cheesy, hand-held. Skip the Pizza Party! topping on their half if they're spice-shy. 20 seconds in the microwave from the fridge. Serve with ketchup for dipping if that's what gets it eaten.",
     equipment:["Muffin tin (12-cup), greased","Medium skillet","Whisk + large measuring cup","2 prep bowls"],
     prepNote:"Make Sunday. Grab 2-3 on your way out. Reheat 45 sec. Keeps 5 days.",
@@ -941,7 +942,7 @@ const DEFAULT_BREAKFASTS = [
     tips:"SEASON WELL: Taste the egg mixture before pouring into the tins — it should taste well seasoned. Eggs need more seasoning than you think, especially cold out of the fridge. | SQUEEZE DRY: Skipping the zucchini squeeze is the #1 mistake — even a little extra moisture makes rubbery, wet muffins. Squeeze harder than you think you need to. | MAILLARD / BROWNING: For a slightly golden top, switch the oven to broil for the last 60-90 seconds. Watch closely — they go from golden to burnt fast. | SILICONE PAN: A silicone muffin pan releases these perfectly without any sticking. Worth $10 on Amazon."
   },
   {
-    id:"b2", name:"PB Banana Overnight Oats (Kids)", calories:320, protein:12, emoji:"🫙", kidFriendly:true, activeTime:"5 min", totalTime:"8 hr", prepTime:"5 min + overnight",
+    id:"b2", breakfastFor:["kids","mk"], grabAndGo:true, batch:true, gentle:true, reheat:"Makes 2 jars · eat cold from the fridge · keeps 4 days", name:"PB Banana Overnight Oats (Kids)", calories:320, protein:12, emoji:"🫙", kidFriendly:true, activeTime:"5 min", totalTime:"8 hr", prepTime:"5 min + overnight",
     kidNote:"Built for the girls. The spinach puree is optional if the green tint is a dealbreaker — the protein is already in the Fairlife and PB. Let them add their own banana slices in the morning.",
     equipment:["2 mason jars with lids"],
     prepNote:"Make 2 jars Sunday night. Hand to kids straight from the fridge.",
@@ -970,13 +971,13 @@ const DEFAULT_BREAKFASTS = [
   },
 
   ,{
-    id:"breakfast3",
+    id:"breakfast3", breakfastFor:["andrew","mk"], grabAndGo:true, batch:true, gentle:true, reheat:"Makes 4 jars · eat cold · keeps 5 days",
     name:"High-Protein Chia Pudding",
     emoji:"🫐",
     equipment:["5 mason jars with lids","Whisk"],
     calories:320,
     protein:22,
-    activeTime:"5 min", totalTime:"8 hr 5 min",
+    activeTime:"5 min", totalTime:"5 min + overnight",
     prepTime:"5 min + overnight",
     description:"Make 5 jars Sunday night, grab one every morning. Zero prep during the week. Creamy, filling, and genuinely delicious.",
     tags:["prep-ahead","batch","grab-and-go","high-protein"],
@@ -1012,7 +1013,7 @@ const DEFAULT_BREAKFASTS = [
     active:true
   }
   ,{
-    id:"breakfast4",
+    id:"breakfast4", breakfastFor:["andrew","mk"], grabAndGo:true, batch:true, gentle:true, reheat:"Makes 5 jars · eat cold · add granola the morning of so it stays crunchy",
     name:"Greek Yogurt Parfait Jars",
     emoji:"🍓",
     equipment:["5 mason jars with lids"],
@@ -1053,7 +1054,7 @@ const DEFAULT_BREAKFASTS = [
     active:true
   }
   ,{
-    id:"breakfast5",
+    id:"breakfast5", breakfastFor:["andrew"], grabAndGo:true, batch:true, reheat:"Makes 8 · microwave 90 sec from frozen, flip halfway",
     name:"Frozen Breakfast Burritos",
     emoji:"🌯",
     equipment:["Large nonstick skillet","Whisk","Foil or parchment for wrapping","3 prep bowls"],
@@ -1115,7 +1116,7 @@ const DEFAULT_BREAKFASTS = [
     active:true
   }
   ,{
-    id:"breakfast6",
+    id:"breakfast6", breakfastFor:["andrew","kids"], grabAndGo:true, batch:true, reheat:"Makes ~16 pancakes · freeze in stacks of 3 with parchment · toaster or 60 sec microwave",
     name:"Cottage Cheese Protein Pancakes",
     emoji:"🥞",
     equipment:["Blender","Nonstick skillet or griddle","Thin spatula","Sheet pan (to keep warm in oven)"],
@@ -1169,7 +1170,7 @@ const DEFAULT_BREAKFASTS = [
     active:true
   }
   ,{
-    id:"breakfast7",
+    id:"breakfast7", breakfastFor:["kids"], grabAndGo:true, batch:true, reheat:"Makes 12 squares · freeze flat · toaster 2 min or microwave 40 sec",
     name:"Sheet Pan Pancakes",
     emoji:"🍳",
     equipment:["Rimmed sheet pan (18×13) + parchment","Large mixing bowl + whisk","Offset or regular spatula","1 prep bowl"],
@@ -1224,7 +1225,7 @@ const DEFAULT_BREAKFASTS = [
     active:true
   }
   ,{
-    id:"breakfast8",
+    id:"breakfast8", breakfastFor:["andrew","kids"], grabAndGo:false, batch:false,
     name:"Savory Weekend Scramble",
     emoji:"🍳",
     equipment:["Large nonstick skillet","Whisk","Silicone spatula","1 prep bowl"],
@@ -1281,7 +1282,7 @@ const DEFAULT_BREAKFASTS = [
     active:true
   }
   ,{
-    id:"breakfast9",
+    id:"breakfast9", breakfastFor:["andrew"], grabAndGo:true, batch:true, component:true, reheat:"Makes 4 · split + toast · keeps 4 days, freezes 2 months",
     name:"Fit Flour Protein English Muffins (+ Shape Variations)",
     emoji:"🫓",
     equipment:["Sheet pan + parchment","Large mixing bowl","Pastry brush","2 prep bowls"],
@@ -1365,7 +1366,7 @@ const DEFAULT_BREAKFASTS = [
     active:true
   }
   ,{
-    id:"breakfast10",
+    id:"breakfast10", breakfastFor:["andrew","kids"], grabAndGo:true, batch:true, component:true, reheat:"Makes 20 patties · microwave 1–2 from frozen 60–90 sec",
     name:"Homemade Chicken Sausage Patties",
     emoji:"🍳",
     equipment:["Cast iron or nonstick skillet","Instant-read thermometer","Parchment (for stacking patties)","Wire rack","1 prep bowl"],
@@ -1421,6 +1422,131 @@ const DEFAULT_BREAKFASTS = [
     ],
     tips:"USE FRESH CHICKEN: Ground chicken that is fresh or recently frozen makes a dramatic difference vs freezer-burnt meat. Buy fresh and freeze yourself in 1 lb portions — label with the date. Freezer-burnt chicken = muted flavor no matter how much seasoning you add. | HEAT: Medium-HIGH end of medium. The pan should sizzle assertively when the patty hits it. If it doesn't sizzle immediately the heat is too low and you will steam instead of sear. | KICK UP THE SEASONING: This recipe is a base — feel free to be aggressive. Double the sage for more breakfast sausage character. Add 2½ tsp salt instead of 2. Double the maple syrup to 2 tbsp. Extra smoked paprika adds depth. Taste test a cooked piece and adjust before forming all the patties. | SAGE IS ESSENTIAL: Sage is what makes breakfast sausage taste like breakfast sausage — be generous with it. | DON'T OVERMIX: Mix until just combined. Overmixing = rubbery patties. | SLIGHTLY WIDER THAN YOU WANT: Patties shrink 15-20% as they cook. | BATCH ECONOMICS: 2 lbs fresh ground chicken (~$8) = 20 patties vs ~$10-12 for 8-10 at the store.",
     kidNote:"Kids love homemade sausage patties — you control the spice level completely. Make a mild batch (skip red pepper flakes, add extra maple) for the girls and a spicy batch for the adults. Freeze separately labeled. The maple version is the crowd-pleaser.",
+    active:true
+  },{
+    id:"breakfast11", breakfastFor:["andrew"], grabAndGo:true, batch:true, reheat:"Makes 6 · unwrap, paper towel, microwave 60 sec, flip, 45 sec more · or 325°F oven 15 min from frozen",
+    name:"Freezer Breakfast Sandwiches", emoji:"🥪", audience:"family", kidFriendly:true,
+    calories:380, protein:28, activeTime:"25 min", totalTime:"45 min", prepTime:"25 min prep + 18 min oven",
+    equipment:["9×13 baking dish + parchment","Sheet pan","Whisk + large measuring cup","Parchment + foil for wrapping","2 prep bowls"],
+    source:"Sunday batch — six hot sandwiches for the week, 90 seconds each morning",
+    description:"The grab-and-go that actually tastes like a real breakfast. Sheet-pan eggs cut into squares, chicken sausage, cheddar, on an English muffin. Wrap, freeze, microwave. 28g protein in 90 seconds.",
+    leftoverNote:"Freezes 2 months wrapped in parchment + foil. Label the date. Reheat from frozen — never thaw on the counter.",
+    ingredients:[
+      "--- 🟡 EGG SQUARES (Bowl 1) ---",
+      "8 large eggs",
+      "¼ cup Fairlife 2% milk",
+      "½ tsp kosher salt",
+      "¼ tsp black pepper",
+      "--- 🥪 BUILD ---",
+      "6 Fit Flour English muffins (breakfast9) — sub: Thomas' Light Multigrain English muffins (Kroger/Publix)",
+      "6 chicken sausage patties (breakfast10) — sub: Amylu or Applegate pre-cooked chicken breakfast patties (Costco/Whole Foods)",
+      "6 slices sharp cheddar (or 6 oz grated)",
+      "Cooking spray or 1 tsp butter for the dish",
+      "--- 🧻 WRAP ---",
+      "6 squares parchment paper + 6 squares foil"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Preheat the oven to 350°F. Line a 9×13 baking dish with parchment and lightly spray it. Set a sheet pan beside it.",
+      "🟡 BOWL 1 (egg squares) — 8 large eggs + ¼ cup Fairlife milk + ½ tsp kosher salt + ¼ tsp black pepper. Whisk 30 seconds until no streaks.",
+      "Split 6 English muffins. Set out 6 sausage patties and 6 slices cheddar. Cut 6 parchment squares and 6 foil squares (about 12 inches each).",
+      "── BAKE THE EGGS ──",
+      "Pour 🟡 Bowl 1 into the lined 9×13 dish. Bake uncovered at 350°F for 15–18 minutes until the center is just set and doesn't jiggle.",
+      "── WHILE THE EGGS BAKE: MUFFINS + SAUSAGE ──",
+      "SAUSAGE + MUFFINS — Lay the 6 split muffins cut-side up on the sheet pan with the 6 patties beside them. Slide into the oven for the last 8 minutes of the egg bake to toast lightly and warm the patties (pre-cooked patties: heated through is enough; homemade raw patties: cook separately to 160°F first).",
+      "── CUT + ASSEMBLE ──",
+      "Lift the egg sheet out by the parchment. Cool 5 minutes, then cut into 6 squares (2 × 3 grid). Pat any surface moisture with a paper towel — this is what keeps the muffin from going soggy in the freezer.",
+      "Build each sandwich: muffin bottom → 1 egg square → 1 sausage patty → 1 slice cheddar → muffin top. Cheese on top of the hot patty so it tacks everything together.",
+      "── COOL + WRAP ──",
+      "Cool completely on a rack — 20 minutes. Wrapping warm sandwiches makes ice crystals and soggy bread.",
+      "Wrap each tightly in parchment, then foil. Write the date on the foil. Freeze flat in a zip-lock bag. Keeps 2 months.",
+      "── MORNING OF ──",
+      "Unwrap the foil and parchment. Wrap the sandwich in a damp paper towel. Microwave 60 seconds, flip, 45 seconds more. Rest 1 minute — the center finishes heating. Oven option: 325°F for 15 minutes still in the foil.",
+      "🫙 CONDIMENT IDEAS — hot sauce (Yellowbird or Cholula) · a smear of Kewpie · Mike's Hot Honey if you're feeling it."
+    ],
+    tips:"DRY THE EGGS: Blotting the egg squares before assembling is the difference between a crisp muffin and a soggy one after freezing. | COOL COMPLETELY: Steam trapped in the wrap is the enemy. Twenty minutes on a rack. | DAMP PAPER TOWEL: Keeps the bread soft in the microwave instead of turning it into a crouton. | DOUBLE IT: 12 sandwiches takes 10 extra minutes and covers two weeks.",
+    kidNote:"The girls can have these too — skip any hot sauce, cut in half. Mild sausage (maple version of breakfast10) if the regular is too peppery.",
+    active:true
+  },
+  {
+    id:"breakfast12", breakfastFor:["mk","kids"], grabAndGo:true, batch:true, gentle:true, reheat:"Makes 12 cups · eat cold or microwave 20 sec · keeps 5 days in the fridge, freezes 2 months",
+    name:"Baked Oatmeal Cups", emoji:"🧁", audience:"family", kidFriendly:true,
+    calories:140, protein:5, activeTime:"10 min", totalTime:"35 min", prepTime:"10 min prep + 25 min bake",
+    equipment:["12-cup muffin tin + liners (or grease well)","Large mixing bowl","Potato masher or fork","Ice cream scoop","2 prep bowls"],
+    source:"The gentle one — soft, mild, barely sweet. A small something for a non-breakfast person, and a cereal upgrade for the girls",
+    description:"Soft, warm, barely sweet oat cups you grab from the fridge. Mild enough for someone who doesn't usually eat in the morning; customizable enough that half the pan can be chocolate-chip for the kids. 10 minutes of work on Sunday.",
+    leftoverNote:"Fridge 5 days in a sealed container. Freeze in a bag 2 months — microwave 30 sec from frozen.",
+    ingredients:[
+      "--- 🟡 WET (Bowl 1) ---",
+      "2 ripe bananas, mashed (about 1 cup)",
+      "2 large eggs",
+      "1½ cups Fairlife 2% milk",
+      "⅓ cup maple syrup (or ⅓ cup Swerve for lower sugar)",
+      "1 tsp vanilla extract",
+      "--- 🔵 DRY (Bowl 2) ---",
+      "3 cups rolled oats (old-fashioned, not instant)",
+      "1 tsp baking powder",
+      "1 tsp cinnamon",
+      "¼ tsp kosher salt",
+      "--- 🫙 STIR-INS (pick per half of the pan) ---",
+      "½ cup blueberries (fresh or frozen) — MK's half",
+      "⅓ cup mini chocolate chips — the girls' half",
+      "Plain — leave 4 cups with nothing added for the gentlest option"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "Preheat the oven to 350°F. Line a 12-cup muffin tin with liners or grease it well (oats stick).",
+      "🟡 BOWL 1 (wet) — 2 mashed bananas + 2 large eggs + 1½ cups Fairlife milk + ⅓ cup maple syrup + 1 tsp vanilla. Whisk until smooth.",
+      "🔵 BOWL 2 (dry) — 3 cups rolled oats + 1 tsp baking powder + 1 tsp cinnamon + ¼ tsp kosher salt. Stir together.",
+      "🫙 STIR-INS — ½ cup blueberries in one small bowl, ⅓ cup mini chocolate chips in another.",
+      "── MIX + FILL ──",
+      "Pour 🔵 Bowl 2 (dry) into 🟡 Bowl 1 (wet). Stir until every oat is wet. Let it sit 5 minutes so the oats drink up some milk — the cups hold together better.",
+      "Scoop into the 12 cups, filling each nearly to the top (they barely rise). Press blueberries into 4 cups, chocolate chips into 4 cups, leave 4 plain. Note which row is which.",
+      "── BAKE ──",
+      "Bake uncovered at 350°F for 22–25 minutes until the tops are set and the edges are lightly golden. A toothpick should come out mostly clean.",
+      "── COOL + STORE ──",
+      "Cool in the tin 10 minutes, then move to a rack until fully cool. Store in a sealed container in the fridge 5 days, or freeze.",
+      "── MORNING OF ──",
+      "Grab one cold, or microwave 20 seconds. For MK: one plain or blueberry cup and a coffee is a complete, gentle start. For the girls: a chocolate-chip cup beside their cereal, or instead of a frozen waffle."
+    ],
+    tips:"RIPE BANANAS: Brown-spotted bananas are the sweetener and the binder. Green ones make dry, bland cups. | DON'T OVERBAKE: Pull them when the center is just set — they firm up as they cool and overbaked oat cups are rubbery. | PROTEIN BUMP: Stir ¼ cup vanilla protein powder into the dry bowl and add 2 extra tbsp milk — about 7g protein per cup. | MAKE IT A JAR: Crumble a cup into a small jar with 2 tbsp Fage and a splash of milk the night before — soft, spoonable, no chewing effort at 7am.",
+    kidNote:"Let the girls choose their stir-in row — ownership buys acceptance. Chocolate-chip cups read as a treat but are mostly oats, banana and egg. Pair with a string cheese or yogurt tube for protein.",
+    active:true
+  },
+  {
+    id:"breakfast13", breakfastFor:["mk","kids"], grabAndGo:true, batch:true, gentle:true, reheat:"Makes 2 jars · shake hard before drinking · best within 24 hours · freezer packs make 30-second mornings",
+    name:"Smoothie Jars (Make 2, Keeps 24 h)", emoji:"🥤", audience:"family", kidFriendly:true,
+    calories:220, protein:14, activeTime:"5 min", totalTime:"5 min", prepTime:"5 min — no cooking",
+    equipment:["Blender","Two 12-oz jars with lids","Freezer zip-lock bags (for the freezer-pack variant)"],
+    source:"A gentle, drinkable breakfast made the night before — for someone who can't face food in the morning",
+    description:"Blend two jars at night, lid them, fridge. In the morning: shake, drink. Cottage cheese or Greek yogurt blends completely smooth and brings real protein; frozen banana makes it creamy without ice. Mild, cold, no chewing — the gentlest possible breakfast.",
+    leftoverNote:"Best within 24 hours — it separates a bit, just shake. Freezer packs (fruit pre-portioned in bags) keep 3 months.",
+    ingredients:[
+      "--- 🟡 PER JAR — blend two batches, or double in one go (Bowl 1) ---",
+      "1 cup Fairlife 2% milk (or unsweetened almond milk)",
+      "½ frozen banana (freeze peeled chunks on a sheet pan, then bag)",
+      "½ cup frozen fruit — pineapple or mango for MK (gentle), mixed berries for the girls",
+      "½ cup Fage 5% Greek yogurt or Good Culture cottage cheese (blends smooth — nobody can tell)",
+      "1 tsp honey (optional)",
+      "1 small handful baby spinach (optional — invisible in a berry smoothie, skip for a pale pineapple one)",
+      "--- 🧊 FREEZER-PACK VARIANT ---",
+      "Per bag: ½ banana + ½ cup fruit + spinach handful — 6 bags at once"
+    ],
+    instructions:[
+      "── MISE EN PLACE ──",
+      "🟡 BOWL 1 (one jar's worth) — 1 cup Fairlife milk + ½ frozen banana + ½ cup frozen fruit + ½ cup Greek yogurt or cottage cheese + 1 tsp honey + 1 handful spinach (optional). Add liquid to the blender first.",
+      "Set two clean 12-oz jars with lids on the counter.",
+      "── BLEND ──",
+      "Blend 🟡 Bowl 1 on high 45–60 seconds until completely smooth — cottage cheese needs the full minute. Too thick to pour? Add 2 tbsp milk.",
+      "Pour into one jar. Rinse and repeat for the second jar (or double everything and split).",
+      "── STORE ──",
+      "Lid tightly and refrigerate. Drink within 24 hours. It will separate slightly overnight — shake hard for 5 seconds before drinking.",
+      "── FREEZER-PACK VARIANT (for 30-second mornings) ──",
+      "Portion 6 zip-lock bags with ½ banana + ½ cup fruit + spinach each. Freeze flat. Morning of: dump a bag + 1 cup milk + ½ cup yogurt into the blender, 45 seconds, done.",
+      "For MK: pineapple + banana + yogurt, no spinach — mild, pale, not fruity-sour. A half jar is fine; the point is something, not a lot."
+    ],
+    tips:"LIQUID FIRST: Milk at the bottom of the blender keeps the blades moving. | FROZEN BANANA IS THE TEXTURE: No ice — ice waters it down and separates faster. | COTTAGE CHEESE WINS: More protein than yogurt and it disappears completely at 60 seconds of blending. | SMALL IS FINE: A 6-oz pour for someone who 'doesn't eat breakfast' is a win; don't fill the jar to the top for MK.",
+    kidNote:"Berry version with the spinach handful — the color hides it entirely. Serve in a cup with a straw next to the cereal; most mornings they'll finish the smoothie first.",
     active:true
   }
 ];
@@ -6687,6 +6813,7 @@ async function loadFromSupabase() {
         if (plan.weekPlan) state.weekPlan = normalizePlan(plan.weekPlan);
         if (plan.nextWeekPlan) state.nextWeekPlan = normalizePlan(plan.nextWeekPlan);
         if (plan.planDefaults && plan.planDefaults.cookDays) state.planDefaults = plan.planDefaults;
+        if (plan.uiPrefs && typeof plan.uiPrefs === "object") state.uiPrefs = plan.uiPrefs;
         if (plan.prepDone) state.prepDone = plan.prepDone;
         if (plan.lunchbox && typeof plan.lunchbox === "object") state.lunchbox = plan.lunchbox;
         if (plan.cookHistory) state.cookHistory = plan.cookHistory;
@@ -6700,7 +6827,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{}, planDefaults: state.planDefaults||null };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{}, planDefaults: state.planDefaults||null, uiPrefs: state.uiPrefs||{} };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -6742,6 +6869,7 @@ function loadFromLocal() {
     if (saved.weekPlan) state.weekPlan = normalizePlan(saved.weekPlan);
     if (saved.nextWeekPlan) state.nextWeekPlan = normalizePlan(saved.nextWeekPlan);
     if (saved.planDefaults && saved.planDefaults.cookDays) state.planDefaults = saved.planDefaults;
+    if (saved.uiPrefs && typeof saved.uiPrefs === "object") state.uiPrefs = saved.uiPrefs;
     if (saved.prepDone) state.prepDone = saved.prepDone;
     if (saved.lunchbox && typeof saved.lunchbox === "object") state.lunchbox = saved.lunchbox;
     if (saved.cookHistory) state.cookHistory = saved.cookHistory;
@@ -7033,6 +7161,7 @@ function viewRecipe(section, id) {
     item.leftoverNote ? `<div class="info-box amber"><span class="info-label" style="color:var(--amber)">♻️ EFFICIENCY:</span>${esc(item.leftoverNote)}</div>` : "",
     item.hiddenVeg ? `<div class="info-box purple"><span class="info-label" style="color:var(--purple)">🥦 HIDDEN VEG:</span>${esc(item.hiddenVeg)}</div>` : "",
     (item.equipment&&item.equipment.length) ? `<div class="info-box" style="border-color:rgba(245,158,11,0.3)"><span class="info-label" style="color:var(--amber)">🍳 YOU'LL NEED:</span>${item.equipment.map(esc).join(" · ")}</div>` : "",
+    item.reheat ? `<div class="info-box" style="border-color:rgba(16,185,129,0.3)"><span class="info-label" style="color:var(--green)">🔁 BATCH:</span>${esc(item.reheat)}</div>` : "",
     item.tips ? `<div class="info-box tip"><span class="info-label" style="color:#fbbf24">💡</span>${esc(item.tips)}</div>` : "",
     item.sourceUrl ? `<div style="font-size:13px;color:var(--dim);margin-top:10px;padding:8px 12px;background:rgba(99,102,241,0.06);border-radius:8px;border:1px solid rgba(99,102,241,0.15)">📎 Original recipe: <a href="${esc(item.sourceUrl)}" target="_blank" style="color:var(--indigo);font-weight:600">${esc(item.source||"View source")}</a></div>` : "",
   ].join("");
@@ -7616,7 +7745,7 @@ function cleanShareName(k) {
   return n.charAt(0).toUpperCase() + n.slice(1);
 }
 function smartPlan(opts) {
-  opts = Object.assign({ dinners: 5, adultNights: 1, quickNights: 2, breakfasts: 2, lunches: 2, nextWeek: true, keepExisting: true }, opts || {});
+  opts = Object.assign({ dinners: 5, adultNights: 1, quickNights: 2, breakfasts: 0, bkAndrew: true, bkMk: true, bkKids: true, lunches: 2, nextWeek: true, keepExisting: true }, opts || {});
   // Day arrays win; numeric opts (older callers) are converted to days with the classic preference order
   if (!Array.isArray(opts.cookDays)) {
     const total = Math.max(0, Math.min(7, opts.dinners)), nAdult = Math.min(opts.adultNights, total), nQuick = Math.min(opts.quickNights, Math.max(0, total - nAdult));
@@ -7646,6 +7775,8 @@ function smartPlan(opts) {
       const plan = t.week === 0 ? state.weekPlan : state.nextWeekPlan;
       const d = planGet(plan, t.day, "dinner"); if (d && (d.recipeId || d.leftoverOf)) { t.dinner = d; t.locked = true; t.dinnerReason = "📌 you placed this"; }
       const b = planGet(plan, t.day, "breakfast"); if (b && b.recipeId) t.breakfast = b;
+      const b2 = planGet(plan, t.day, "breakfast2"); if (b2 && b2.recipeId) t.breakfast2 = b2;
+      const b3 = planGet(plan, t.day, "breakfast3"); if (b3 && b3.recipeId) t.breakfast3 = b3;
       const l = planGet(plan, t.day, "lunch"); if (l && l.recipeId) t.lunch = l;
     });
   }
@@ -7732,7 +7863,7 @@ function smartPlan(opts) {
   // Breakfasts & lunches per week: pick by rating/recency; lunches that use a placed dinner's leftovers get priority and land 1–2 days after
   for (let w = 0; w < weeks; w++) {
     const base = w * 7;
-    const usedB = new Set(timeline.filter(t => t.breakfast).map(t => t.breakfast.recipeId));
+    const usedB = new Set(timeline.flatMap(t => [t.breakfast, t.breakfast2, t.breakfast3].filter(Boolean).map(x => x.recipeId)));
     const usedL = new Set(timeline.filter(t => t.lunch).map(t => t.lunch.recipeId));
     const scoreSide = r => { let s = 50; const rt = (state.ratings || {})[r.id] || {}; s += (rt.stars || 0) * 10 + (rt.favorite ? 20 : 0); const ds = daysSinceCooked(r.id); if (ds < 14) s -= 30; return s + Math.random() * 10; };
     // lunches
@@ -7744,10 +7875,16 @@ function smartPlan(opts) {
       for (let i = base; i < base + 7; i++) { const t = timeline[i]; if (t.lunch) continue; const src = [1, 2].map(b => timeline[i - b]).find(x => x && x.dinner && (r.usesLeftoversFrom || []).includes(x.dinner.recipeId)); if (src) { t.lunch = { recipeId: r.id, section: "lunch", reason: "🔁 leftovers from " + src.day.slice(0, 3) }; usedL.add(r.id); placedL++; break; } }
     });
     lunchDays.forEach(i => { if (placedL >= opts.lunches) return; const t = timeline[i]; if (!t || t.lunch) return; const pool = lunches.filter(r => !usedL.has(r.id)); if (!pool.length) return; const best = pool.map(r => ({ r, s: scoreSide(r) })).sort((a, b) => b.s - a.s)[0].r; t.lunch = { recipeId: best.id, section: "lunch", reason: "☀️ easy lunch" }; usedL.add(best.id); placedL++; });
-    // breakfasts: batch day Sunday first, then Wednesday
-    const bDays = ["Sunday","Wednesday","Saturday","Tuesday","Friday"].map(d => base + PLAN_DAYS.indexOf(d));
-    let placedB = timeline.slice(base, base + 7).filter(t => t.breakfast).length;
-    bDays.forEach(i => { if (placedB >= opts.breakfasts) return; const t = timeline[i]; if (!t || t.breakfast) return; const pool = breakfasts.filter(r => !usedB.has(r.id)); if (!pool.length) return; const best = pool.map(r => ({ r, s: scoreSide(r) })).sort((a, b) => b.s - a.s)[0].r; t.breakfast = { recipeId: best.id, section: "breakfast", reason: t.day === "Sunday" ? "🌅 batch-cook Sunday" : "🌅 breakfast" }; usedB.add(best.id); placedB++; });
+    // breakfasts: Sunday batch lanes (Andrew grab-and-go · MK gentle jar · Girls make-ahead)
+    const sun = timeline[base + PLAN_DAYS.indexOf("Sunday")];
+    const bkPool = breakfasts.filter(r => !r.component);
+    const lastWeekIds = w > 0 ? new Set([timeline[base-7].breakfast, timeline[base-7].breakfast2, timeline[base-7].breakfast3].filter(Boolean).map(x => x.recipeId)) : new Set(Object.values(w === 0 ? {} : {}).map(x => x));
+    const pickLane = (filt, bonus) => { const pool = bkPool.filter(r => filt(r) && !usedB.has(r.id) && !lastWeekIds.has(r.id)); const pool2 = pool.length ? pool : bkPool.filter(filt); if (!pool2.length) return null; return pool2.map(r => ({ r, s: scoreSide(r) + (bonus ? bonus(r) : 0) })).sort((a, b) => b.s - a.s)[0].r; };
+    if (sun) {
+      if (opts.bkAndrew && !sun.breakfast) { const r = pickLane(r => r.batch && r.grabAndGo && (r.breakfastFor || []).includes("andrew"), r => ((r.protein || 0) >= 20 ? 15 : -10) + ((r.protein || 0) >= 26 ? 8 : 0)); if (r) { sun.breakfast = { recipeId: r.id, section: "breakfast", reason: "🌅 Sunday batch — grab all week" }; usedB.add(r.id); } }
+      if (opts.bkMk && !sun.breakfast2) { const r = pickLane(r => r.gentle && (r.breakfastFor || []).includes("mk"), r => /jar|smoothie|oatmeal|pudding/i.test(r.name) ? 8 : 0); if (r) { sun.breakfast2 = { recipeId: r.id, section: "breakfast", reason: "🫙 for MK — small jar, fridge door" }; usedB.add(r.id); } }
+      if (opts.bkKids && !sun.breakfast3) { const r = pickLane(r => r.batch && (r.breakfastFor || []).includes("kids"), null); if (r) { sun.breakfast3 = { recipeId: r.id, section: "breakfast", reason: "🥣 girls' make-ahead — beside the cereal" }; usedB.add(r.id); } }
+    }
   }
   return { timeline, opts, reasonFor };
 }
@@ -7823,7 +7960,7 @@ function closeAutoplanModal() { const m = document.getElementById("autoplan-moda
 function spOpt(name, fallback) { const el = document.getElementById("sp-" + name); if (!el) return fallback; if (el.type === "checkbox") return el.checked; const v = parseInt(el.textContent || el.value); return isNaN(v) ? fallback : v; }
 function runSmartPlan() {
   const pd = planDefaultsGet();
-  const opts = { cookDays: pd.cookDays.slice(), adultDays: pd.adultDays.slice(), quickDays: pd.quickDays.slice(), breakfasts: spOpt("breakfasts", 2), lunches: spOpt("lunches", 2), nextWeek: spOpt("next", true), keepExisting: spOpt("keep", true) };
+  const opts = { cookDays: pd.cookDays.slice(), adultDays: pd.adultDays.slice(), quickDays: pd.quickDays.slice(), bkAndrew: spOpt("bk-andrew", true), bkMk: spOpt("bk-mk", true), bkKids: spOpt("bk-kids", true), breakfasts: 0, lunches: spOpt("lunches", 2), nextWeek: spOpt("next", true), keepExisting: spOpt("keep", true) };
   smartPlanDraft = smartPlan(opts);
   renderSmartPlanModal("preview");
 }
@@ -7849,6 +7986,8 @@ function acceptSmartPlan() {
     const plan = t.week === 0 ? thisW : nextW;
     if (t.dinner) planSet(plan, t.day, "dinner", t.dinner.leftoverOf ? { leftoverOf: t.dinner.leftoverOf, section: "dinner" } : Object.assign({ recipeId: t.dinner.recipeId, section: "dinner" }, t.dinner.side ? { side: t.dinner.side } : {}));
     if (t.breakfast) planSet(plan, t.day, "breakfast", { recipeId: t.breakfast.recipeId, section: "breakfast" });
+    if (t.breakfast2) planSet(plan, t.day, "breakfast2", { recipeId: t.breakfast2.recipeId, section: "breakfast" });
+    if (t.breakfast3) planSet(plan, t.day, "breakfast3", { recipeId: t.breakfast3.recipeId, section: "breakfast" });
     if (t.lunch) planSet(plan, t.day, "lunch", { recipeId: t.lunch.recipeId, section: "lunch" });
   });
   state.weekPlan = thisW; if (smartPlanDraft.opts.nextWeek) state.nextWeekPlan = nextW;
@@ -7877,7 +8016,10 @@ function renderSmartPlanModal(mode) {
         return block("🌙", "Cook nights", "tap to toggle · " + pd.cookDays.length + " selected", "cook", pd.cookDays, "#818cf8", false, "rgba(99,102,241,0.08)")
              + block("🍷", "Adults night(s)", pd.adultDays.length ? pd.adultDays.map(d=>d.slice(0,3)).join(", ") : "none", "adult", pd.adultDays, "#f472b6", true, "rgba(244,114,182,0.08)")
              + block("⚡", "Quick nights", pd.quickDays.length ? pd.quickDays.map(d=>d.slice(0,3)).join(", ") : "none", "quick", pd.quickDays, "#fbbf24", true, "rgba(245,158,11,0.08)"); })()}
-      ${row("🌅", "Breakfasts", stepperHtml("sp-breakfasts", 2, 0, 5, "#fbbf24"), "rgba(245,158,11,0.06)")}
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--dim);margin:6px 2px 4px">🌅 BREAKFASTS — all land on Sunday as a batch</div>
+      ${toggle("sp-bk-andrew", "🥚 Andrew's Sunday batch (grab-and-go, 20g+ protein)", true)}
+      ${toggle("sp-bk-mk", "🫙 A gentle jar for MK (small, mild, already made)", true)}
+      ${toggle("sp-bk-kids", "🥣 Girls' weekday upgrade (cereal stays — one make-ahead beside it)", true)}
       ${row("☀️", "Adult lunches <span style=\"font-weight:400;color:var(--dim);font-size:12px\">(kids\' lunchboxes live in 🍱 Lunchbox)</span>", stepperHtml("sp-lunches", 2, 0, 5, "#34d399"), "rgba(16,185,129,0.08)")}
       ${toggle("sp-next", "Plan next week too (leftovers carry over)", true)}
       ${toggle("sp-keep", "Keep what I've already placed", true)}
@@ -7893,11 +8035,11 @@ function renderSmartPlanModal(mode) {
       let dinnerHtml = `<div style="color:var(--dim);font-size:13px">— no dinner (eat out / leftovers)</div>`;
       if (t.dinner && t.dinner.leftoverOf) { const src = byIdAll(t.dinner.leftoverOf); dinnerHtml = `<div style="font-size:14px;font-weight:700;color:#cbd5e1">🔁 Leftovers: ${esc(src ? src.name : "")}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div>`; }
       else if (t.dinner && t.dinner.recipeId) { const r = byIdAll(t.dinner.recipeId); if (r) dinnerHtml = `<div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="spPeek('${r.id}')" title="Tap to see the full recipe"><span style="font-size:20px">${r.emoji || "🍽️"}</span><div style="min-width:0"><div style="font-size:14px;font-weight:700;color:var(--text);text-decoration:underline dotted rgba(255,255,255,0.25);text-underline-offset:3px">${esc(r.name)}${r.quick ? ' <span style="font-size:10px;background:rgba(245,158,11,0.15);color:#fbbf24;border-radius:999px;padding:1px 6px;font-weight:800">⚡</span>' : ""}${(r.audience === "adults") ? ' <span style="font-size:10px;background:rgba(244,114,182,0.15);color:#f472b6;border-radius:999px;padding:1px 6px;font-weight:800">🍷</span>' : ""}</div><div style="font-size:12px;color:var(--dim)">${esc(t.dinnerReason)}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${involvementLine(r)}</div></div></div>`; }
-      const sides = [t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side] ? "🥦 + " + SIDES_BY_ID[t.dinner.side].name : "", t.breakfast ? "🌅 Breakfast: " + ((byIdAll(t.breakfast.recipeId) || {}).name || "") : "", t.lunch ? "☀️ Adult lunch: " + ((byIdAll(t.lunch.recipeId) || {}).name || "") + (t.lunch.reason && /leftover/.test(t.lunch.reason) ? " 🔁" : "") : ""].filter(Boolean).join(" · ");
-      return `<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px">
+      const sides = [t.dinner && t.dinner.side && SIDES_BY_ID[t.dinner.side] ? "🥦 + " + SIDES_BY_ID[t.dinner.side].name : "", t.breakfast ? "🥚 Your batch: " + ((byIdAll(t.breakfast.recipeId) || {}).name || "") : "", t.breakfast2 ? "🫙 MK's jar: " + ((byIdAll(t.breakfast2.recipeId) || {}).name || "") : "", t.breakfast3 ? "🥣 Girls' make-ahead: " + ((byIdAll(t.breakfast3.recipeId) || {}).name || "") : "", t.lunch ? "☀️ Adult lunch: " + ((byIdAll(t.lunch.recipeId) || {}).name || "") + (t.lunch.reason && /leftover/.test(t.lunch.reason) ? " 🔁" : "") : ""].filter(Boolean).join(" · ");
+      return `<div class="sp-row" style="display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);margin-bottom:6px">
         <div style="width:38px;flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:0.8px;color:var(--green);padding-top:3px">${t.day.slice(0, 3).toUpperCase()}</div>
         <div style="flex:1;min-width:0">${dinnerHtml}${sides ? `<div style="font-size:12px;color:#94a3b8;margin-top:4px">${esc(sides)}</div>` : ""}</div>
-        ${t.dinner ? `<div style="display:flex;gap:4px;flex-shrink:0">${t.dinner.recipeId ? `<button onclick="swapSmartPlanSlot(${i})" title="Pick something else" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">↻ swap</button>` : ""}<button onclick="spOpenMove(${i})" title="Move to another day" style="padding:6px 10px;border-radius:8px;border:1px solid ${spMoveOpen===i?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.14)"};background:${spMoveOpen===i?"rgba(16,185,129,0.12)":"transparent"};color:${spMoveOpen===i?"#34d399":"var(--muted)"};font-size:12px;cursor:pointer">→ move</button></div>` : ""}
+        ${t.dinner ? `<div class="sp-row-actions" style="display:flex;gap:4px;flex-shrink:0">${t.dinner.recipeId ? `<button onclick="swapSmartPlanSlot(${i})" title="Pick something else" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">↻ swap</button>` : ""}<button onclick="spOpenMove(${i})" title="Move to another day" style="padding:6px 10px;border-radius:8px;border:1px solid ${spMoveOpen===i?"rgba(16,185,129,0.6)":"rgba(255,255,255,0.14)"};background:${spMoveOpen===i?"rgba(16,185,129,0.12)":"transparent"};color:${spMoveOpen===i?"#34d399":"var(--muted)"};font-size:12px;cursor:pointer">→ move</button></div>` : ""}
       </div>
       ${spMoveOpen===i ? `<div style="margin:-2px 0 8px 48px;padding:8px 10px;border-radius:10px;background:rgba(16,185,129,0.06);border:1px dashed rgba(16,185,129,0.35)"><div style="font-size:11px;color:var(--dim);margin-bottom:6px">Move to… (a taken day swaps)</div>${[0,1].filter(ww => ww===0 || d.opts.nextWeek).map(ww => `<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px"><span style="font-size:10px;font-weight:800;letter-spacing:0.8px;color:${ww===0?"#34d399":"#818cf8"};width:34px">${ww===0?"THIS":"NEXT"}</span>${PLAN_DAYS.map((dd, k) => { const j = ww*7+k; const tt = d.timeline[j]; const taken = tt && tt.dinner; return `<button onclick="spMoveTo(${i},${j})" ${j===i?"disabled":""} style="padding:6px 0;width:40px;border-radius:8px;border:1.5px solid ${j===i?"rgba(16,185,129,0.6)":taken?"rgba(255,255,255,0.22)":"rgba(255,255,255,0.1)"};background:${j===i?"rgba(16,185,129,0.15)":"transparent"};color:${j===i?"#34d399":taken?"var(--text)":"var(--dim)"};font-size:11px;font-weight:800;cursor:pointer">${dd.slice(0,3)}${taken&&j!==i?"<span style=\"display:block;font-size:8px;font-weight:600;color:var(--dim)\">swap</span>":""}</button>`; }).join("")}</div>`).join("")}</div>` : ""}`;
     }).join("");
@@ -7950,7 +8092,7 @@ function planTonight(recipeId){ const today=todayPlanDay(); const r=byIdAll(reci
 function weekKeyOf(){ return planWeekView==="next"?"next":"this"; }
 function buildPrepList(plan){
   const dayOf={}; const recipes=[];
-  PLAN_DAYS.forEach(day=>["breakfast","lunch","dinner"].forEach(slot=>{ const e=planGet(plan,day,slot); if(!e) return; if(e.recipeId){ const r=byIdAll(e.recipeId); if(r){ recipes.push({r,day,slot}); dayOf[r.id]=day; } } if(e.side&&SIDES_BY_ID[e.side]){ const sd=SIDES_BY_ID[e.side]; recipes.push({r:{id:sd.id,name:sd.name,ingredients:sd.ingredients,instructions:sd.steps},day,slot:"side"}); } }));
+  PLAN_DAYS.forEach(day=>["breakfast","breakfast2","breakfast3","lunch","dinner"].forEach(slot=>{ const e=planGet(plan,day,slot); if(!e) return; if(e.recipeId){ const r=byIdAll(e.recipeId); if(r){ recipes.push({r,day,slot}); dayOf[r.id]=day; } } if(e.side&&SIDES_BY_ID[e.side]){ const sd=SIDES_BY_ID[e.side]; recipes.push({r:{id:sd.id,name:sd.name,ingredients:sd.ingredients,instructions:sd.steps},day,slot:"side"}); } }));
   const short=d=>d.slice(0,3);
   const groups={ sauces:[], chop:[], marinate:[], thaw:[], ahead:[] };
   // (a) sauces referenced by planned recipes
@@ -7971,6 +8113,7 @@ function buildPrepList(plan){
   // (d) thaw frozen proteins
   recipes.forEach(x=>{ (x.r.ingredients||[]).forEach(ing=>{ if(typeof ing!=="string") return; if(/\bfrozen\b/i.test(ing)&&/salmon burger|meatball|shrimp|chicken|just bare|tenderloin|steak|turkey|salmon|cod/i.test(ing)&&!/corn|peas|edamame|broccoli|rice|berries|cauliflower|veg/i.test(ing)){ const idx=PLAN_DAYS.indexOf(x.day); const prev=idx>0?PLAN_DAYS[idx-1]:"Sunday"; groups.thaw.push({text:`Move to fridge: ${ing.split(/[,—(]/)[0].trim()}`, detail:`${short(prev)} → ${short(x.day)} ${x.r.name}`, key:"thaw-"+x.r.id+"-"+ing.slice(0,12)}); } }); });
   // (e) cook ahead: rice/grains, slow cooker
+  recipes.filter(x=>/^breakfast/.test(x.slot)&&x.r.batch).forEach(x=>{ const who=x.slot==="breakfast2"?"MK's jars Mon–Fri":x.slot==="breakfast3"?"the girls' weekday upgrade":"your grab-and-go Mon–Fri"; groups.ahead.push({text:`Batch-cook ${x.r.name}`, detail:`${short(x.day)} — ${who}${x.r.reheat?" · "+x.r.reheat.split("·")[0].trim():""}`, key:"ahead-bk-"+x.r.id}); });
   recipes.forEach(x=>{ const n=(x.r.name||"").toLowerCase(); const txt=(x.r.instructions||[]).join(" ").toLowerCase(); if(/slow cooker/.test(n)) groups.ahead.push({text:`Slow cooker morning-of: ${x.r.name}`, detail:`${short(x.day)} — load it before work`, key:"ahead-"+x.r.id}); else if(/\b(jasmine|sushi|brown) rice\b|\bcook (the )?rice\b|quinoa|farro/.test(txt)&&x.slot!=="side") groups.ahead.push({text:`Cook rice/grain ahead for ${x.r.name}`, detail:`${short(x.day)} — or use frozen rice pouches`, key:"ahead-"+x.r.id}); });
   return groups;
 }
@@ -8049,7 +8192,9 @@ function renderPlan() {
   ];
 
   const daysHtml = DAYS.map(day => {
-    const slotsHtml = MEAL_SLOTS.map(slot => {
+    const daySlots = [];
+    MEAL_SLOTS.forEach(sl => { daySlots.push(sl); if (sl.key === "breakfast") { if (planGet(plan, day, "breakfast2")) daySlots.push(Object.assign({}, sl, { key: "breakfast2", label: "MK's jar" })); if (planGet(plan, day, "breakfast3")) daySlots.push(Object.assign({}, sl, { key: "breakfast3", label: "Girls" })); } });
+    const slotsHtml = daySlots.map(slot => {
       // Find assignment for this day+slot
       const entry = planGet(plan, day, slot.key);
       const dayKey = day + "_" + slot.key;
@@ -8134,6 +8279,7 @@ function renderPlan() {
   el.innerHTML = `
     ${pickerModal}
     ${renderRatingNudge()}
+    ${planWeekView==="this" ? renderGirlsBreakfastCard() : ""}
     ${planWeekView==="this" ? lbPackCard(false) : ""}
     <div id="autoplan-modal" class="sp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeAutoplanModal()">
       <div class="sp-box" style="background:#0f172a;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto"></div>
@@ -9274,6 +9420,38 @@ function doneToggleChip(id,chip){ if(!state.ratings)state.ratings={}; const cur=
 function doneSaveNote(id){ const el=document.getElementById("done-note"); if(!el||!el.value.trim())return; if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const log=cur.log||[]; log.unshift({date:new Date().toISOString().split("T")[0],text:el.value.trim()}); state.ratings[id]={...cur,log,note:el.value.trim(),date:cur.date||new Date().toISOString()}; scheduleSave(); el.value=""; const st=document.getElementById("done-note-status"); if(st){st.textContent="✅ Saved";} setTimeout(()=>renderCookScreen(),600); }
 // Unrated cooks from the last 3 days → nudge on the Plan tab
 function unratedRecentCooks(){ const cut=Date.now()-3*86400000; return (state.cookHistory||[]).filter(h=>{ const d=new Date(h.date+"T12:00:00").getTime(); if(d<cut)return false; const r=(state.ratings||{})[h.recipeId]; return !(r&&r.date&&new Date(r.date).getTime()>=d-43200000); }).filter((h,i,a)=>a.findIndex(x=>x.recipeId===h.recipeId)===i); }
+
+// ── Girls' weekday breakfast card: cereal stays, upgrade it ──
+function girlsBreakfastSuggestion(){
+  const pool=(state.breakfasts||[]).filter(r=>r&&r.batch&&(r.breakfastFor||[]).includes("kids")&&!r.component&&isActive(r.id));
+  if(!pool.length) return null;
+  const wk=Math.floor(Date.now()/(7*86400000));
+  return pool[wk % pool.length];
+}
+function renderGirlsBreakfastCard(){
+  const collapsed=!!(state.uiPrefs&&state.uiPrefs.girlsCardCollapsed);
+  const sug=girlsBreakfastSuggestion();
+  const sunEntry=planGet(state.weekPlan||{}, "Sunday", "breakfast3"); const onSunday=sug&&sunEntry&&sunEntry.recipeId===sug.id;
+  const sugName=sug?esc(sug.name):"";
+  return `<div style="background:rgba(99,102,241,0.07);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:12px 16px;margin:0 0 12px">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="state.uiPrefs=state.uiPrefs||{};state.uiPrefs.girlsCardCollapsed=!${collapsed};scheduleSave();renderPlan()">
+      <div style="flex:1;font-size:13px;font-weight:800;letter-spacing:0.6px;color:#a5b4fc">🥣 GIRLS THIS WEEK — cereal stays, upgrade it</div>
+      <span style="color:var(--dim);font-size:13px">${collapsed?"▸ show":"▾ hide"}</span>
+    </div>
+    ${collapsed?"":`
+    <div style="font-size:14px;color:#e2e8f0;line-height:1.55;margin-top:8px">
+      <div>🥛 <b>Pour Fairlife</b> — 13g protein per cup vs 8. Same cereal, better breakfast.</div>
+      <div>🥣 <b>Cereal picks:</b> Cheerios or Kix + a handful of berries · Three Wishes or Magic Spoon if you want low-sugar.</div>
+      <div>🧇 <b>Waffle swap:</b> Kodiak Power Waffles — 12g protein, same toaster, same syrup.</div>
+      <div>🧀 <b>Add a protein:</b> a string cheese or yogurt tube beside whatever they eat. That's the whole trick.</div>
+      ${sug?`<div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.08)">✨ <b>This week's make-ahead:</b> <span style="cursor:pointer;text-decoration:underline dotted" onclick="viewRecipeById('${sug.id}')">${sug.emoji||""} ${sugName}</span> — ${esc((sug.reheat||"").split("·")[0].trim())}.
+        ${onSunday?`<span style="color:#34d399;font-weight:700;margin-left:6px">✓ on Sunday's prep</span>`:`<button onclick="addGirlsSunday('${sug.id}')" style="margin-left:8px;padding:5px 12px;border-radius:8px;border:none;background:rgba(99,102,241,0.25);color:#c7d2fe;font-weight:700;font-size:12px;cursor:pointer">+ Add to Sunday</button>`}</div>`:""}
+      <div style="margin-top:8px"><button onclick="addCerealUpgrades(this)" style="padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">🛒 add cereal upgrades to list</button></div>
+    </div>`}
+  </div>`;
+}
+function addGirlsSunday(id){ const plan=state.weekPlan=state.weekPlan||{}; planSet(plan,"Sunday","breakfast3",{recipeId:id,section:"breakfast"}); scheduleSave(); renderPlan(); }
+function addCerealUpgrades(btn){ state.needsGrocery=state.needsGrocery||[]; const want=["Fairlife 2% milk","Kodiak Power Waffles","String cheese","Yogurt tubes (freeze them)","Blueberries or strawberries"]; let n=0; want.forEach(w=>{ const has=state.needsGrocery.some(x=>(typeof x==="string"?x:(x.text||"")).toLowerCase().startsWith(w.toLowerCase().slice(0,10))); if(!has){ state.needsGrocery.push({text:w,sources:["🥣 Girls' breakfast"]}); n++; } }); scheduleSave(); if(btn){ btn.textContent=n?"✓ added "+n+" to Shop":"✓ already on the list"; } }
 function renderRatingNudge(){ const list=unratedRecentCooks(); if(!list.length)return ""; return list.slice(0,2).map(h=>{ const when=h.date===new Date().toISOString().split("T")[0]?"tonight":"on "+new Date(h.date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long"}); return '<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#fbbf24">⭐ RATE IT WHILE IT\'S FRESH</div><div style="font-size:15px;font-weight:700">'+esc(h.name)+' <span style="font-weight:400;color:var(--dim)">— cooked '+when+'</span></div></div><div style="display:flex;gap:2px">'+[1,2,3,4,5].map(n=>'<button onclick="nudgeRate(\''+h.recipeId+'\','+n+')" style="font-size:26px;background:none;border:none;cursor:pointer;padding:2px 4px;opacity:0.6">☆</button>').join("")+'</div><button onclick="viewRecipeById(\''+h.recipeId+'\')" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:13px;cursor:pointer">+ note</button><button onclick="dismissNudge(\''+h.recipeId+'\')" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button></div>'; }).join(""); }
 function nudgeRate(id,n){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,stars:n,date:new Date().toISOString()}; const h=(state.cookHistory||[]).find(x=>x.recipeId===id); if(h)h.rating=n; scheduleSave(); renderPlan(); }
 function dismissNudge(id){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,date:new Date().toISOString()}; scheduleSave(); renderPlan(); }
@@ -11731,6 +11909,7 @@ function renderCookScreen() {
       <div class="cook-done-emoji">🎉</div>
       <div class="cook-done-title">That's it!</div>
       <div class="cook-done-sub" style="margin-bottom:18px">${esc(recipe.name)} is ready.</div>
+      ${recipe.reheat?`<div style="font-size:14px;color:#34d399;margin:-8px 0 16px">🔁 ${esc(recipe.reheat)}</div>`:""}
       <div style="background:#111827;border:2px solid #1f2937;border-radius:16px;padding:18px;margin:0 0 14px;width:100%;text-align:left">
         <div style="color:#10b981;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⭐ Rate it now (or later — it's always on the recipe card)</div>
         <div style="display:flex;justify-content:center;gap:2px;margin:4px 0 10px">${starBtns}</div>
