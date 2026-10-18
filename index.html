@@ -6710,6 +6710,7 @@ let state = {
   nextWeekPlan: {},
   lunchbox: { plan:{}, feedback:{}, packed:{}, hasThermos:false, schoolDays:["Monday","Tuesday","Wednesday","Thursday","Friday"], noSchool:[] },
   planDefaults: { cookDays:["Monday","Tuesday","Wednesday","Thursday","Saturday"], adultDays:["Saturday"], quickDays:["Tuesday","Thursday"] },
+  useUp: [],
   cookHistory: [],
   groceryNotes: {},
   vaultSort: "name",
@@ -6814,6 +6815,7 @@ async function loadFromSupabase() {
         if (plan.nextWeekPlan) state.nextWeekPlan = normalizePlan(plan.nextWeekPlan);
         if (plan.planDefaults && plan.planDefaults.cookDays) state.planDefaults = plan.planDefaults;
         if (plan.uiPrefs && typeof plan.uiPrefs === "object") state.uiPrefs = plan.uiPrefs;
+        if (Array.isArray(plan.useUp)) state.useUp = plan.useUp;
         if (plan.prepDone) state.prepDone = plan.prepDone;
         if (plan.lunchbox && typeof plan.lunchbox === "object") state.lunchbox = plan.lunchbox;
         if (plan.cookHistory) state.cookHistory = plan.cookHistory;
@@ -6827,7 +6829,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{}, planDefaults: state.planDefaults||null, uiPrefs: state.uiPrefs||{} };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{}, planDefaults: state.planDefaults||null, uiPrefs: state.uiPrefs||{}, useUp: state.useUp||[] };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -6870,6 +6872,7 @@ function loadFromLocal() {
     if (saved.nextWeekPlan) state.nextWeekPlan = normalizePlan(saved.nextWeekPlan);
     if (saved.planDefaults && saved.planDefaults.cookDays) state.planDefaults = saved.planDefaults;
     if (saved.uiPrefs && typeof saved.uiPrefs === "object") state.uiPrefs = saved.uiPrefs;
+    if (Array.isArray(saved.useUp)) state.useUp = saved.useUp;
     if (saved.prepDone) state.prepDone = saved.prepDone;
     if (saved.lunchbox && typeof saved.lunchbox === "object") state.lunchbox = saved.lunchbox;
     if (saved.cookHistory) state.cookHistory = saved.cookHistory;
@@ -7794,8 +7797,23 @@ function smartPlan(opts) {
 
   const placedIds = () => timeline.filter(t => t.dinner && t.dinner.recipeId).map(t => t.dinner.recipeId);
 
+  // 🥡 use-it-up items (unplanned) → bonus when the recipe uses them on/before the by-day
+  const useUpItems = (typeof useUpUnplanned === "function" ? useUpUnplanned() : []);
+  const todayIdx = PLAN_DAYS.indexOf(todayPlanDay());
+  function useUpBonus(r, idx) {
+    let bonus = 0, note = "";
+    useUpItems.forEach(it => {
+      const m = useUpRecipeMatch(it, r); if (m.score < 2) return;           // strong matches only
+      // already satisfied by a placed dinner earlier in the timeline? then no bonus for a second one
+      const already = timeline.some((t, j) => j !== idx && t.dinner && t.dinner.recipeId && (() => { const o = byId[t.dinner.recipeId]; return o && useUpRecipeMatch(it, o).score >= 2; })());
+      if (already) return;
+      const byIdx = it.by ? PLAN_DAYS.indexOf(it.by) : (todayIdx + 2) % 7; const onTime = (idx % 7) <= byIdx && idx < 7;
+      const b = onTime ? 45 : 10; if (b > bonus) { bonus = b; note = "🥡 uses the " + it.text + (it.by ? " before " + it.by.slice(0, 3) : ""); } });
+    return { bonus, note };
+  }
   function scoreDinner(r, idx, wantAdult, wantQuick) {
     let s = 50;
+    s += useUpBonus(r, idx).bonus;
     const rt = (state.ratings || {})[r.id] || {};
     s += (rt.stars || 0) * 10; if (rt.favorite) s += 20; if (rt.stars === 1) s -= 40;
     const ds = daysSinceCooked(r.id); if (ds < 14) s -= 45; else if (ds < 28) s -= 15;
@@ -7835,6 +7853,7 @@ function smartPlan(opts) {
   function mainProtein(r) { if (r.proteinType) return r.proteinType; const n = (r.name || "").toLowerCase(); return ["salmon","shrimp","cod","tuna","steak","beef","pork","turkey","chicken","meatball","bean","egg"].find(p => n.includes(p)) || "other"; }
   function reasonFor(r, idx, wantAdult, wantQuick) {
     const reasons = [];
+    { const ub = useUpBonus(r, idx); if (ub.bonus >= 20) reasons.push(ub.note); }
     (r.usesLeftoversFrom || []).forEach(src => { for (let back = 1; back <= 3; back++) { const t = timeline[idx - back]; if (t && t.dinner && t.dinner.recipeId === src) reasons.push("🔁 uses leftovers from " + (byId[src] ? byId[src].name.split(" ").slice(0, 3).join(" ") : "earlier") + " (" + t.day.slice(0, 3) + ")"); } });
     if (r.sharedAnchor) timeline.forEach((t, j) => { if (t.dinner && t.dinner.recipeId && Math.abs(j - idx) <= 3 && j !== idx) { const o = byId[t.dinner.recipeId]; if (o && o.sharedAnchor === r.sharedAnchor) reasons.push("🍗 same rotisserie bird as " + t.day.slice(0, 3)); } });
     const mine = keysOf(r); const sharedWith = [];
@@ -7988,6 +8007,7 @@ function swapSmartPlanSlot(i) {
 function byIdAll(id) { return [...(state.dinners||[]), ...(state.breakfasts||[]), ...(state.lunches||[]), ...(state.desserts||[])].find(r => r && r.id === id); }
 function acceptSmartPlan() {
   if (!smartPlanDraft) return;
+  try { smartPlanDraft.timeline.forEach(t => { if (t.week !== 0 || !t.dinner || !t.dinner.recipeId) return; const r = byIdAll(t.dinner.recipeId); if (!r) return; useUpUnplanned().forEach(it => { if (useUpRecipeMatch(it, r).score >= 2 && !it.plannedRecipeId) it.plannedRecipeId = r.id; }); }); } catch (e) {}
   const keep = smartPlanDraft.opts.keepExisting;
   const thisW = keep ? normalizePlan(Object.assign({}, state.weekPlan || {})) : {};
   const nextW = keep ? normalizePlan(Object.assign({}, state.nextWeekPlan || {})) : {};
@@ -8080,6 +8100,94 @@ function pantryMatchScore(r){
 function tonightPicks(){
   const pool=(state.dinners||[]).filter(r=>r&&r.id&&r.quick&&isActive(r.id));
   return pool.map(r=>{ const rt=(state.ratings||{})[r.id]||{}; const ds=daysSinceCooked(r.id); let sc=pantryMatchScore(r)*60+(rt.stars||0)*6+(rt.favorite?10:0); if(ds<7) sc-=30; else if(ds<14) sc-=12; if((r.audience||"family")==="adults") sc-=8; return {r,sc}; }).sort((a,b)=>b.sc-a.sc).slice(0,3).map(x=>x.r);
+}
+
+// ── 🥡 USE IT UP ─────────────────────────────────────────────────────────────
+function useUpList(){ if(!Array.isArray(state.useUp)) state.useUp=[]; const today=new Date().toISOString().split("T")[0]; const cut=Date.now()-10*86400000;
+  state.useUp=state.useUp.filter(x=>x&&x.text&&(!x.added||new Date(x.added+"T12:00:00").getTime()>cut)); return state.useUp; }
+const USEUP_STOP=new Set(["half","some","leftover","leftovers","bag","of","a","an","the","lb","lbs","oz","cup","cups","fresh","frozen","pack","package","container","that","need","needs","to","use","going","bad","about","old","extra","bunch","couple","few","piece","pieces"]);
+function useUpTokens(text){ return String(text||"").toLowerCase().replace(/[^a-z\s]/g," ").split(/\s+/).map(w=>w.replace(/(es|s)$/,"")).filter(w=>w.length>2&&!USEUP_STOP.has(w)); }
+// Score how well a recipe uses the item: 3 = ingredient key/exact noun, 2 = all tokens hit one ingredient, 1 = main noun hits
+function useUpRecipeMatch(item, r){
+  const toks=useUpTokens(item.text); if(!toks.length) return {score:0};
+  const itemKey=getIngredientKey(item.text);
+  let best=0, line="";
+  const protein=/^(chicken|beef|pork|turkey|salmon|shrimp|steak|sausage|fish|cod|tuna)$/;
+  let skipSec=false;
+  (r.ingredients||[]).forEach(ing=>{ if(typeof ing!=="string") return; if(ing.startsWith("---")){ skipSec=/serv|topping|garnish|optional|upgrade|table|side|dip/i.test(ing); return; } if(skipSec||ing.startsWith("Option ")) return; const low=ing.toLowerCase().replace(/(es|s)\b/g,"");
+    if(/\b(optional|for serving|to serve|on the side|if you like)\b/.test(low)) return;
+    // broth/stock/bouillon/powder/seasoning lines never count as "using" a protein or produce item
+    if(/\b(broth|stock|bouillon|bone broth|powder|seasoning|flavor|sauce|dressing|gravy)\b/.test(low) && !toks.some(t=>/\b(broth|stock|sauce|dressing)\b/.test(t))) return;
+    const hits=toks.filter(t=>low.includes(t)).length; let sc=0;
+    // a protein item must hit the protein word itself in this line
+    if(toks.some(t=>protein.test(t)) && !toks.filter(t=>protein.test(t)).some(t=>low.includes(t))) return;
+    if(hits===toks.length) sc=3; else if(hits>0 && toks.length>1 && hits>=Math.ceil(toks.length/2)) sc=2; else if(hits>0) sc=1;
+    if(itemKey && getIngredientKey(ing)===itemKey) sc=Math.max(sc,3);
+    if(sc>best){ best=sc; line=ing; } });
+  // bare "chicken" shouldn't rank thigh/rotisserie recipes as highly as a breast-specific one
+  if(best&&toks.length===1&&/^(chicken|beef|pork|turkey)$/.test(toks[0])) best=Math.min(best,2);
+  return {score:best, line};
+}
+function useUpMatches(item, limit){
+  const all=[...(state.dinners||[]),...(state.lunches||[]),...(state.breakfasts||[])].filter(r=>r&&r.id&&isActive(r.id)&&!r.component);
+  const out=[];
+  all.forEach(r=>{ const m=useUpRecipeMatch(item,r); if(!m.score) return; let s=m.score*40; if(r.quick) s+=12; const rt=(state.ratings||{})[r.id]||{}; s+=(rt.stars||0)*4; if(rt.favorite) s+=8; const ds=daysSinceCooked(r.id); if(ds<14) s-=20; if((r.audience||"family")==="family") s+=6; if((r.usesLeftoversFrom||[]).length&&!r.sharedAnchor) s-=30;
+    const qty=(m.line.match(/^[\d½¼¾⅓⅔⅛.\/\s-]+(?:lbs?|oz|cups?|cloves?|large|small|medium|heads?|cans?)?/i)||[""])[0].trim();
+    out.push({r, score:s, strong:m.score>=2, label:"uses "+(qty?qty+" ":"")+useUpTokens(item.text).join(" ")}); });
+  return out.sort((a,b)=>b.score-a.score).slice(0,limit||6);
+}
+function useUpDayIndex(day){ return PLAN_DAYS.indexOf(day); }
+function useUpByLabel(item){ return item.by?("by "+item.by.slice(0,3)):"within 2 days"; }
+function useUpIsPast(item){ if(!item.by) return false; const t=useUpDayIndex(todayPlanDay()), b=useUpDayIndex(item.by); if(b<0||t===6) return false; return b<t-1; }
+function useUpAdd(){ const inp=document.getElementById("useup-input"); if(!inp||!inp.value.trim()) return; const by=window._useUpBy||null; useUpList().unshift({id:"uu"+Date.now().toString(36), text:inp.value.trim(), by, added:new Date().toISOString().split("T")[0]}); window._useUpBy=null; window._useUpExpanded=state.useUp[0].id; scheduleSave(); renderPlan(); setTimeout(()=>{const i=document.getElementById("useup-input"); if(i) i.focus();},50); }
+function useUpRemove(id){ state.useUp=useUpList().filter(x=>x.id!==id); scheduleSave(); renderPlan(); }
+function useUpPush(id){ const it=useUpList().find(x=>x.id===id); if(!it) return; const t=useUpDayIndex(todayPlanDay()); it.by=PLAN_DAYS[Math.min(6,t+2)]; scheduleSave(); renderPlan(); }
+function useUpSetBy(day){ window._useUpBy=(window._useUpBy===day)?null:day; renderPlan(); setTimeout(()=>{const i=document.getElementById("useup-input"); if(i) i.focus();},30); }
+function useUpToggle(id){ window._useUpExpanded=(window._useUpExpanded===id)?null:id; renderPlan(); }
+function useUpMore(id){ window._useUpMore=window._useUpMore||{}; window._useUpMore[id]=!window._useUpMore[id]; renderPlan(); }
+function useUpPlace(itemId, recipeId, day){
+  const r=byIdAll(recipeId); if(!r) return; const item=useUpList().find(x=>x.id===itemId);
+  const section=state.breakfasts.some(x=>x.id===recipeId)?"breakfast":state.lunches.some(x=>x.id===recipeId)?"lunch":"dinner";
+  const plan=state.weekPlan=state.weekPlan||{};
+  if(section==="dinner" && planGet(plan,day,"dinner") && planGet(plan,day,"dinner").recipeId!==recipeId){ const cur=byIdAll(planGet(plan,day,"dinner").recipeId); if(!confirm("Replace "+(cur?cur.name:"the planned dinner")+" on "+day+" with "+r.name+"?")) return; }
+  const e={recipeId,section}; if(section==="dinner"){ const sd=pickSide(r,[]); if(sd) e.side=sd; }
+  planSet(plan,day,section,e); if(item) item.plannedRecipeId=recipeId; window._useUpDayPick=null; scheduleSave(); planWeekView="this"; renderPlan();
+}
+function useUpDayPick(itemId, recipeId){ const k=itemId+":"+recipeId; window._useUpDayPick=(window._useUpDayPick===k)?null:k; renderPlan(); }
+// Called when a cook finishes — clear items this recipe used
+function useUpOnCooked(recipeId){ const r=byIdAll(recipeId); if(!r) return; const list=useUpList(); const used=list.filter(it=>it.plannedRecipeId===recipeId||useUpRecipeMatch(it,r).score>=2); if(!used.length) return; state.useUp=list.filter(it=>!used.includes(it)); scheduleSave(); try{ showCookRatingStatus("🥡 Used up: "+used.map(u=>u.text).join(", ")); }catch(e){} }
+function useUpUnplanned(){ return useUpList().filter(it=>!it.plannedRecipeId); }
+function renderUseUpCard(){
+  if(planWeekView!=="this") return "";
+  const items=useUpList(); const today=todayPlanDay(); const ti=useUpDayIndex(today); const tomorrow=PLAN_DAYS[(ti+1)%7];
+  const chip=(label,day)=>`<button onclick="useUpSetBy('${day}')" style="flex-shrink:0;padding:6px 10px;border-radius:999px;border:1px solid ${window._useUpBy===day?'rgba(16,185,129,0.7)':'rgba(255,255,255,0.14)'};background:${window._useUpBy===day?'rgba(16,185,129,0.18)':'transparent'};color:${window._useUpBy===day?'#34d399':'var(--muted)'};font-size:12px;font-weight:700;cursor:pointer;min-height:32px">${label}</button>`;
+  const ordered=[...PLAN_DAYS.slice(ti+2),...PLAN_DAYS.slice(0,ti)].filter(d=>d!==today&&d!==tomorrow);
+  const dayChips=[chip("Today",today),chip("Tomorrow",tomorrow),...ordered.map(d=>chip(d.slice(0,3),d))].join("");
+  const inputRow=`<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="useup-input" placeholder="Something that needs using — chicken breasts, half an onion, spinach…" onkeydown="if(event.key==='Enter'){useUpAdd();}" style="flex:1;min-width:200px;padding:11px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:var(--text);font-size:16px;box-sizing:border-box"><button onclick="useUpAdd()" style="padding:11px 18px;border-radius:12px;border:none;background:var(--green);color:#0a0f1a;font-weight:800;font-size:14px;cursor:pointer;min-height:44px">Add</button></div>
+    <div style="display:flex;gap:6px;overflow-x:auto;padding:8px 0 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch"><span style="font-size:11px;color:var(--dim);flex-shrink:0;align-self:center;margin-right:2px">Use by:</span>${dayChips}</div>`;
+  if(!items.length){ return `<details style="margin-bottom:14px;border:1px dashed rgba(255,255,255,0.14);border-radius:14px;padding:10px 14px"><summary style="cursor:pointer;font-size:14px;color:var(--muted);list-style:none">🥡 Need to use something up? <span style="color:var(--green);font-weight:700">Add it →</span></summary><div style="padding-top:10px">${inputRow}</div></details>`; }
+  const rows=items.map((it,idx)=>{
+    const expanded=window._useUpExpanded ? window._useUpExpanded===it.id : idx===0;
+    const past=useUpIsPast(it); const planned=it.plannedRecipeId?byIdAll(it.plannedRecipeId):null;
+    const matches=planned?[]:useUpMatches(it,6); const more=(window._useUpMore||{})[it.id]; const shown=more?matches:matches.slice(0,4);
+    const todayHas=planGet(state.weekPlan||{},today,"dinner");
+    const matchRows=shown.map(m=>{ const r=m.r; const pick=window._useUpDayPick===(it.id+":"+r.id);
+      return `<div style="padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.04);margin-top:6px"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:20px;flex-shrink:0">${r.emoji||"🍽️"}</span>
+        <div style="flex:1;min-width:160px;cursor:pointer" onclick="viewRecipeById('${r.id}')"><div style="font-size:14px;font-weight:700;color:var(--text);line-height:1.25">${esc(r.name)}${r.quick?' <span style="font-size:10px;color:#fde047">⚡</span>':''}</div><div style="font-size:11px;color:var(--dim)">⏱ ${esc(timeLabel(r,true))} · ${(r.audience||"family")==="adults"?"🍷":"👪"} · <span style="color:#86efac">${esc(m.label)}</span></div></div>
+        <div style="display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap"><button onclick="useUpPlace('${it.id}','${r.id}','${today}')" style="padding:8px 12px;border-radius:10px;border:none;background:var(--green);color:#0a0f1a;font-weight:800;font-size:12px;cursor:pointer;min-height:40px">${todayHas&&todayHas.recipeId!==r.id?"Replace tonight":"Tonight"}</button><button onclick="useUpPlace('${it.id}','${r.id}','${tomorrow}')" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(16,185,129,0.5);background:transparent;color:#34d399;font-weight:700;font-size:12px;cursor:pointer;min-height:40px">Tomorrow</button><button onclick="useUpDayPick('${it.id}','${r.id}')" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-weight:700;font-size:12px;cursor:pointer;min-height:40px">Pick day…</button></div></div>
+        ${pick?`<div style="display:flex;gap:6px;overflow-x:auto;padding-top:8px;scrollbar-width:none">${PLAN_DAYS.map(d=>`<button onclick="useUpPlace('${it.id}','${r.id}','${d}')" style="flex-shrink:0;padding:6px 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:${d===today?'rgba(16,185,129,0.15)':'transparent'};color:var(--text);font-size:12px;font-weight:700;cursor:pointer;min-height:32px">${d.slice(0,3)}</button>`).join("")}</div>`:""}</div>`; }).join("");
+    return `<div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;margin-top:10px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:140px;cursor:pointer" onclick="useUpToggle('${it.id}')"><span style="font-size:15px;font-weight:700;color:var(--text)">${esc(it.text)}</span> <span style="font-size:11px;padding:2px 8px;border-radius:999px;background:${past?'rgba(245,158,11,0.18)':'rgba(255,255,255,0.08)'};color:${past?'#fbbf24':'var(--dim)'};margin-left:4px">${esc(useUpByLabel(it))}</span>${planned?` <span style="font-size:11px;color:#86efac">→ planned: ${esc(planned.name)}</span>`:""}</div>
+        <button onclick="useUpRemove('${it.id}')" title="Remove" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;min-width:40px;min-height:40px">✕</button>
+      </div>
+      ${past&&!planned?`<div style="margin-top:6px;padding:8px 10px;border-radius:10px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);font-size:13px;color:#fbbf24;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="flex:1">⚠️ past ${esc(it.by.slice(0,3))} — still have it?</span><button onclick="useUpPush('${it.id}')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(245,158,11,0.5);background:transparent;color:#fbbf24;font-size:12px;font-weight:700;cursor:pointer;min-height:36px">Still have it (push 2 days)</button><button onclick="useUpRemove('${it.id}')" style="padding:6px 10px;border-radius:8px;border:none;background:rgba(255,255,255,0.08);color:var(--muted);font-size:12px;font-weight:700;cursor:pointer;min-height:36px">Tossed</button></div>`:""}
+      ${expanded&&!planned?(matches.length?matchRows+(matches.length>4?`<button onclick="useUpMore('${it.id}')" style="margin-top:6px;background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:4px 0">${more?"Show fewer":"Show more ("+(matches.length-4)+")"}</button>`:""):`<div style="font-size:13px;color:var(--dim);margin-top:6px">No recipe in the Vault uses that yet — ask 👨‍🍳 for an idea.</div>`):""}
+    </div>`; }).join("");
+  return `<div style="background:linear-gradient(135deg,rgba(16,185,129,0.08),rgba(16,185,129,0.02));border:1.5px solid rgba(16,185,129,0.3);border-radius:14px;padding:12px 14px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#34d399;margin-bottom:8px">🥡 USE IT UP</div>
+    ${inputRow}${rows}</div>`;
 }
 function renderTonightCard(plan, allRecipes){
   if(planWeekView!=="this") return "";
@@ -8288,6 +8396,7 @@ function renderPlan() {
   el.innerHTML = `
     ${pickerModal}
     ${renderRatingNudge()}
+    ${renderUseUpCard()}
     ${planWeekView==="this" ? renderGirlsBreakfastCard() : ""}
     ${planWeekView==="this" ? lbPackCard(false) : ""}
     <div id="autoplan-modal" class="sp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeAutoplanModal()">
@@ -8448,12 +8557,15 @@ function renderVault() {
   const filtered = filterBySearch(allRecipes).filter(r => {
     if (audienceFilter !== "all" && (r.audience||"family") !== audienceFilter) return false;
     if (state.vaultQuick && !r.quick) return false;
+    if (state.vaultUseUp && !useUpUnplanned().some(it => useUpRecipeMatch(it, r).score > 0)) return false;
     return true;
   });
 
   // Sort options
   const sortBy = state.vaultSort || "name";
+  const uuScore = r => state.vaultUseUp ? Math.max(0, ...useUpUnplanned().map(it => useUpRecipeMatch(it, r).score)) : 0;
   const sorted = [...filtered].sort((a,b) => {
+    if (state.vaultUseUp) { const d = uuScore(b) - uuScore(a); if (d) return d; }
     if (sortBy === "rating") {
       const ra = (state.ratings[a.id]||{}).stars||0;
       const rb = (state.ratings[b.id]||{}).stars||0;
@@ -8492,6 +8604,7 @@ function renderVault() {
               ${cookCount?`<span style="font-size:11px;color:var(--dim)">Made ${cookCount}x</span>`:""}
               ${kidWinsBadge(r.id)?`<span style="font-size:11px;color:#f472b6">${kidWinsBadge(r.id)}</span>`:""}
               ${assignedDay?`<span style="font-size:11px;color:var(--green)">✅ ${assignedDay[0]}</span>`:""}
+              ${(function(){ const hits=useUpUnplanned().filter(it=>useUpRecipeMatch(it,r).score>0).map(it=>it.text); return hits.length?`<span style="font-size:11px;color:#86efac;background:rgba(16,185,129,0.12);padding:1px 7px;border-radius:999px">🥡 uses: ${esc(hits.join(", "))}</span>`:""; })()}
             </div>
           </div>
           <div class="vc-actions" style="display:flex;flex-direction:column;gap:4px;flex-shrink:0" onclick="event.stopPropagation()">
@@ -8529,6 +8642,7 @@ function renderVault() {
       <button onclick="state.vaultAudience='family';saveLocal();renderVault()" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:${(state.vaultAudience||'all')==='family'?'rgba(99,102,241,0.2)':'rgba(255,255,255,0.06)'};color:${(state.vaultAudience||'all')==='family'?'#818cf8':'var(--muted)'}">👨‍👩‍👧 Family</button>
       <button onclick="state.vaultAudience='adults';saveLocal();renderVault()" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:${(state.vaultAudience||'all')==='adults'?'rgba(245,158,11,0.2)':'rgba(255,255,255,0.06)'};color:${(state.vaultAudience||'all')==='adults'?'#fbbf24':'var(--muted)'}">🍷 Adults Night</button>
       <button onclick="state.vaultQuick=!state.vaultQuick;saveLocal();renderVault()" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:${state.vaultQuick?'rgba(250,204,21,0.2)':'rgba(255,255,255,0.06)'};color:${state.vaultQuick?'#fde047':'var(--muted)'}">⚡ Quick</button>
+      ${useUpUnplanned().length?`<button onclick="state.vaultUseUp=!state.vaultUseUp;renderVault()" style="padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;border:none;cursor:pointer;background:${state.vaultUseUp?'rgba(16,185,129,0.22)':'rgba(255,255,255,0.06)'};color:${state.vaultUseUp?'#34d399':'var(--muted)'}">🥡 Uses what I have</button>`:""}
     </div>
 
     ${section("🍽️ Dinners", dinners)}
@@ -11908,6 +12022,7 @@ function renderCookScreen() {
   if(isDone) {
     // Log this cook once per day per recipe
     (function(){ const today=new Date().toISOString().split("T")[0]; const already=(state.cookHistory||[]).some(h=>h.recipeId===recipe.id&&h.date===today); if(!already) logCook(recipe.id, recipe.name, 0); })();
+    try { useUpOnCooked(recipe.id); } catch(e) {}
     const section=recipe.section||(state.breakfasts.some(r=>r.id===recipe.id)?"breakfast":state.lunches.some(r=>r.id===recipe.id)?"lunch":"dinner");
     const rr=(state.ratings||{})[recipe.id]||{};
     const starsNow=rr.stars||0;
@@ -13293,6 +13408,7 @@ async function sendChatMessage() {
   const systemPrompt = `You are a knowledgeable home cooking assistant for the Lemmon family meal planning app. 
 ${recipeContext}
 The family: Andrew (44, radiologist, avid home cook), MK (39, wife), two daughters (7 and 5).
+${(useUpUnplanned().length ? "Ingredients the family needs to use up soon: " + useUpUnplanned().map(it => it.text + (it.by ? " (by " + it.by + ")" : "")).join("; ") + ". Prefer suggestions that use these." : "")}
 Goals: high protein, lower calorie, family-friendly meals. 
 Key pantry items: Dan-O's Original/Spicy/Sea-Soning, Kinder's The Blend, Greek Freak, Nothing Hidden Ranch, Burlap & Barrel spices, Brami/Kaizen protein pasta, Fairlife milk, Fage 0% Greek yogurt, Good Culture cottage cheese, Rao's marinara, Primal Kitchen sauces.
 Be concise, practical, and specific. Answer cooking questions directly. For substitutions, give a clear yes/no then explain. For technique questions, give the exact detail they need. No fluff.`;
