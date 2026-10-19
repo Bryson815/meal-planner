@@ -5244,9 +5244,9 @@ const DEFAULT_DINNERS = [
     day:"Sunday",
     calories:620,
     protein:34,
-    activeTime:"35 min",
-    totalTime:"38 min",
-    prepTime:"20 min prep + 18 min oven",
+    activeTime:"45 min",
+    totalTime:"1 hr 10 min",
+    prepTime:"Water on first · prep + béchamel while it heats · 18 min oven + 5 min rest",
     equipment:["Large Dutch oven or 4-qt saucepan","9×13 baking dish","Large pot for pasta","Box grater","Blender (for the cottage cheese)","Whisk","4 prep bowls + 1 large measuring cup"],
     leftoverNote:"Keeps 4 days. Reheat portions in a 350°F oven with a splash of milk, covered with foil, 15 min — the microwave works in a pinch. Freezes OK for a month.",
     source:"House recipe — classic béchamel mac with the broccoli-soup cheese rules and a blended cottage cheese boost",
@@ -5279,23 +5279,25 @@ const DEFAULT_DINNERS = [
       "Cholula or Frank's · crumbled turkey bacon · extra Dijon"
     ],
     instructions:[
-      "── MISE EN PLACE ──",
+      "── START HERE: WATER ON FIRST ──",
+      "Fill the pasta pot with water + 1 tbsp kosher salt. Lid ON, HIGH heat. A big pot takes 12–15 min to boil — everything through the béchamel happens while you wait.",
       "Preheat oven to 400°F. Butter a 9×13 baking dish.",
-      "🧀 CHEESE BOWL — Grate 10 oz sharp cheddar + 4 oz Gruyere, both on the large holes of a box grater, into one bowl. Leave out at room temperature — cold cheese seizes.",
+      "── WHILE THE WATER HEATS: MISE EN PLACE ──",
+      "🧀 CHEESE BOWL — Grate 10 oz sharp cheddar + 4 oz Gruyere, both on the large holes of a box grater, into one bowl. Leave out at room temperature — cold cheese seizes. (The longest prep job — an 8-minute one.)",
       "🟡 BOWL 1 (cottage cheese) — Blend 1 cup cottage cheese in a blender 30 seconds until completely smooth, no curds. Pour into a small bowl.",
       "🔵 BOWL 2 (seasoning) — 1 tsp Dijon + ½ tsp garlic powder + ½ tsp salt + ¼ tsp pepper + 1 pinch nutmeg in a small cup.",
       "🟣 BOWL 3 (milk) — Measure 3 cups whole milk into a large measuring cup.",
       "🫙 STOVE SIDE — Measure ¼ cup flour into a small cup. Set 4 tbsp butter beside the stove.",
       "🟢 BOWL 4 (panko top) — 1 cup panko + 2 tbsp melted butter + ¼ cup Parmesan. Toss until the crumbs are evenly buttery.",
-      "Fill the pasta pot with water + 1 tbsp kosher salt. Bring to a boil, lid on.",
-      "── COOK THE PASTA ──",
-      "Lid OFF. Drop 12 oz pasta into the boiling water and cook uncovered, 2 min LESS than the package says — it finishes in the oven. Drain, do not rinse, and leave it in the colander.",
-      "── WHILE THE PASTA COOKS: BÉCHAMEL ──",
-      "Melt the 4 tbsp butter in the Dutch oven over MEDIUM. When it foams, sprinkle in the ¼ cup flour. Whisk constantly 2 min until it smells nutty — this cooks out the raw flour.",
+      "── STILL WAITING ON THE WATER: START THE BÉCHAMEL ──",
+      "Melt the 4 tbsp butter in the Dutch oven over MEDIUM, uncovered. When it foams, sprinkle in the ¼ cup flour. Whisk constantly 2 min until it smells nutty — this cooks out the raw flour.",
       "Pour in 🟣 Bowl 3 (3 cups milk) SLOWLY in a thin stream, whisking the whole time — this prevents lumps. Takes about a minute.",
-      "Stir in 🔵 Bowl 2 (Dijon + spices). Bring to a gentle simmer over MEDIUM, uncovered, whisking often, 4-5 min until it thickens enough to coat the back of a spoon.",
+      "Stir in 🔵 Bowl 2 (Dijon + spices). Keep it at a gentle simmer over MEDIUM, uncovered, whisking every minute or so, until it coats the back of a spoon — about 5 min. Drop to LOW if the pasta isn't in yet; it's happy to wait.",
+      "── WATER BOILING? PASTA IN ──",
+      "Lid OFF the pasta pot. Drop 12 oz pasta into the boiling water and cook uncovered, 2 min LESS than the package says — it finishes in the oven. Give the béchamel a whisk while it cooks.",
+      "Drain the pasta — do not rinse — and leave it in the colander.",
       "── ADD CHEESE — OFF HEAT ──",
-      "Turn the heat OFF. Pour in 🟡 Bowl 1 (blended cottage cheese) and whisk smooth.",
+      "Turn the béchamel heat OFF. Pour in 🟡 Bowl 1 (blended cottage cheese) and whisk smooth.",
       "Add 🧀 Cheese Bowl one large handful at a time, stirring each handful in completely before the next. Off heat, patiently — boiling after cheese makes it grainy and greasy.",
       "Taste the sauce now. It should be well seasoned — add salt if it is flat.",
       "── ASSEMBLE AND BAKE ──",
@@ -13517,7 +13519,7 @@ function showImportStatus(msg) {
 
 // Bump RECIPE_REV whenever built-in recipes are edited in code. On next load, saved copies of
 // built-in recipes take the new content once (ratings, notes, plans are stored separately and untouched).
-const RECIPE_REV = "2026-10-19b";
+const RECIPE_REV = "2026-10-19c";
 function refreshBuiltInRecipes() {
   try {
     if (state.recipeRev === RECIPE_REV) return false;
