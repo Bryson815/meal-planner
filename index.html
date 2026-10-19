@@ -12346,6 +12346,21 @@ function renderCookScreen() {
     const SWITCH_RE=/while|meanwhile|parallel|at the same time|\bside\b|strips|bread|toast|sauce|jus|dressing|glaze|toppings|bowls|assembl|serve|plating|plate|night before|morning of|day before|oven|grill|smoker|broil|rest/i;
     const PARALLEL_RE=/while|meanwhile|parallel|at the same time/i;
     const backToMain=isSectionStart&&PARALLEL_RE.test(prevSectionHeader)&&!PARALLEL_RE.test(sectionHeader);
+    // Heads-up: does the NEXT step start something that happens WHILE this one cooks?
+    const nextParallel=(function(){
+      let ri=-1, hdr=null;
+      for(let i=0;i<allSteps.length;i++){
+        if(allSteps[i].startsWith("──")){ if(ri===step) hdr=allSteps[i].replace(/──/g,"").trim(); continue; }
+        ri++;
+        if(ri===step+1){ const txt=allSteps[i];
+          if(hdr && PARALLEL_RE.test(hdr)) return hdr;
+          const m=txt.match(/^(while|meanwhile|as soon as|at the same time)[^—:.]*[—:]/i); if(m) return m[0].replace(/[—:]\s*$/,"").trim();
+          return null; }
+      }
+      return null;
+    })();
+    cookState.nextParallel=nextParallel;
+    const headsUpHtml=nextParallel?`<div style="margin-top:22px;max-width:800px;background:rgba(245,158,11,0.10);border:2px solid rgba(245,158,11,0.55);border-radius:14px;padding:14px 18px;display:flex;gap:14px;align-items:flex-start"><div style="font-size:26px;line-height:1">⏭</div><div><div style="color:#fbbf24;font-size:13px;font-weight:800;letter-spacing:1.1px;margin-bottom:4px">DON'T WAIT HERE — GET THIS GOING, THEN TAP NEXT</div><div style="color:#fde68a;font-size:17px;line-height:1.4">${(function(){ const t=nextParallel.includes(":")?nextParallel.split(":").slice(1).join(":").trim():""; const sc=x=>{ const l=x.toLowerCase(); return l.charAt(0).toUpperCase()+l.slice(1); }; return t ? "Next up, <b>done while this cooks</b>: "+esc(sc(t))+"." : "The next step happens <b>while this cooks</b> ("+esc(nextParallel.toLowerCase())+") — don't wait for it to finish."; })()}</div></div></div>`:"";
     const showSectionBanner=isSectionStart&&(SWITCH_RE.test(sectionHeader)||backToMain);
     // Offer a timer for durations that are instructions to wait — skip times that merely describe ("the 12-15 min simmer", "after 45 min", "every 30 sec")
     const timerMatch=(function(){
@@ -12479,6 +12494,7 @@ function renderCookScreen() {
       }
       return badge + formattedText + noteHtml;
     })()}
+    ${headsUpHtml}
     ${timerHtml}
     ${tipHtml}
   </div>
@@ -13098,6 +13114,7 @@ function speakCurrentStep(){
   const txt=scale===1?t:scaleAmountsInText(t,scale,true);
   let out=cleanForSpeech(txt);
   if(/^(Bowl \d|Cheese bowl|Pantry cup|Stove side)/.test(out)&&!/into one bowl|together/i.test(out)) out=out.replace(/\.\s*$/,"")+". All into one bowl.";
+  if(cookState.nextParallel) out=out.replace(/\s*$/,"")+" Don't wait for this to finish. Get it going, then say next — the next step happens while this cooks.";
   speak("Step "+(cookState.step+1)+". "+out);
 }
 function toggleReadAloud(){ state.readAloud=!state.readAloud; scheduleSave(); if(cookState) cookState._lastSpokenStep=cookState.step; renderCookScreen(); if(state.readAloud){ speakCurrentStep(); } else { try{speechSynthesis.cancel();}catch(e){} } }
