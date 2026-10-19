@@ -12354,6 +12354,9 @@ function renderCookScreen() {
       while((m=re.exec(stepText))){
         const before=stepText.slice(Math.max(0,m.index-30),m.index);
         if(/\b(the|after|before|first|last|within|every|per|gives?|takes?|window|during|next|another\s+\d|total\s+of|about\s+to|in\s+the)\s*$/i.test(before)) continue;
+        // relative to something we don't know ("2 min LESS than the package says", "1 min longer") — not a countdown
+        const after=stepText.slice(m.index+m[0].length, m.index+m[0].length+24);
+        if(/^\s*(less|more|shorter|longer|under|over|shy|short|past|beyond|than|early|earlier|later|extra)\b/i.test(after)) continue;
         return [m[0],m[1],m[2]];
       }
       return null;
