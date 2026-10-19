@@ -5248,7 +5248,7 @@ const DEFAULT_DINNERS = [
       "Bake at 400°F, uncovered, 15-18 min until bubbling at the edges and the panko is deep golden. Broil 1-2 min at the end if you want it darker — watch it.",
       "Rest 5 min before serving. It sets up and stops being lava.",
       "── SERVE ──",
-      "Kids: scoop straight from the dish, nothing on top. A side of fruit or the cheesy broccoli rice.",
+      "Kids: scoop straight from the dish, nothing on top. Pair with something fresh and green — buttered peas, cucumber coins or roasted broccoli — and fruit. Not another starch.",
       "Adults: a few dashes of Cholula, crumbled turkey bacon over the top, or a swipe of Dijon on the plate.",
       "🫙 CONDIMENT IDEAS — plain for the girls · Cholula or Frank's on adult bowls · Fly By Jing chili crisp over the panko · a dab of Dijon stirred in."
     ],
@@ -7681,51 +7681,51 @@ function daysSinceCooked(id) {
 
 // ── 5-minute vegetable sides (auto-attached to dinners by the planner) ──
 const SIDES = [
-  { id:"side-roast-broccoli", name:"Roasted Broccoli", emoji:"🥦", method:"oven", cuisine:["any"], vegServings:2,
+  { id:"side-roast-broccoli", role:"green", veg:"broccoli", name:"Roasted Broccoli", emoji:"🥦", method:"oven", cuisine:["any"], vegServings:2,
     ingredients:["1 large head broccoli (about 5 cups florets)","1½ tbsp olive or avocado oil","½ tsp kosher salt","½ lemon","2 tbsp grated Parmesan (optional)"],
     steps:["Oven 425°F. Cut 1 head broccoli into florets, toss on a sheet pan with 1½ tbsp oil + ½ tsp salt.","Roast 15 min uncovered until edges are crisp and browned — don't stir.","Squeeze ½ lemon over, scatter 2 tbsp Parmesan. Serve hot."],
     kidNote:"Crispy edges are the hook. Serve a few 'broccoli chips' with ranch for dipping." },
-  { id:"side-cucumber-salad", name:"Cucumber Rice-Vinegar Salad", emoji:"🥒", method:"raw", cuisine:["asian","any"], vegServings:1,
+  { id:"side-cucumber-salad", role:"fresh", veg:"cucumber", name:"Cucumber Rice-Vinegar Salad", emoji:"🥒", method:"raw", cuisine:["asian","any"], vegServings:1,
     ingredients:["2 Persian cucumbers (or 1 English), sliced thin","2 tbsp rice vinegar","½ tsp sugar","¼ tsp kosher salt","1 tsp sesame seeds (optional)"],
     steps:["Slice 2 cucumbers into thin coins into a bowl.","Add 2 tbsp rice vinegar + ½ tsp sugar + ¼ tsp salt. Toss, sit 5 min.","Sprinkle 1 tsp sesame seeds. Serve cold."],
     kidNote:"Skip the sesame for the girls — plain vinegar cucumbers are a kid favorite." },
-  { id:"side-buttered-peas", kidFav:true, name:"Buttered Peas", emoji:"🟢", method:"micro", cuisine:["american","any"], vegServings:1,
+  { id:"side-buttered-peas", role:"green", veg:"pea", kidFav:true, name:"Buttered Peas", emoji:"🟢", method:"micro", cuisine:["american","any"], vegServings:1,
     ingredients:["2 cups frozen peas","1 tbsp butter","¼ tsp kosher salt","Squeeze of lemon (optional)"],
     steps:["Microwave 2 cups frozen peas with 1 tbsp water, covered, 4 min.","Drain. Stir in 1 tbsp butter + ¼ tsp salt. Lemon if you like."],
     kidNote:"The safest green on the planet. Lucy can eat them with a spoon." },
-  { id:"side-green-beans", name:"Green Beans with Lemon + Almonds", emoji:"🫛", method:"stove", cuisine:["american","med","any"], vegServings:2,
+  { id:"side-green-beans", role:"green", veg:"green bean", name:"Green Beans with Lemon + Almonds", emoji:"🫛", method:"stove", cuisine:["american","med","any"], vegServings:2,
     ingredients:["12 oz green beans, trimmed (bagged is fine)","1 tbsp butter","2 tbsp sliced almonds","½ lemon","¼ tsp kosher salt"],
     steps:["Boil 12 oz green beans in salted water 4 min, uncovered. Drain.","Same pan: melt 1 tbsp butter, toast 2 tbsp almonds 1 min. Add beans, toss 1 min.","Squeeze ½ lemon, ¼ tsp salt."],
     kidNote:"Pull a handful of plain beans out before the almonds for the girls — dip in ketchup if that's what it takes." },
-  { id:"side-glazed-carrots", name:"Honey-Glazed Carrots", emoji:"🥕", method:"stove", cuisine:["american","any"], vegServings:2,
+  { id:"side-glazed-carrots", role:"green", veg:"carrot", name:"Honey-Glazed Carrots", emoji:"🥕", method:"stove", cuisine:["american","any"], vegServings:2,
     ingredients:["1 lb carrots, cut into coins (or 1 bag baby carrots)","1 tbsp butter","1 tbsp honey","¼ tsp kosher salt","⅓ cup water"],
     steps:["Carrots + ⅓ cup water + 1 tbsp butter + ¼ tsp salt in a skillet. Lid on, medium, 6 min.","Lid off. Add 1 tbsp honey, cook 2–3 min until the water's gone and carrots are glazed."],
     kidNote:"Sweet and soft — a reliable yes." },
-  { id:"side-sweet-potato", kidFav:true, name:"Roasted Sweet Potato Cubes", emoji:"🍠", method:"oven", cuisine:["american","mex","any"], vegServings:2,
+  { id:"side-sweet-potato", role:"starch", veg:"sweet potato", kidFav:true, name:"Roasted Sweet Potato Cubes", emoji:"🍠", method:"oven", cuisine:["american","mex","any"], vegServings:2,
     ingredients:["2 medium sweet potatoes, ¾-inch cubes","1½ tbsp avocado oil","½ tsp kosher salt","½ tsp smoked paprika (adults) or cinnamon (kids)"],
     steps:["Oven 425°F. Toss 2 cubed sweet potatoes with 1½ tbsp oil + ½ tsp salt on a sheet pan.","Roast 20 min, flip once at 10, until browned.","Dust half with paprika, half with a pinch of cinnamon."],
     kidNote:"Cinnamon half is the kid half. Call them 'sweet potato fries'." },
-  { id:"side-salad", name:"Simple Side Salad", emoji:"🥗", method:"raw", cuisine:["any"], vegServings:1,
+  { id:"side-salad", role:"fresh", veg:"lettuce|greens|romaine|tomato", name:"Simple Side Salad", emoji:"🥗", method:"raw", cuisine:["any"], vegServings:1,
     ingredients:["1 bag mixed greens or chopped romaine","1 cup cherry tomatoes, halved","½ cucumber, sliced","3 tbsp Bolthouse Ranch or Primal Kitchen Greek dressing"],
     steps:["Greens + 1 cup tomatoes + ½ cucumber in a bowl.","Dress with 3 tbsp dressing right before serving. Toss."],
     kidNote:"Deconstruct: tomatoes and cucumbers in a pile with ranch to dip. Greens optional." },
-  { id:"side-steam-broccoli", name:"Steam-Bag Broccoli + Parmesan", emoji:"🥦", method:"micro", cuisine:["any"], vegServings:2,
+  { id:"side-steam-broccoli", role:"green", rich:true, veg:"broccoli", name:"Steam-Bag Broccoli + Parmesan", emoji:"🥦", method:"micro", cuisine:["any"], vegServings:2,
     ingredients:["1 steam-in-bag broccoli florets (12 oz)","1 tbsp butter","3 tbsp grated Parmesan","Pinch kosher salt"],
     steps:["Microwave the bag per package (about 5 min).","Tip into a bowl, toss with 1 tbsp butter + 3 tbsp Parmesan + pinch of salt."],
     kidNote:"Cheese on broccoli is the Lemmon house rule. Let Lucy add her own." },
-  { id:"side-spinach", name:"Garlic Sautéed Spinach", emoji:"🍃", method:"stove", cuisine:["med","american","any"], vegServings:2,
+  { id:"side-spinach", role:"green", veg:"spinach", name:"Garlic Sautéed Spinach", emoji:"🍃", method:"stove", cuisine:["med","american","any"], vegServings:2,
     ingredients:["10 oz baby spinach (1 big bag)","1 tbsp olive oil","2 cloves garlic, sliced","¼ tsp kosher salt","Squeeze of lemon"],
     steps:["Olive oil + 2 sliced garlic cloves in a large skillet over medium 1 min.","Add the whole bag of spinach in batches, toss 2–3 min until just wilted. ¼ tsp salt, squeeze of lemon."],
     kidNote:"Honest note: kids rarely take this one. It's for the adults — give the girls peas or cucumbers instead." },
-  { id:"side-corn", kidFav:true, name:"Corn with Butter + Tajín", emoji:"🌽", method:"micro", cuisine:["mex","american","any"], vegServings:1,
+  { id:"side-corn", role:"starchy-veg", veg:"corn", kidFav:true, name:"Corn with Butter + Tajín", emoji:"🌽", method:"micro", cuisine:["mex","american","any"], vegServings:1,
     ingredients:["2 cups frozen corn (or 3 ears, kernels cut off)","1 tbsp butter","¼ tsp kosher salt","Tajín for the adults","Lime wedge"],
     steps:["Microwave 2 cups corn with 1 tbsp water, covered, 3 min. Drain.","Stir in 1 tbsp butter + ¼ tsp salt. Plate the kids' portion. Tajín + lime on the adults'."],
     kidNote:"Sweet corn with butter — zero resistance." },
-  { id:"side-broccoli-rice", name:"Cheesy Broccoli Rice", emoji:"🧀", method:"stove", cuisine:["american","any"], vegServings:2,
+  { id:"side-broccoli-rice", role:"starch", rich:true, veg:"broccoli|rice", name:"Cheesy Broccoli Rice", emoji:"🧀", method:"stove", cuisine:["american","any"], vegServings:2,
     ingredients:["1 cup jasmine rice","3 cups broccoli, chopped small (leftover chopped broccoli is perfect)","1 cup sharp cheddar, shredded","1 tbsp butter","½ tsp kosher salt"],
     steps:["Cook 1 cup rice per package, lid on. In the last 5 min, pile 3 cups chopped broccoli on top and re-cover.","Off heat: fold in 1 cup cheddar + 1 tbsp butter + ½ tsp salt. Lid on 2 min to melt."],
     kidNote:"The soup in rice form. This is the side the girls ask for." },
-  { id:"side-edamame", name:"Edamame with Flaky Salt", emoji:"🫘", method:"micro", cuisine:["asian","any"], vegServings:1,
+  { id:"side-edamame", role:"green", veg:"edamame", name:"Edamame with Flaky Salt", emoji:"🫘", method:"micro", cuisine:["asian","any"], vegServings:1,
     ingredients:["1 bag frozen edamame in pods (12 oz)","Flaky salt","Optional: 1 tsp Bachan's or soy sauce"],
     steps:["Microwave the bag per package (about 4 min) or boil 3 min.","Toss with flaky salt. Adults: drizzle 1 tsp Bachan's."],
     kidNote:"Pods are a toy. Kids pop them themselves — a guaranteed vegetable." },
@@ -7733,15 +7733,67 @@ const SIDES = [
 const SIDES_BY_ID = {}; SIDES.forEach(x => SIDES_BY_ID[x.id] = x);
 function sideCuisineOf(r){ const n=((r&&r.name)||"").toLowerCase(); if(/korean|thai|teriyaki|bulgogi|poke|dumpling|lettuce cup|basil|asian/.test(n)) return "asian"; if(/taco|burrito|fajita|enchilada|quesadilla|mexican|nugget "fajita|salsa/.test(n)) return "mex"; if(/greek|chickpea|piccata|scampi|shakshuka|cod|lemon herb|mediterranean|salmon/.test(n)) return "med"; return "american"; }
 function sideMethodUsed(r){ const txt=((r&&r.instructions)||[]).join(" ").toLowerCase(); return { oven:/\b(oven|bake|roast|broil|sheet pan)\b/.test(txt), stove:/\b(skillet|saucepan|dutch oven|simmer|sauté|saute|sear|boil)\b/.test(txt) }; }
-// Pick a side that fits the dinner's cuisine and doesn't fight for the same burner/oven
+// ── Side pairing ────────────────────────────────────────────────────────────
+// A side should fill what the main is missing. Rules, in order:
+//  1. Main already carries a starch (pasta, mac, rice, bowl, tortilla, bun, bread, potato, pizza crust)
+//     → never a starch side (rice, sweet potato); corn is discouraged.
+//  2. Main is rich/cheesy/creamy → prefer fresh or plain green; avoid cheesy sides.
+//  3. Main has no starch and isn't a bowl → a starch side is welcome (kids' plates need one).
+//  4. Don't repeat a vegetable the main already has (broccoli in the main → not broccoli on the side).
+//  5. Cuisine fit, then don't fight for the oven, then kid-favorite when asked.
+function mainProfile(r){
+  const name=((r&&r.name)||"").toLowerCase();
+  const ing=((r&&r.ingredients)||[]).join(" ").toLowerCase();
+  const all=name+" "+ing;
+  const starch=/\b(pasta|mac|macaroni|spaghetti|penne|rigatoni|ziti|fettuccine|linguine|noodle|ramen|udon|gnocchi|brami|kaizen|orzo|lasagna|rice|risotto|quinoa|farro|couscous|tortilla|taco|burrito|quesadilla|enchilada|fajita|wrap|pita|naan|flatbread|pizza|bun|buns|bread|sourdough|toast|sandwich|sub|slider|burger|biscuit|potato|potatoes|fries|grits|polenta|pancake|waffle|dumpling|bowl|skewer-rice)(e?s)?\b/.test(name)
+    || /\b(\d+\s*(oz|cups?|lb)\s+)?(dry\s+)?(pasta|macaroni|spaghetti|penne|rigatoni|brami|kaizen|gnocchi|jasmine rice|basmati|white rice|brown rice|tortillas|buns|potatoes|yukon|russet|naan|pita)\b/.test(ing);
+  const rich=/\b(mac|cheese|cheesy|alfredo|carbonara|cream|creamy|parm|parmesan crusted|enchilada|quesadilla|pizza|bechamel|béchamel|gratin|casserole|smash burger|short rib|french onion)\b/.test(name)
+    || ((ing.match(/\b(cheddar|gruyere|gruyère|mozzarella|cream cheese|heavy cream|half-and-half|béchamel|fontina|provolone)\b/g)||[]).length>=2);
+  return { starch, rich, all };
+}
+function rankSides(recipe, preferKidFav){
+  if(!recipe) return [];
+  const cz=sideCuisineOf(recipe), used=sideMethodUsed(recipe), mp=mainProfile(recipe);
+  const scored=[];
+  SIDES.forEach(x=>{
+    let sc=0;
+    const isStarch=x.role==="starch";
+    if(mp.starch && isStarch) return;                              // rule 1: hard no
+    if(mp.starch && x.role==="starchy-veg") sc-=10;
+    if(mp.rich){ if(x.rich) return; if(x.role==="fresh") sc+=12; else if(x.role==="green") sc+=6; }  // rule 2
+    if(!mp.starch && !mp.rich && isStarch) sc+=8;                  // rule 3
+    if(x.veg && new RegExp("\\b("+x.veg+")").test(mp.all)) sc-=25; // rule 4
+    if(x.cuisine.includes(cz)) sc+=10; if(x.cuisine.includes("any")) sc+=3;
+    if(used.oven && x.method==="oven") sc-=8; if(used.stove && x.method==="stove") sc-=3;
+    if(x.method==="micro"||x.method==="raw") sc+=2;
+    if(preferKidFav && x.kidFav) sc+=15;
+    scored.push({x,sc});
+  });
+  return scored.sort((a,b)=>b.sc-a.sc).map(o=>o.x.id);
+}
+function sideFits(recipe, sideId){ return rankSides(recipe).includes(sideId); }
 function pickSide(recipe, exclude, preferKidFav){
   if(!recipe || recipe.noSide) return null;
-  const cz=sideCuisineOf(recipe), used=sideMethodUsed(recipe);
-  let ok=SIDES.filter(x=>!(exclude||[]).includes(x.id)); if(!ok.length) ok=SIDES.slice();
-  const scored=ok.map(x=>{ let sc=0; if(x.cuisine.includes(cz)) sc+=10; if(x.cuisine.includes("any")) sc+=3; if(used.oven && x.method==="oven") sc-=8; if(used.stove && x.method==="stove") sc-=3; if(x.method==="micro"||x.method==="raw") sc+=2; if(preferKidFav && x.kidFav) sc+=15; sc+=Math.random()*2; return {x,sc}; }).sort((a,b)=>b.sc-a.sc);
-  return scored.length?scored[0].x.id:null;
+  const ranked=rankSides(recipe, preferKidFav);
+  // a little randomness among the top 3 that aren't excluded
+  const pool=ranked.filter(id=>!(exclude||[]).includes(id));
+  const top=(pool.length?pool:ranked).slice(0,3);
+  return top.length ? top[Math.floor(Math.random()*Math.min(top.length, 2))] : null;
 }
-function cycleSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e||!e.recipeId) return; const r=byIdAll(e.recipeId); const next=pickSide(Object.assign({},r,{noSide:false}),[e.side]); e.side=next||e.side; planSet(plan,day,slot,e); scheduleSave(); renderPlan(); }
+// ↻ walks down the ranked list instead of bouncing between two
+function cycleSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e||!e.recipeId) return; const r=byIdAll(e.recipeId); const ranked=rankSides(r); if(!ranked.length) return; const i=ranked.indexOf(e.side); e.side=ranked[(i+1)%ranked.length]; planSet(plan,day,slot,e); scheduleSave(); renderPlan(); }
+// Fix sides already saved on a plan that break the rules (e.g. mac & cheese + cheesy broccoli rice)
+function fixSideConflicts(){
+  let changed=false;
+  [state.weekPlan||{}, state.nextWeekPlan||{}].forEach(plan=>{
+    const used=[];
+    Object.keys(plan).forEach(k=>{ const e=plan[k]; if(e&&e.side) used.push(e.side); });
+    Object.keys(plan).forEach(k=>{ const e=plan[k]; if(!e||!e.recipeId||!e.side) return; const r=byIdAll(e.recipeId); if(!r) return;
+      if(!sideFits(r,e.side)){ const nx=pickSide(r, used); if(nx){ e.side=nx; used.push(nx); changed=true; } else { delete e.side; changed=true; } } });
+  });
+  if(changed) scheduleSave();
+  return changed;
+}
 function removeSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e) return; delete e.side; e.noSide=true; planSet(plan,day,slot,e); scheduleSave(); renderPlan(); }
 function addSide(day, slot){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e||!e.recipeId) return; const r=byIdAll(e.recipeId); delete e.noSide; e.side=pickSide(Object.assign({},r,{noSide:false}),[]); planSet(plan,day,slot,e); scheduleSave(); renderPlan(); }
 // Which side is attached to a recipe anywhere on the visible/this-week plan?
@@ -8338,6 +8390,7 @@ function cookPrepList(){
 }
 
 function renderPlan() {
+  try { fixSideConflicts(); } catch (e) {}
   const el = document.getElementById("page-plan");
   if (!el) return;
 
@@ -13525,7 +13578,7 @@ async function sendChatMessage() {
   const recipeContext = c ? `This conversation is about ONE recipe — the one the user has open right now. Answer about it; "this", "it", "the recipe" all mean this recipe: ${JSON.stringify({
     name: c.name, description: c.description, servings: c.servings, time: (typeof timeLabel === "function" ? timeLabel(c) : c.time),
     equipment: c.equipment, ingredients: c.ingredients, instructions: c.instructions, tips: c.tips, kidNote: c.kidNote
-  })}. ` : "The user is not looking at a specific recipe right now. ";
+  })}. ${(function(){ const sd = typeof sideForRecipe === "function" ? sideForRecipe(c.id) : null; return sd ? "It's planned with this side: " + sd.name + ". " : ""; })()}When judging a side, a plate wants one starch, one protein and a vegetable — flag two starches or two heavy/cheesy components. ` : "The user is not looking at a specific recipe right now. ";
 
   // Build system prompt
   const systemPrompt = `You are a knowledgeable home cooking assistant for the Lemmon family meal planning app. 
