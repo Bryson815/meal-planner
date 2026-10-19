@@ -1884,7 +1884,7 @@ const DEFAULT_LUNCHES = [
     active:true
   },
   {
-    id:"lunch9", usesLeftoversFrom:["dinner45"], quick:true,
+    id:"lunch9", usesLeftoversFrom:["dinner45"], quick:true, isSide:true, sideId:"side-broccoli-rice",
     name:"Cheesy Broccoli Rice (Side)",
     emoji:"🥦",
     audience:"family",
@@ -7721,7 +7721,7 @@ const SIDES = [
     ingredients:["2 cups frozen corn (or 3 ears, kernels cut off)","1 tbsp butter","¼ tsp kosher salt","Tajín for the adults","Lime wedge"],
     steps:["Microwave 2 cups corn with 1 tbsp water, covered, 3 min. Drain.","Stir in 1 tbsp butter + ¼ tsp salt. Plate the kids' portion. Tajín + lime on the adults'."],
     kidNote:"Sweet corn with butter — zero resistance." },
-  { id:"side-broccoli-rice", role:"starch", rich:true, veg:"broccoli|rice", name:"Cheesy Broccoli Rice", emoji:"🧀", method:"stove", cuisine:["american","any"], vegServings:2,
+  { id:"side-broccoli-rice", role:"starch", rich:true, veg:"broccoli|rice", kidFav:true, recipeId:"lunch9", name:"Cheesy Broccoli Rice", emoji:"🧀", method:"stove", cuisine:["american","any"], vegServings:2,
     ingredients:["1 cup jasmine rice","3 cups broccoli, chopped small (leftover chopped broccoli is perfect)","1 cup sharp cheddar, shredded","1 tbsp butter","½ tsp kosher salt"],
     steps:["Cook 1 cup rice per package, lid on. In the last 5 min, pile 3 cups chopped broccoli on top and re-cover.","Off heat: fold in 1 cup cheddar + 1 tbsp butter + ½ tsp salt. Lid on 2 min to melt."],
     kidNote:"The soup in rice form. This is the side the girls ask for." },
@@ -7767,9 +7767,59 @@ function rankSides(recipe, preferKidFav){
     if(used.oven && x.method==="oven") sc-=8; if(used.stove && x.method==="stove") sc-=3;
     if(x.method==="micro"||x.method==="raw") sc+=2;
     if(preferKidFav && x.kidFav) sc+=15;
+    if(sideUsesUp(x)) sc+=18;
     scored.push({x,sc});
   });
   return scored.sort((a,b)=>b.sc-a.sc).map(o=>o.x.id);
+}
+
+function planToast(msg){ try { let t=document.getElementById("plan-toast"); if(!t){ t=document.createElement("div"); t.id="plan-toast"; t.style.cssText="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:900;background:#064e3b;color:#d1fae5;border:1px solid rgba(134,239,172,0.4);padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:90vw;text-align:center"; document.body.appendChild(t); } t.textContent=msg; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>{t.style.display="none";},4500); } catch(e){} }
+// "+ Week" on a side recipe: put it on the best-fitting planned dinner instead of a lunch slot
+function attachSideToWeek(r){
+  const sid=sideIdForRecipe(r); const plan=activePlan(); if(!sid){ planToast("That side isn't linked yet."); return; }
+  const dinners=PLAN_DAYS.map(d=>[d,planGet(plan,d,"dinner")]).filter(([d,e])=>e&&e.recipeId);
+  if(!dinners.length){ planToast("Plan a dinner first — sides ride along with a dinner."); return; }
+  const fit=dinners.find(([d,e])=>e.side!==sid && rankSides(byIdAll(e.recipeId)).includes(sid)) || dinners.find(([d,e])=>e.side!==sid);
+  if(!fit){ planToast("Already on this week's plan."); return; }
+  const [d,e]=fit; e.side=sid; e.sideManual=true; delete e.noSide; planSet(plan,d,"dinner",e); scheduleSave(); renderPlan(); if(typeof renderVault==="function") try{renderVault();}catch(x){}
+  planToast("🥦 "+SIDES_BY_ID[sid].name+" added as "+d+"'s side — tap the side on the plan to move it");
+}
+function isSideRecipe(r){ return !!(r && (r.isSide || /\(side\)\s*$/i.test(r.name || ""))); }
+function sideIdForRecipe(r){ if(!r) return null; if(r.sideId && SIDES_BY_ID[r.sideId]) return r.sideId; const hit=SIDES.find(x=>x.recipeId===r.id); return hit?hit.id:null; }
+// does this side use up something on the Use-it-up list?
+function sideUsesUp(x){ try { const items=useUpUnplanned(); if(!items.length) return null; const txt=(x.name+" "+(x.ingredients||[]).join(" ")).toLowerCase(); const hit=items.find(it=>useUpTokens(it.text).some(t=>t.length>2&&!/^(chopped|sliced|diced|minced|leftover|leftovers|cooked|fresh|frozen|small|large|bag|half|extra|some|raw|cut|whole)$/.test(t)&&new RegExp("\\b"+t).test(txt))); return hit?hit.text:null; } catch(e){ return null; } }
+// Side chooser on a planned dinner: every side, with an honest fit label. Manual picks always allowed.
+let sidePickOpen=null;
+function openSidePicker(day, slot){ sidePickOpen=(sidePickOpen&&sidePickOpen.day===day&&sidePickOpen.slot===slot)?null:{day,slot}; renderPlan(); }
+function chooseSide(day, slot, id){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e) return; e.side=id; e.sideManual=true; delete e.noSide; planSet(plan,day,slot,e); sidePickOpen=null; scheduleSave(); renderPlan(); }
+function sidePickerHtml(day, slot, r, cur){
+  const ranked=rankSides(r), mp=mainProfile(r);
+  const rows=SIDES.slice().sort((a,b)=>{ const ia=ranked.indexOf(a.id), ib=ranked.indexOf(b.id); return (ia<0?99:ia)-(ib<0?99:ib); }).map(x=>{
+    const fits=ranked.includes(x.id), uu=sideUsesUp(x);
+    let why = fits ? (ranked.indexOf(x.id)<3?'<span style="color:#86efac">good match</span>':'<span style="color:var(--dim)">works</span>')
+      : (mp.starch && x.role==="starch" ? '<span style="color:#fbbf24">2nd starch</span>' : mp.rich && x.rich ? '<span style="color:#fbbf24">heavy with this</span>' : '<span style="color:var(--dim)">ok</span>');
+    const tags=[x.kidFav?'👧':'', uu?'<span style="color:#86efac">🥡 uses '+esc(uu)+'</span>':''].filter(Boolean).join(' ');
+    return `<button onclick="event.stopPropagation();chooseSide('${day}','${slot}','${x.id}')" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 8px;border-radius:8px;border:1px solid ${x.id===cur?'rgba(134,239,172,0.55)':'rgba(255,255,255,0.07)'};background:${x.id===cur?'rgba(16,185,129,0.12)':'transparent'};color:var(--text);font-size:12.5px;cursor:pointer;margin-bottom:4px"><span style="font-size:16px">${x.emoji}</span><span style="flex:1;min-width:0"><b style="font-weight:600">${esc(x.name)}</b><span style="display:block;font-size:11px">${why}${tags?' · '+tags:''}</span></span>${x.recipeId?`<span onclick="event.stopPropagation();spPeek('${x.recipeId}')" style="font-size:11px;color:var(--dim);padding:2px 6px;border:1px solid rgba(255,255,255,0.12);border-radius:6px">👁</span>`:''}</button>`;
+  }).join("");
+  return `<div class="plan-move-pop" onclick="event.stopPropagation()" style="margin:-2px 0 6px;padding:8px;border-radius:10px;background:rgba(16,185,129,0.05);border:1px dashed rgba(134,239,172,0.35)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:11px;color:var(--dim)">Pick the side — best fits first</span><button onclick="sidePickOpen=null;renderPlan()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px">✕</button></div>${rows}</div>`;
+}
+// A side recipe that got placed as a lunch → move it onto a dinner that week as that dinner's side
+function migrateSideLunches(){
+  let msg=null;
+  [["this",state.weekPlan||{}],["next",state.nextWeekPlan||{}]].forEach(([wk,plan])=>{
+    Object.keys(plan).forEach(k=>{
+      const e=plan[k]; if(!e||!e.recipeId||!/_lunch$/.test(k)) return;
+      const r=byIdAll(e.recipeId); if(!isSideRecipe(r)) return;
+      const sid=sideIdForRecipe(r); const day=k.replace(/_lunch$/,"");
+      const order=[day, ...PLAN_DAYS.slice(PLAN_DAYS.indexOf(day)+1), ...PLAN_DAYS.slice(0,PLAN_DAYS.indexOf(day)).reverse()];
+      let target=null;
+      if(sid){ for(const d of order){ const de=plan[d+"_dinner"]; if(de&&de.recipeId){ const dr=byIdAll(de.recipeId); if(dr&&rankSides(dr).includes(sid)){ target=d; break; } } } }
+      if(!target && sid){ for(const d of order){ const de=plan[d+"_dinner"]; if(de&&de.recipeId){ target=d; break; } } }
+      delete plan[k];
+      if(target){ plan[target+"_dinner"].side=sid; plan[target+"_dinner"].sideManual=true; delete plan[target+"_dinner"].noSide; msg=(r.name||"Side").replace(/\s*\(side\)\s*$/i,"")+" moved from "+day.slice(0,3)+" lunch to "+target+" dinner's side"; }
+    });
+  });
+  if(msg){ scheduleSave(); setTimeout(()=>planToast("🥦 "+msg), 300); }
 }
 function sideFits(recipe, sideId){ return rankSides(recipe).includes(sideId); }
 function pickSide(recipe, exclude, preferKidFav){
@@ -7789,7 +7839,7 @@ function fixSideConflicts(){
     const used=[];
     Object.keys(plan).forEach(k=>{ const e=plan[k]; if(e&&e.side) used.push(e.side); });
     Object.keys(plan).forEach(k=>{ const e=plan[k]; if(!e||!e.recipeId||!e.side) return; const r=byIdAll(e.recipeId); if(!r) return;
-      if(!sideFits(r,e.side)){ const nx=pickSide(r, used); if(nx){ e.side=nx; used.push(nx); changed=true; } else { delete e.side; changed=true; } } });
+      if(!e.sideManual && !sideFits(r,e.side)){ const nx=pickSide(r, used); if(nx){ e.side=nx; used.push(nx); changed=true; } else { delete e.side; changed=true; } } });
   });
   if(changed) scheduleSave();
   return changed;
@@ -8390,7 +8440,7 @@ function cookPrepList(){
 }
 
 function renderPlan() {
-  try { fixSideConflicts(); } catch (e) {}
+  try { migrateSideLunches(); fixSideConflicts(); } catch (e) {}
   const el = document.getElementById("page-plan");
   if (!el) return;
 
@@ -8485,8 +8535,8 @@ function renderPlan() {
             </div>
           </div>
           ${slot.key==="dinner" ? (entry.side && SIDES_BY_ID[entry.side]
-            ? `<div class="side-line" style="display:flex;align-items:center;gap:6px;padding:4px 10px 6px 76px;margin:-2px 0 4px;font-size:12px;color:#86efac"><span style="flex:1;min-width:0">🥦 + ${esc(SIDES_BY_ID[entry.side].name)}</span><button onclick="cycleSide('${day}','${slot.key}')" title="Different side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">↻</button><button onclick="removeSide('${day}','${slot.key}')" title="No side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">✕</button></div>`
-            : (recipe.noSide ? "" : `<div class="side-line" style="padding:2px 10px 6px 76px;margin:-2px 0 4px;font-size:12px"><button onclick="addSide('${day}','${slot.key}')" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:2px 0;min-height:28px">🥦 + add a side</button></div>`)) : ""}${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key ? planMovePopoverHtml(day, slot.key) : ""}`;
+            ? `<div class="side-line" style="display:flex;align-items:center;gap:6px;padding:4px 10px 6px 76px;margin:-2px 0 4px;font-size:12px;color:#86efac"><span onclick="openSidePicker('${day}','${slot.key}')" title="Choose the side" style="flex:1;min-width:0;cursor:pointer;text-decoration:underline dotted rgba(134,239,172,0.4);text-underline-offset:3px">🥦 + ${esc(SIDES_BY_ID[entry.side].name)}${SIDES_BY_ID[entry.side].kidFav?' <span title="Kid favorite">👧</span>':''}</span><button onclick="cycleSide('${day}','${slot.key}')" title="Different side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">↻</button><button onclick="removeSide('${day}','${slot.key}')" title="No side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">✕</button></div>`
+            : (recipe.noSide ? "" : `<div class="side-line" style="padding:2px 10px 6px 76px;margin:-2px 0 4px;font-size:12px"><button onclick="openSidePicker('${day}','${slot.key}')" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:2px 0;min-height:28px">🥦 + add a side</button></div>`)) + (sidePickOpen&&sidePickOpen.day===day&&sidePickOpen.slot===slot.key ? sidePickerHtml(day, slot.key, recipe, entry.side) : "") : ""}${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key ? planMovePopoverHtml(day, slot.key) : ""}`;
       } else {
         return `
           <div onclick="openDaySlotPicker('${day}','${slot.key}')" class="plan-slot-empty" ondragover="planDragOver(event,'${slot.key}')" ondragleave="planDragLeave(event)" ondrop="planDrop(event,planWeekView,'${day}','${slot.key}')"
@@ -8629,7 +8679,7 @@ function filterDayPicker(query) {
   // Group by type
   const dinners = filtered.filter(r => state.dinners.some(d => d.id === r.id));
   const breakfasts = filtered.filter(r => state.breakfasts.some(d => d.id === r.id));
-  const lunches = filtered.filter(r => state.lunches.some(d => d.id === r.id));
+  const lunches = filtered.filter(r => state.lunches.some(d => d.id === r.id) && !isSideRecipe(r));
 
   function recipeBtn(r) {
     const assigned = Object.entries(activePlan()).find(([d,a]) => a && a.recipeId === r.id);
@@ -8747,7 +8797,8 @@ function renderVault() {
   // Group by category
   const dinners = sorted.filter(r => state.dinners.some(d=>d.id===r.id));
   const breakfasts = sorted.filter(r => state.breakfasts.some(d=>d.id===r.id));
-  const lunches = sorted.filter(r => state.lunches.some(d=>d.id===r.id));
+  const lunches = sorted.filter(r => state.lunches.some(d=>d.id===r.id) && !isSideRecipe(r));
+  const sideRecipes = sorted.filter(r => isSideRecipe(r));
   const desserts = sorted.filter(r => state.desserts && state.desserts.some(d=>d&&d.id===r.id));
 
   function vaultCard(r) {
@@ -8814,12 +8865,14 @@ function renderVault() {
     ${section("🍽️ Dinners", dinners)}
     ${section("⚡ Breakfasts", breakfasts)}
     ${section("🥗 Lunches", lunches)}
+    ${section("🥦 Sides", sideRecipes)}
     ${section("🍫 Desserts", desserts)}
     <div style="height:30px"></div>
   `;
 }
 
 function quickAssignToWeek(recipeId) {
+  { const r0 = byIdAll(recipeId); if (isSideRecipe(r0)) { attachSideToWeek(r0); return; } }
   const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
   // Find first unassigned day
   const section = state.dinners.some(r=>r&&r.id===recipeId) ? "dinner" : state.breakfasts.some(r=>r&&r.id===recipeId) ? "breakfast" : "lunch";
