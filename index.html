@@ -810,7 +810,7 @@ body[class*="plan-dragging-"] .plan-slot-row,body[class*="plan-dragging-"] .plan
     <div class="nav-title">🥗 <span class="nav-title-long">Lemmon Family Meal Planner</span><span class="nav-title-short">Lemmon Meals</span></div>
     <div class="sync-status offline" id="syncStatus">Connecting…</div>
   </div>
-  <button class="nav-cook-mobile" onclick="window.chatContext=null;openChatAssistant(null);renderChatMessages()">💬 Ask</button>
+  <button class="nav-cook-mobile" onclick="openChatAssistant(null)">💬 Ask</button>
   <div class="nav-tabs">
     <button class="tab-btn active" onclick="showTab('plan')" title="Plan"><span class="tab-icon">📅</span><span class="tab-label">Plan</span></button>
     <button class="tab-btn" onclick="showTab('vault')" title="Recipe Vault"><span class="tab-icon">🗄️</span><span class="tab-label">Vault</span></button>
@@ -7188,7 +7188,7 @@ function viewRecipe(section, id) {
         ${item.audience ? `<div style="margin-bottom:8px"><span class="tag ${item.audience==='adults'?'tag-amber':'tag-pink'}">${item.audience==='adults'?'🍷 Adults night':'👨‍👩‍👧‍👧 Family'}</span></div>` : ''}
         ${item.kidNote ? `<div class="info-box" style="border-color:rgba(236,72,153,0.3);background:rgba(236,72,153,0.07);margin-bottom:10px"><span class="info-label" style="color:#f472b6">👧 KIDS:</span>${esc(item.kidNote)}</div>` : ''}
         ${(function(){ const sd=(section==="dinner")?sideForRecipe(item.id):null; if(!sd) return ""; return `<details class="info-box" style="border-color:rgba(134,239,172,0.35);background:rgba(16,185,129,0.06);margin-bottom:10px;padding:10px 12px"><summary style="cursor:pointer;font-weight:700;color:#86efac;list-style:none">🥦 Tonight's side: ${esc(sd.name)} <span style="font-weight:400;color:var(--dim);font-size:12px">· ${sd.method==="oven"?"oven":sd.method==="stove"?"stovetop":sd.method==="micro"?"microwave":"no cook"} · tap for steps</span></summary><div style="margin-top:8px;font-size:13px;color:var(--muted)"><div style="margin-bottom:6px">${sd.ingredients.map(esc).join(" · ")}</div>${sd.steps.map((st,i)=>`<div style="padding:3px 0"><b style="color:var(--text)">${i+1}.</b> ${esc(st)}</div>`).join("")}${sd.kidNote?`<div style="margin-top:6px;color:#f472b6">👧 ${esc(sd.kidNote)}</div>`:""}</div></details>`; })()}
-        <button class="desk-only" onclick="window.chatContext=arguments[0];openChatAssistant(arguments[0]);renderChatMessages()" onmousedown="(function(){const allR=[...state.dinners,...state.breakfasts,...state.lunches,...state.desserts];window.chatContext=allR.find(r=>r&&r.id==='${item.id}');})()" style="width:100%;margin-top:8px;padding:10px;border-radius:12px;border:1px solid rgba(16,185,129,0.3);background:transparent;color:var(--green);font-weight:600;font-size:14px;cursor:pointer">
+        <button class="desk-only" onclick="askAboutRecipe('${item.id}')" style="width:100%;margin-top:8px;padding:10px;border-radius:12px;border:1px solid rgba(16,185,129,0.3);background:transparent;color:var(--green);font-weight:600;font-size:14px;cursor:pointer">
         👨‍🍳 Ask About This Recipe
       </button>
       <button class="desk-only" onclick="closeModalForce();startCooking('${section}','${item.id}')"
@@ -7213,7 +7213,7 @@ function viewRecipe(section, id) {
       <button class="modal-close" onclick="closeModalForce()">✕</button>
     </div>
     <div class="modal-sticky-actions mobile-only">
-      <button onclick="window.chatContext=(function(){const allR=[...state.dinners,...state.breakfasts,...state.lunches,...state.desserts];return allR.find(r=>r&&r.id==='${item.id}');})();openChatAssistant(window.chatContext);renderChatMessages()" style="flex:1;padding:14px;border-radius:14px;border:1px solid rgba(16,185,129,0.4);background:transparent;color:var(--green);font-weight:700;font-size:15px">👨‍🍳 Ask</button>
+      <button onclick="askAboutRecipe('${item.id}')" style="flex:1;padding:14px;border-radius:14px;border:1px solid rgba(16,185,129,0.4);background:transparent;color:var(--green);font-weight:700;font-size:15px">👨‍🍳 Ask</button>
       <button onclick="closeModalForce();startCooking('${section}','${item.id}')" style="flex:2;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#07090f;font-weight:800;font-size:16px">Start Cooking →</button>
     </div>
     <div class="scale-row">
@@ -13428,13 +13428,23 @@ window.addEventListener("hashchange", checkUrlImport);
 let chatHistory = [];
 let chatLoading = false;
 
+// One conversation per recipe (plus one general thread). Switching recipes parks the old thread and
+// opens that recipe's own — so chicken questions never bleed into the tuna chat, and coming back resumes.
+let chatThreads = {}; let chatThreadKey = "general";
+function askAboutRecipe(id) {
+  const r = [...(state.dinners||[]), ...(state.breakfasts||[]), ...(state.lunches||[]), ...(state.desserts||[])].find(x => x && x.id === id);
+  openChatAssistant(r || null);
+}
 function openChatAssistant(contextRecipe) {
   const modal = document.getElementById("chat-assistant-modal");
   if (!modal) return;
-  // Set context if viewing a recipe
-  if (contextRecipe) {
-    window.chatContext = contextRecipe;
-  }
+  const ctx = (contextRecipe && contextRecipe.id && contextRecipe.name) ? contextRecipe : null;
+  const key = ctx ? ctx.id : "general";
+  if (key !== chatThreadKey) { chatThreads[chatThreadKey] = chatHistory; chatHistory = chatThreads[key] || []; chatThreadKey = key; }
+  window.chatContext = ctx;
+  const sub = document.getElementById("chat-subtitle");
+  if (sub) sub.innerHTML = ctx ? "About: <b style=\"color:var(--text)\">" + esc(ctx.name) + "</b>" : "Ask anything about cooking";
+  renderChatMessages();
   modal.style.display = "flex";
   setTimeout(() => {
     const inp = document.getElementById("chat-input");
@@ -13448,7 +13458,7 @@ function closeChatAssistant() {
 }
 
 function clearChat() {
-  chatHistory = [];
+  chatHistory = []; chatThreads[chatThreadKey] = [];
   renderChatMessages();
 }
 
@@ -13461,7 +13471,7 @@ function renderChatMessages() {
       <div style="text-align:center;padding:30px 20px;color:var(--dim)">
         <div style="font-size:32px;margin-bottom:10px">👨‍🍳</div>
         <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">Recipe Assistant</div>
-        <div style="font-size:13px">Ask anything about cooking, substitutions, technique, macros, or any recipe in your vault.</div>
+        <div style="font-size:13px">${window.chatContext ? "Ask anything about <b style=\"color:var(--text)\">" + esc(window.chatContext.name) + "</b> — timing, swaps, make-ahead, how to scale it." : "Ask anything about cooking, substitutions, technique, macros, or any recipe in your vault."}</div>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:6px">
           ${["Can I use oat flour instead of blending oats?","What temp should I cook chicken thighs to?","How do I fix a sauce that's too salty?","What can I substitute for buttermilk?"].map(q =>
             `<button onclick="sendSuggestedQuestion('${q}')" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:var(--muted);font-size:13px;cursor:pointer;text-align:left">${q}</button>`
@@ -13511,12 +13521,11 @@ async function sendChatMessage() {
   renderChatMessages();
 
   // Build context about current recipe if viewing one
-  const recipeContext = window.chatContext ? `The user is currently viewing this recipe: ${JSON.stringify({
-    name: window.chatContext.name,
-    ingredients: window.chatContext.ingredients,
-    instructions: window.chatContext.instructions,
-    tips: window.chatContext.tips
-  })}. ` : "";
+  const c = window.chatContext;
+  const recipeContext = c ? `This conversation is about ONE recipe — the one the user has open right now. Answer about it; "this", "it", "the recipe" all mean this recipe: ${JSON.stringify({
+    name: c.name, description: c.description, servings: c.servings, time: (typeof timeLabel === "function" ? timeLabel(c) : c.time),
+    equipment: c.equipment, ingredients: c.ingredients, instructions: c.instructions, tips: c.tips, kidNote: c.kidNote
+  })}. ` : "The user is not looking at a specific recipe right now. ";
 
   // Build system prompt
   const systemPrompt = `You are a knowledgeable home cooking assistant for the Lemmon family meal planning app. 
@@ -13567,7 +13576,7 @@ init().catch(function(e) {
         <span style="font-size:20px">👨‍🍳</span>
         <div>
           <div style="font-size:15px;font-weight:700;color:var(--text)">Recipe Assistant</div>
-          <div style="font-size:11px;color:var(--dim)">Ask anything about cooking</div>
+          <div id="chat-subtitle" style="font-size:11px;color:var(--dim)">Ask anything about cooking</div>
         </div>
       </div>
       <div style="display:flex;gap:8px">
@@ -13590,7 +13599,7 @@ init().catch(function(e) {
 </div>
 
 <!-- Floating chat button -->
-<button id="chat-fab" class="chat-fab" onclick="window.chatContext=null;openChatAssistant(null);renderChatMessages()" 
+<button id="chat-fab" class="chat-fab" onclick="openChatAssistant(null)" 
   style="position:fixed;bottom:20px;right:16px;width:52px;height:52px;border-radius:50%;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-size:22px;cursor:pointer;z-index:400;box-shadow:0 4px 16px rgba(16,185,129,0.4);display:flex;align-items:center;justify-content:center">
   👨‍🍳
 </button>
