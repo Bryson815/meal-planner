@@ -7808,6 +7808,7 @@ async function loadFromSupabase() {
       if (plan.swaps)      state.swaps      = plan.swaps;
       if (plan.spiceBlends) state.spiceBlends = plan.spiceBlends;
       state.recipeRev = plan.recipeRev || null;
+      if (plan.shopPicks) state.shopPicks = plan.shopPicks; if (plan.shopPicksWeek) state.shopPicksWeek = plan.shopPicksWeek;
       if (plan.userEmail)  state.userEmail  = plan.userEmail;
       if (plan.wifeEmail)  state.wifeEmail  = plan.wifeEmail;
       if (plan.store)      state.store      = plan.store;
@@ -7837,7 +7838,7 @@ async function saveToSupabase() {
   if (!supabase) { saveToLocal(); return; }
   setSyncStatus("saving");
   try {
-    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{}, planDefaults: state.planDefaults||null, uiPrefs: state.uiPrefs||{}, useUp: state.useUp||[], recipeRev: state.recipeRev||null };
+    const plan = { breakfasts: state.breakfasts, lunches: state.lunches, dinners: state.dinners, desserts: state.desserts, swaps: state.swaps, spiceBlends: state.spiceBlends, userEmail: state.userEmail, wifeEmail: state.wifeEmail, store: state.store, grocery: state.grocery, useStaticGrocery: state.useStaticGrocery, pantry: state.pantry, alexaOnlyItems: state.alexaOnlyItems, alexaSyncTime: state.alexaSyncTime, ratings: state.ratings, activeRecipes: state.activeRecipes, sauces: state.sauces, weekPlan: state.weekPlan, nextWeekPlan: state.nextWeekPlan||{}, cookHistory: state.cookHistory, groceryNotes: state.groceryNotes, prepDone: state.prepDone||{}, lunchbox: state.lunchbox||{}, planDefaults: state.planDefaults||null, uiPrefs: state.uiPrefs||{}, useUp: state.useUp||[], recipeRev: state.recipeRev||null, shopPicks: state.shopPicks||{}, shopPicksWeek: state.shopPicksWeek||null };
     await supabase.from("meal_plan").upsert({ id: "family", plan, updated_at: new Date().toISOString() });
     saveToLocal();
     setSyncStatus("saved");
@@ -7970,6 +7971,11 @@ function instacartSlug() { return INSTACART_SLUGS[state.store] || "kroger"; }
 // Turn an ingredient line into something Instacart's search understands: product only, no prep words, no notes
 function productPhrase(text) {
   let t = String(text || "");
+  t = t.replace(/^\s*(?:the\s+)?(?:juice|zest)(?:\s+and\s+(?:juice|zest))?\s+of\s+(?:\d+\s*|½\s*|a\s+|an\s+|half\s+(?:a\s+)?)?/i, "");   // "Juice of 1 lemon" → lemon
+  t = t.replace(/\b(wedges?|halves|slices?)\b(?!\s+of)/gi, m => /wedges?/i.test(m) ? "" : m);                         // "Lime wedge" → lime
+  t = t.replace(/\bfreshly\b/gi, "");
+  t = t.split(/\s(?:added|broken|drizzled|scattered|torn|tossed|right before|at the end)\b/i)[0];   // "Prosciutto added after baking" → Prosciutto
+  t = t.replace(/\s+(drizzle|sprinkle|dusting)\s*$/i, "");
   t = t.replace(/\([^)]*\)/g, " ");                 // (notes)
   t = t.split(/\s[—–-]\s/)[0];                      // — trailing notes
   t = t.replace(/\b(sub|substitute|or)\b:?.*$/i, m => /^or\s/i.test(m) ? "" : "").trim();
@@ -7989,7 +7995,7 @@ function storeHint(text) {
   return "";
 }
 // Unchecked, non-staple items from the planned list, grouped by store section
-function collectShoppingItems() {
+function collectShoppingItems(applyPicks) {
   const cats = buildSmartGroceryList();
   const pantryNeeds = (state.needsGrocery || []);
   const all = [...cats, ...(pantryNeeds.length ? [{ cat: "🧄 Pantry Restock", items: pantryNeeds }] : [])];
@@ -8001,12 +8007,15 @@ function collectShoppingItems() {
     if (!text) return;
     if (typeof condimentOwned === "function" && condimentOwned(text)) return; // marked "Have it" in Our brands
     const section = categorizeGroceryItem(text);
-    (out[section] = out[section] || []).push({ text, phrase: productPhrase(text), sources: (item && item.sources) || [] });
+    const phrase = productPhrase(text);
+    if (/^(water|ice)$/i.test(phrase.trim())) return;
+    if (applyPicks && shopPickState(phrase, text, !!(item && item.opt)).on === false) return;
+    (out[section] = out[section] || []).push({ text, phrase, sources: (item && item.sources) || [], opt: !!(item && item.opt) });
   }));
   return out;
 }
 function buildClaudeListText() {
-  const grouped = collectShoppingItems();
+  const grouped = collectShoppingItems(true);
   const order = ["Produce","Proteins","Dairy & Eggs","Bread & Grains","Frozen","Pantry","Condiments","Spices & Seasonings","Other"];
   const lines = ["Add these to my Instacart cart at " + state.store + ":", ""];
   let n = 0;
@@ -8037,16 +8046,76 @@ async function shareListToMK() {
   try { await navigator.clipboard.writeText(text); flashCopyStatus("✅ Copied — paste it to MK in Messages"); } catch (e) { flashCopyStatus("⚠️ Couldn't copy — long-press the list to select it"); }
 }
 function flashCopyStatus(msg, ms) {
-  const el = document.getElementById("copy-claude-status");
-  if (!el) return; el.textContent = msg; el.style.display = "block";
-  setTimeout(() => { el.style.display = "none"; }, ms || 5000);
+  ["copy-claude-status","copy-claude-status-pv"].forEach(id => { const el = document.getElementById(id);
+    if (!el) return; el.textContent = msg; el.style.display = "block";
+    setTimeout(() => { el.style.display = "none"; }, ms || 5000); });
 }
 
 
 // ── One-tap Instacart list page (via Supabase relay → Instacart Developer Platform) ──
 const INSTACART_RELAY_URL = "https://opnpfaepzhtoozjdzgjv.supabase.co/functions/v1/instacart-list";
+
+// ── Preview before sending: every line with a checkbox; staples/spices/optional start unchecked ──
+const SPICE_RE = /\b(seasoning|powder|paprika|cumin|oregano|thyme|rosemary|herbes de provence|chili powder|cinnamon|nutmeg|cayenne|red pepper flakes|bay lea|dan-o|kinder|tajin|tajín|everything bagel|italian seasoning|taco seasoning|curry powder|garam masala|turmeric|coriander|sesame seeds)\b/i;
+function shopPickState(phrase, text, opt){
+  const k = (phrase||"").toLowerCase();
+  const picks = state.shopPicks || {};
+  let reason = "", def = true;
+  if (typeof condimentOwned === "function" && condimentOwned(text)) { def = false; reason = "you have it"; }
+  else if (typeof STAPLES_RE !== "undefined" && STAPLES_RE.test(k) && !/\b(fit flour|almond flour|oat flour|fresh|bunch|lb|chicken|beef|pork|salmon|shrimp|turkey|cheese|milk|yogurt|cream)\b/i.test(k)) { def = false; reason = "staple"; }
+  else if (SPICE_RE.test(k)) { def = false; reason = "spice — check the cabinet"; }
+  else if (opt) { def = false; reason = "optional / topping"; }
+  const on = (k in picks) ? !!picks[k] : def;
+  return { on, def, reason };
+}
+function shopPreviewItems(){
+  const grouped = collectShoppingItems(false);
+  const order = ["Produce","Proteins","Dairy & Eggs","Bread & Grains","Frozen","Pantry","Condiments","Spices & Seasonings","Other"];
+  const out = [];
+  order.concat(Object.keys(grouped).filter(k=>!order.includes(k))).forEach(sec => {
+    const seen = {};
+    (grouped[sec]||[]).forEach(it => { const k = it.phrase.toLowerCase(); if (!k) return;
+      if (!seen[k]) seen[k] = { sec, phrase: it.phrase, text: it.text, sources: [...(it.sources||[])], opt: it.opt, count: 0 };
+      else { (it.sources||[]).forEach(x=>{ if(!seen[k].sources.includes(x)) seen[k].sources.push(x); }); if(!it.opt) seen[k].opt=false; }
+      seen[k].count++; });
+    Object.values(seen).forEach(v => { const st = shopPickState(v.phrase, v.text, v.opt); out.push(Object.assign(v, st)); });
+  });
+  return out;
+}
+function shopPickToggle(k, on){ state.shopPicks = state.shopPicks || {}; state.shopPicks[k] = !!on; scheduleSave(); renderShopPreview(); }
+function shopPickReset(){ state.shopPicks = {}; scheduleSave(); renderShopPreview(); }
+function shopWeekKey(){ const d=new Date(); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return d.toISOString().slice(0,10); }
+function openShopPreview(){ if (state.shopPicksWeek !== shopWeekKey()) { state.shopPicks = {}; state.shopPicksWeek = shopWeekKey(); } let m=document.getElementById("shop-preview"); if(!m){ m=document.createElement("div"); m.id="shop-preview"; m.className="sp-modal"; m.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:420;display:flex;align-items:flex-end;justify-content:center"; m.onclick=e=>{ if(e.target===m) closeShopPreview(); }; document.body.appendChild(m); } m.style.display="flex"; document.body.classList.add("sheet-open"); renderShopPreview(); }
+function closeShopPreview(){ const m=document.getElementById("shop-preview"); if(m) m.style.display="none"; document.body.classList.remove("sheet-open"); }
+function renderShopPreview(){
+  const m=document.getElementById("shop-preview"); if(!m) return;
+  const items = shopPreviewItems(); const onN = items.filter(i=>i.on).length;
+  let html="", cur="";
+  items.forEach(it => {
+    if (it.sec !== cur) { cur = it.sec; html += `<div style="font-size:11px;font-weight:800;letter-spacing:1px;color:var(--green);text-transform:uppercase;margin:14px 0 6px">${esc(cur)}</div>`; }
+    const k = it.phrase.toLowerCase().replace(/'/g,"\\'");
+    const qty = (it.text.match(/^([\d½¼¾⅓⅔⅛.\/\s-]+)\s*(lbs?|oz|cups?|cans?|jars?|bags?|packs?|packages?|pouches?)\b/i)||[])[0];
+    html += `<label style="display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:10px;margin-bottom:4px;background:${it.on?"rgba(16,185,129,0.07)":"rgba(255,255,255,0.02)"};border:1px solid ${it.on?"rgba(16,185,129,0.25)":"rgba(255,255,255,0.06)"};cursor:pointer;opacity:${it.on?1:0.65}">
+      <input type="checkbox" ${it.on?"checked":""} onchange="shopPickToggle('${k}', this.checked)" style="width:20px;height:20px;margin-top:1px;accent-color:#10b981;flex-shrink:0">
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:var(--text)">${esc(it.phrase)}${it.count>1?` <span style="color:var(--dim);font-weight:500">×${it.count}</span>`:""}${qty?` <span style="color:var(--dim);font-weight:500">(~${esc(qty.trim())})</span>`:""}</div>
+      <div style="font-size:11px;color:var(--dim);margin-top:2px">${esc(it.sources.slice(0,2).join(" · "))}${it.reason?` · <span style="color:${it.on?"#fbbf24":"#94a3b8"}">${esc(it.reason)}</span>`:""}</div></div></label>`;
+  });
+  m.innerHTML = `<div style="background:#0f172a;border-radius:20px 20px 0 0;width:100%;max-width:640px;max-height:88vh;display:flex;flex-direction:column">
+    <div style="padding:16px 18px 10px;border-bottom:1px solid rgba(255,255,255,0.08)">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="font-size:18px;font-weight:800">Review before sending</div><button onclick="closeShopPreview()" style="padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:13px;cursor:pointer">✕ Close</button></div>
+      <div style="font-size:13px;color:var(--dim);margin-top:4px">${onN} of ${items.length} going to ${esc(state.store)}. Staples, spices and optional toppings start unchecked — tick anything you're actually out of. Your picks hold for this week.</div>
+    </div>
+    <div style="overflow-y:auto;padding:4px 18px 12px;flex:1">${items.length?html:'<div style="padding:30px;text-align:center;color:var(--dim)">Nothing on the list.</div>'}</div>
+    <div style="padding:12px 18px 18px;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="shopPickReset()" style="padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:13px;cursor:pointer">Reset picks</button>
+      <button onclick="copyListForClaude()" ${onN?"":"disabled"} style="flex:1;min-width:150px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-weight:800;font-size:14px;cursor:pointer">🛒 Copy ${onN} for Claude</button>
+      <button onclick="openInstacartList(this)" ${onN?"":"disabled"} style="flex:1;min-width:150px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:800;font-size:14px;cursor:pointer">🥕 Send ${onN} to Instacart</button>
+    </div>
+    <div id="copy-claude-status-pv" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:0 0 12px"></div>
+  </div>`;
+}
 async function openInstacartList(btn) {
-  const grouped = collectShoppingItems();
+  const grouped = collectShoppingItems(true);
   const seen = {};
   Object.values(grouped).flat().forEach(it => {
     const k = it.phrase.toLowerCase(); if (!k) return;
@@ -9966,16 +10035,20 @@ function buildSmartGroceryList() {
       // not purchases: alternatives, labels, "extra X on top", notes
       if (/^(or|and)\s/i.test(text) || /\bVERSION:|^[A-Z][A-Z\s/&'-]{3,}:\s/.test(text) || /^(extra|the|a few|more)\s/i.test(text) || /\s·\s/.test(text) || /\b(to finish|on top|for max enjoyment|if you went there|if they insist)\b/i.test(text) || /^(squeeze|pinch|dash|splash|drizzle) of\b/i.test(text)) return;
       if (/optional/i.test(curSection) && /upgrade|optional/i.test(curSection)) return; // "ADULT UPGRADE (optional)" sections
+      // not purchases: homemade sauces from the Sauces tab, serving notes, headers-as-lines, water
+      if (/^🫙|\bfrom (the )?sauces tab\b|^serve (with|over|on)\b|^(additions?|optional|garnish(es)?|toppings?|to serve)\s*[:(]/i.test(text)) return;
+      if (/^(water|ice|hot water|cold water|warm water|boiling water)\b/i.test(text) || /:\s*$/.test(text)) return;   // water; "Optional additions:" style headers
+      const optLine = /\b(upgrade|garnish|condiment ideas|for the table)\b/i.test(curSection) || /\(optional\)|\boptional\b|\bif you like\b|\badded after\b|\bbroken over\b|\bright before serving\b/i.test(text);
       if (/^(kosher salt|salt|black pepper|pepper|salt (and|&) (black )?pepper|water|ice)\b/i.test(text) && !/^\s*\d/.test(text)) return;
-      raw.push({ text, source: r.name });
+      raw.push({ text, source: r.name, opt: optLine });
     });
   });
   const seen = new Map();
-  raw.forEach(({text, source}) => {
+  raw.forEach(({text, source, opt}) => {
     const key = (typeof getIngredientKey === "function" ? getIngredientKey(text) : "") ||
       text.toLowerCase().replace(/^[\d\s\/½¼¾⅓⅔⅛.,-]+(tbsp|tsp|cup|cups|oz|lb|lbs|g|cloves?|large|small|medium|can|cans|bunch)?\s*/i, "").split(/[,(]/)[0].trim();
-    if (!seen.has(key)) seen.set(key, { text, sources: [source] });
-    else if (!seen.get(key).sources.includes(source)) seen.get(key).sources.push(source);
+    if (!seen.has(key)) seen.set(key, { text, sources: [source], opt: !!opt });
+    else { const e = seen.get(key); if (!e.sources.includes(source)) e.sources.push(source); if (!opt) e.opt = false; } // needed by any recipe → not optional
   });
   const items = [...seen.values()];
   const lunch = (typeof lbGroceryItems === "function") ? lbGroceryItems(null) : [];
@@ -10066,12 +10139,12 @@ function renderGrocery() {
       </div>
     </div>
     <div class="shop-actions" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-      <button onclick="openInstacartList(this)" style="flex:2;min-width:200px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:800;font-size:14px;cursor:pointer">🥕 Open list in Instacart</button>
-      <button onclick="copyListForClaude()" style="flex:1;min-width:180px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-weight:700;font-size:14px;cursor:pointer">🛒 Copy list for Claude → Instacart</button>
+      <button onclick="openShopPreview()" style="flex:2;min-width:200px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:800;font-size:14px;cursor:pointer">🥕 Open list in Instacart</button>
+      <button onclick="openShopPreview()" style="flex:1;min-width:180px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-weight:700;font-size:14px;cursor:pointer">🛒 Copy list for Claude → Instacart</button>
       <button onclick="openInstacart()" style="flex:1;min-width:120px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-weight:700;font-size:14px;cursor:pointer">🛍️ Open ${esc(state.store)}</button>
       <button onclick="shareListToMK()" style="flex:1;min-width:120px;padding:12px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:var(--text);font-weight:700;font-size:14px;cursor:pointer">📤 Share to MK</button>
     </div>
-    <div style="font-size:12px;color:var(--dim);margin:-4px 0 10px">Fastest path: Copy → paste into Claude → it fills your Instacart cart. 🔎 on any item opens that product search at ${esc(state.store)}.</div>
+    <div style="font-size:12px;color:var(--dim);margin:-4px 0 10px">Both buttons open a review screen first — untick anything you don't need, then send. 🔎 on any item opens that product search at ${esc(state.store)}.</div>
     <div id="copy-claude-status" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:4px 0;margin-bottom:8px"></div>
 
     <div style="display:flex;gap:6px;margin-bottom:10px">
