@@ -5487,10 +5487,10 @@ const DEFAULT_DINNERS = [
       "--- 🍝 PASTA ---",
       "12 oz Brami or Barilla Protein+ elbows or cavatappi (regular pasta works)",
       "1 tbsp kosher salt for the pasta water",
-      "--- 🟢 PANKO TOP (Bowl 4) ---",
-      "1 cup panko",
-      "2 tbsp butter, melted",
-      "¼ cup grated Parmesan",
+      "--- 🟢 PANKO TOP (Bowl 4 — adult half only) ---",
+      "½ cup panko",
+      "1 tbsp butter, melted",
+      "2 tbsp grated Parmesan",
       "--- 🌶️ ADULT UPGRADES ---",
       "Cholula or Frank's · crumbled turkey bacon · extra Dijon"
     ],
@@ -5504,7 +5504,7 @@ const DEFAULT_DINNERS = [
       "🔵 BOWL 2 (seasoning) — 1 tsp Dijon + ½ tsp garlic powder + ½ tsp salt + ¼ tsp pepper + 1 pinch nutmeg in a small cup.",
       "🟣 BOWL 3 (milk) — Measure 3 cups whole milk into a large measuring cup.",
       "🫙 STOVE SIDE — Measure ¼ cup flour into a small cup. Set 4 tbsp butter beside the stove.",
-      "🟢 BOWL 4 (panko top) — 1 cup panko + 2 tbsp melted butter + ¼ cup Parmesan. Toss until the crumbs are evenly buttery.",
+      "🟢 BOWL 4 (panko top, adult half) — ½ cup panko + 1 tbsp melted butter + 2 tbsp Parmesan. Toss until the crumbs are evenly buttery. Set aside a small handful of the grated cheddar for the kids' half.",
       "── STILL WAITING ON THE WATER: START THE BÉCHAMEL ──",
       "Melt the 4 tbsp butter in the Dutch oven over MEDIUM, uncovered. When it foams, sprinkle in the ¼ cup flour. Whisk constantly 2 min until it smells nutty — this cooks out the raw flour.",
       "Pour in 🟣 Bowl 3 (3 cups milk) SLOWLY in a thin stream, whisking the whole time — this prevents lumps. Takes about a minute.",
@@ -5518,8 +5518,8 @@ const DEFAULT_DINNERS = [
       "Taste the sauce now. It should be well seasoned — add salt if it is flat.",
       "── ASSEMBLE AND BAKE ──",
       "Add the drained pasta to the cheese sauce and fold until every piece is coated. It will look loose — the pasta drinks it up in the oven.",
-      "Pour into the buttered 9×13 dish. Scatter 🟢 Bowl 4 (panko top) evenly over the surface.",
-      "Bake at 400°F, uncovered, 15-18 min until bubbling at the edges and the panko is deep golden. Broil 1-2 min at the end if you want it darker — watch it.",
+      "Pour into the buttered 9×13 dish. Scatter 🟢 Bowl 4 (panko top) over ONE half only. Kids' half: the reserved handful of cheddar, no crumbs — classic-looking mac.",
+      "Bake at 400°F, uncovered, 15-18 min until bubbling at the edges, the panko is deep golden and the cheddar on the kids' half is melted and spotty-brown. Broil 1-2 min at the end if you want it darker — watch it.",
       "Rest 5 min before serving. It sets up and stops being lava.",
       "── SERVE ──",
       "Kids: scoop straight from the dish, nothing on top. Pair with something fresh and green — buttered peas, cucumber coins or roasted broccoli — and fruit. Not another starch.",
@@ -5527,7 +5527,7 @@ const DEFAULT_DINNERS = [
       "🫙 CONDIMENT IDEAS — plain for the girls · Cholula or Frank's on adult bowls · Fly By Jing chili crisp over the panko · a dab of Dijon stirred in."
     ],
     tips:"BLOCKS, GRATED, ROOM TEMP: Same rule as the soup. Pre-shredded cheese is coated in starch and never melts smooth. | COTTAGE CHEESE BLENDED: 30 seconds in the blender and it is a creamy protein base with no curds. Undetectable. Adds about 25g protein to the dish. | UNDERCOOK THE PASTA: Two minutes under. It bakes 15 more minutes in the sauce. Fully cooked pasta turns to mush. | OFF HEAT FOR CHEESE: The only way this fails is boiling after the cheese goes in. | NOT A MACRO MEAL: 620 calories per serving. This is a Sunday dinner. The protein boost just makes it a better one.",
-    kidNote:"The pot is plain on purpose — no mustard taste comes through, no pepper visible, no toppings. Both girls get it as-is with fruit on the side. If Lucy wants to add Parmesan on top, let her. If the panko top is 'too crunchy,' serve from the middle of the dish.",
+    kidNote:"Oct 2026: the girls weren't into the crumb topping — they know classic mac. Kids' half stays plain with a cheddar top; offer a bite from the crunchy side without pushing, and try again in a few months. The pot is plain on purpose — no mustard taste comes through, no pepper visible, no toppings. Both girls get it as-is with fruit on the side. If Lucy wants to add Parmesan on top, let her. If the panko top is 'too crunchy,' serve from the middle of the dish.",
     active:true
   },
   {
@@ -13756,7 +13756,7 @@ function showImportStatus(msg) {
 
 // Bump RECIPE_REV whenever built-in recipes are edited in code. On next load, saved copies of
 // built-in recipes take the new content once (ratings, notes, plans are stored separately and untouched).
-const RECIPE_REV = "2026-10-19e";
+const RECIPE_REV = "2026-10-19f";
 function refreshBuiltInRecipes() {
   try {
     if (state.recipeRev === RECIPE_REV) return false;
