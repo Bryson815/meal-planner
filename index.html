@@ -7999,6 +7999,7 @@ function collectShoppingItems() {
     if (state.grocery[key]) return; // checked = have it
     const text = typeof item === "string" ? item : (item.text || "");
     if (!text) return;
+    if (typeof condimentOwned === "function" && condimentOwned(text)) return; // marked "Have it" in Our brands
     const section = categorizeGroceryItem(text);
     (out[section] = out[section] || []).push({ text, phrase: productPhrase(text), sources: (item && item.sources) || [] });
   }));
