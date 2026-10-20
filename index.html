@@ -4591,8 +4591,8 @@ const DEFAULT_DINNERS = [
       "1.5 cups fresh mozzarella or shredded whole milk mozzarella",
       "¼ cup freshly grated Parmesan",
       "--- FAMILY FAVORITES ---",
-      "Mini pepperoni",
-      "Sliced Italian sausage",
+      "2 oz mini pepperoni (about ½ cup)",
+      "Optional: 4 oz Italian sausage — pre-cooked chicken sausage links, sliced (Amylu/Aidells), or raw bulk sausage browned first (freeze the rest of the pack)",
       "Fresh basil to finish",
       "Red pepper flakes for adults",
       "--- ADULT UPGRADES ---",
@@ -4608,7 +4608,8 @@ const DEFAULT_DINNERS = [
       "Line a baking sheet with parchment paper or dust a pizza stone with cornmeal.",
       "🟡 BOWL 1 (dry) — 1½ cups (198g) Fit Flour + 1 tsp salt + 1 tsp garlic powder + 1 tsp Italian seasoning. Whisk together.",
       "🔵 BOWL 2 (wet) — 2 large eggs + 2 tbsp olive oil. Beat with a fork. Fill a small cup with 4 tbsp water for adjusting.",
-      "Set out the sauce (½ jar), 1.5 cups mozzarella, ¼ cup Parmesan (grate it from the block now) and any toppings so the pizza can be built fast.",
+      "Set out the sauce (½ jar), 1.5 cups mozzarella, ¼ cup Parmesan (grate it from the block now) and the toppings (½ cup mini pepperoni) so the pizza can be built fast.",
+      "Using raw bulk Italian sausage? Brown 4 oz in a small skillet over MEDIUM, uncovered, breaking it into small crumbles, until no pink remains (160°F) — about a 6-minute job. Drain on a paper towel. Raw sausage will not cook through on the pizza. Pre-cooked links: just slice into thin coins.",
       "── MAKE THE DOUGH ──",
       "Pour 🔵 Bowl 2 (eggs + oil) into 🟡 Bowl 1 (dry). Mix until combined.",
       "Add water 1 tbsp at a time until a smooth dough forms — should not be sticky. Usually 2-3 tbsp total.",
@@ -4619,7 +4620,7 @@ const DEFAULT_DINNERS = [
       "Optional: pre-bake the crust 5 min at 425°F, uncovered, before adding toppings for extra crispiness.",
       "── TOP AND BAKE ──",
       "Spread the ½ jar of sauce evenly leaving a ½ inch border for the crust. Sprinkle the pinch of dried oregano and red pepper flakes over the sauce.",
-      "Add the 1.5 cups mozzarella generously. Add toppings.",
+      "Add the 1.5 cups mozzarella generously. Kids' half: ½ cup mini pepperoni. Sausage (cooked) wherever you want it.",
       "Sprinkle the ¼ cup Parmesan over everything.",
       "Bake at 425°F for 10-12 min, uncovered, until cheese is bubbling and edges are golden.",
       "Optional: broil 2 min for extra color on the cheese — watch closely.",
@@ -10038,7 +10039,7 @@ function buildSmartGroceryList() {
       // not purchases: homemade sauces from the Sauces tab, serving notes, headers-as-lines, water
       if (/^🫙|\bfrom (the )?sauces tab\b|^serve (with|over|on)\b|^(additions?|optional|garnish(es)?|toppings?|to serve)\s*[:(]/i.test(text)) return;
       if (/^(water|ice|hot water|cold water|warm water|boiling water)\b/i.test(text) || /:\s*$/.test(text)) return;   // water; "Optional additions:" style headers
-      const optLine = /\b(upgrade|garnish|condiment ideas|for the table)\b/i.test(curSection) || /\(optional\)|\boptional\b|\bif you like\b|\badded after\b|\bbroken over\b|\bright before serving\b/i.test(text);
+      const optLine = /\b(upgrades?|garnish(es)?|condiment ideas|for the table)\b/i.test(curSection) || /\(optional\)|\boptional\b|\bif you like\b|\badded after\b|\bbroken over\b|\bright before serving\b/i.test(text);
       if (/^(kosher salt|salt|black pepper|pepper|salt (and|&) (black )?pepper|water|ice)\b/i.test(text) && !/^\s*\d/.test(text)) return;
       raw.push({ text, source: r.name, opt: optLine });
     });
@@ -14553,7 +14554,7 @@ function showImportStatus(msg) {
 
 // Bump RECIPE_REV whenever built-in recipes are edited in code. On next load, saved copies of
 // built-in recipes take the new content once (ratings, notes, plans are stored separately and untouched).
-const RECIPE_REV = "2026-10-20b";
+const RECIPE_REV = "2026-10-20c";
 function refreshBuiltInRecipes() {
   try {
     if (state.recipeRev === RECIPE_REV) return false;
