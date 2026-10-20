@@ -8091,14 +8091,15 @@ function shopPreviewItems(){
   const grouped = collectShoppingItems(false);
   const order = ["Produce","Proteins","Dairy & Eggs","Bread & Grains","Frozen","Pantry","Condiments","Spices & Seasonings","Other"];
   const out = [];
+  const seen = {};
   order.concat(Object.keys(grouped).filter(k=>!order.includes(k))).forEach(sec => {
-    const seen = {};
     (grouped[sec]||[]).forEach(it => { const k = it.phrase.toLowerCase().replace(/(?<=[a-z]{3})(es|s)$/,""); if (!k) return;
       if (!seen[k]) seen[k] = { sec, phrase: it.phrase, text: it.text, sources: [...(it.sources||[])], opt: it.opt, count: 0 };
       else { (it.sources||[]).forEach(x=>{ if(!seen[k].sources.includes(x)) seen[k].sources.push(x); }); if(!it.opt) seen[k].opt=false; }
       seen[k].count++; });
-    Object.values(seen).forEach(v => { const st = shopPickState(v.phrase, v.text, v.opt); out.push(Object.assign(v, st)); });
   });
+  const secs = order.concat(Object.keys(grouped).filter(k=>!order.includes(k)));
+  Object.values(seen).sort((a,b)=>secs.indexOf(a.sec)-secs.indexOf(b.sec)).forEach(v => { const st = shopPickState(v.phrase, v.text, v.opt); out.push(Object.assign(v, st)); });
   return out;
 }
 function shopPickToggle(k, on){ state.shopPicks = state.shopPicks || {}; state.shopPicks[k] = !!on; scheduleSave(); renderShopPreview(); }
