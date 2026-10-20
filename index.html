@@ -815,8 +815,7 @@ body[class*="plan-dragging-"] .plan-slot-row,body[class*="plan-dragging-"] .plan
     <button class="tab-btn active" onclick="showTab('plan')" title="Plan"><span class="tab-icon">📅</span><span class="tab-label">Plan</span></button>
     <button class="tab-btn" onclick="showTab('vault')" title="Recipe Vault"><span class="tab-icon">🗄️</span><span class="tab-label">Vault</span></button>
     <button class="tab-btn" onclick="showTab('grocery')" title="Grocery"><span class="tab-icon">🛒</span><span class="tab-label">Shop</span></button>
-    <button class="tab-btn" onclick="showTab('sauces')" title="Sauces"><span class="tab-icon">🫙</span><span class="tab-label">Sauces</span></button>
-    <button class="tab-btn" onclick="showTab('pantry')" title="Pantry"><span class="tab-icon">🧄</span><span class="tab-label">Pantry</span></button>
+    <button class="tab-btn" onclick="showTab('sauces')" title="Our brands + sauces"><span class="tab-icon">🫙</span><span class="tab-label">Brands</span></button>
     <button class="tab-btn" onclick="showTab('history')" title="History"><span class="tab-icon">📖</span><span class="tab-label">History</span></button>
     <button class="tab-btn" onclick="showTab('prep')" title="Prep Order"><span class="tab-icon">🔪</span><span class="tab-label">Prep</span></button>
     <button class="tab-btn" onclick="showTab('eatout')" title="Eat Out"><span class="tab-icon">🍔</span><span class="tab-label">Eat Out</span></button>
@@ -838,13 +837,13 @@ body[class*="plan-dragging-"] .plan-slot-row,body[class*="plan-dragging-"] .plan
   <div class="more-box">
     <div class="more-handle"></div>
     <div class="more-grid">
-      <button onclick="closeMoreSheet();showTab('sauces')"><span>🫙</span>Sauces</button>
-      <button onclick="closeMoreSheet();showTab('pantry')"><span>🧄</span>Pantry</button>
+      <button onclick="closeMoreSheet();showTab('sauces')"><span>🫙</span>Brands</button>
       <button onclick="closeMoreSheet();showTab('history')"><span>📖</span>History</button>
       <button onclick="closeMoreSheet();showTab('prep')"><span>🔪</span>Prep</button>
       <button onclick="closeMoreSheet();showTab('lunchbox')"><span>🍱</span>Lunchbox</button>
       <button onclick="closeMoreSheet();showTab('eatout')"><span>🍔</span>Eat Out</button>
       <button onclick="closeMoreSheet();showTab('settings')"><span>⚙️</span>Settings</button>
+      <button onclick="closeMoreSheet();showTab('pantry')"><span>🧄</span>Pantry</button>
     </div>
   </div>
 </div>
@@ -10406,6 +10405,7 @@ function renderSettings() {
   const connected = !!supabase;
   document.getElementById("page-settings").innerHTML = `
     <div style="font-size:19px;font-weight:700;margin:8px 0 18px">⚙️ Settings</div>
+    <button onclick="showTab('pantry')" style="width:100%;text-align:left;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);color:var(--text);font-size:14px;cursor:pointer;margin-bottom:16px">🧄 Pantry <span style="color:var(--dim);font-size:12px">— optional; the Shop review screen handles this now</span></button>
 
     <div class="setup-banner">
       <div style="font-size:14px;font-weight:600;color:var(--indigo);margin-bottom:8px">☁️ Shared Sync — Supabase Setup</div>
