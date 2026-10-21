@@ -8283,6 +8283,18 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
+const APP_BUILD = 2026102102;   // bump on every deploy; an older open tab reloads itself instead of writing
+function staleCheck(plan){
+  if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
+    let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
+    if (n < 2) { try { sessionStorage.setItem("staleReload", String(n + 1)); } catch (e) {} location.reload(); }
+    return true;
+  }
+  try { sessionStorage.removeItem("staleReload"); } catch (e) {}
+  return false;
+}
+// Keys the cloud has that this version doesn't know about are carried through untouched
+function keepUnknown(remote, merged){ const out = Object.assign({}, merged); Object.keys(remote || {}).forEach(k => { if (!SHARED_KEYS.includes(k) && !(k in out)) out[k] = remote[k]; }); out.appBuild = Math.max(APP_BUILD, (remote && +remote.appBuild) || 0); return out; }
 function sharedSnapshot(){ const o = {}; SHARED_KEYS.forEach(k => { if (state[k] !== undefined) o[k] = state[k]; }); return o; }
 function jsonMap(o){ const m = {}; Object.keys(o || {}).forEach(k => m[k] = _j(o[k])); return m; }
 function applySharedPlan(plan){
@@ -8304,6 +8316,7 @@ function merge3(base, local, remote){
   keys.forEach(k => {
     const lj = _j(local[k]), rj = _j(remote[k]), bj = base && (k in base) ? base[k] : undefined;
     if (lj === rj) { out[k] = local[k]; return; }
+    if (local[k] === undefined) { out[k] = remote[k]; return; }   // missing here ≠ deleted (top-level keys are never deleted)
     const localChanged = bj === undefined ? false : lj !== bj;
     const remoteChanged = bj === undefined ? true : rj !== bj;
     if (localChanged && !remoteChanged) { out[k] = local[k]; return; }
@@ -8352,6 +8365,7 @@ async function loadFromSupabase() {
   try {
     setSyncStatus("loading");
     const { plan, missing } = await fetchCloudPlan();
+    if (staleCheck(plan)) return;
     cloudReady = true;
     if (missing || !plan) { syncBase = {}; await saveToSupabase(); return; }
     const local = sharedSnapshot();
@@ -8371,9 +8385,10 @@ async function saveToSupabase() {
   syncing = true; setSyncStatus("saving");
   try {
     const { plan: remote } = await fetchCloudPlan();
+    if (staleCheck(remote)) { syncing = false; return; }
     const local = sharedSnapshot();
-    const merged = remote ? merge3(syncBase || jsonMap(remote), local, remote) : local;
-    const remoteBrought = _j(merged) !== _j(local);
+    const merged = keepUnknown(remote, remote ? merge3(syncBase || jsonMap(remote), local, remote) : local);
+    const remoteBrought = SHARED_KEYS.some(k => _j(merged[k]) !== _j(local[k]));
     if (remoteBrought) { applySharedPlan(merged); try { renderTab(currentTab); } catch(e) {} }
     const up = await supabase.from("meal_plan").upsert({ id: "family", plan: merged, updated_at: new Date().toISOString() });
     if (up && up.error) throw up.error;
@@ -8389,6 +8404,7 @@ async function pullCloud(){
   if (!supabase || !cloudReady || syncing) return;
   try {
     const { plan } = await fetchCloudPlan(); if (!plan) return;
+    if (staleCheck(plan)) return;
     if (syncBase && _j(jsonMap(plan)) === _j(syncBase)) return;   // nothing new
     const local = sharedSnapshot();
     const merged = merge3(syncBase || jsonMap(plan), local, plan);
