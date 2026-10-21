@@ -8596,7 +8596,7 @@ function renderShopPreview(){
   const items = shopPreviewItems(); const onN = items.filter(i=>i.on).length;
   const rowHtml = (it) => {
     const k = shopKey(it.phrase).replace(/'/g,"\\'");
-    const qty = [((it.text.match(/^[\d½¼¾⅓⅔⅛.\/\s\-–]+(?:(lbs?|oz|cups?|cans?|jars?|bags?|packs?|packages?|pouches?|tbsp|tsp)\b)?/i)||[])[0]||"").trim(), ...(it.text.match(/\(\+[^)]*\)/g)||[])].filter(Boolean).join(" ");
+    const qty = [((it.text.match(/^[\d½¼¾⅓⅔⅛.\/\s\-–]+(?:(lbs?|oz|cups?|cans?|jars?|bags?|packs?|packages?|pouches?|bottles?|tbsp|tsp|cloves?|heads?|bunch(?:es)?|sticks?|slices?|whole|large|medium|small)\b)?/i)||[])[0]||"").trim(), ...(it.text.match(/\(\+[^)]*\)/g)||[])].filter(Boolean).join(" ");
     return `<label style="display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:10px;margin-bottom:4px;background:${it.on?"rgba(16,185,129,0.07)":"rgba(255,255,255,0.02)"};border:1px solid ${it.on?"rgba(16,185,129,0.25)":"rgba(255,255,255,0.06)"};cursor:pointer;opacity:${it.on?1:0.65}">
       <input type="checkbox" ${it.on?"checked":""} onchange="shopPickToggle('${k}', this.checked)" style="width:20px;height:20px;margin-top:1px;accent-color:#10b981;flex-shrink:0">
       <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:var(--text)">${esc(it.phrase)}${it.count>1?` <span style="color:var(--dim);font-weight:500">×${it.count}</span>`:""}${qty?` <span style="color:var(--dim);font-weight:500">(~${esc(qty.trim())})</span>`:""}</div>
