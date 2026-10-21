@@ -8171,6 +8171,7 @@ let state = {
   grocery:    {},          // checked items {key: true}
   userEmail:  "alemmon42@gmail.com",
   wifeEmail:  "mklemmon44@gmail.com",
+  wifePhone:  "",
   store:      "Publix",
   netlifyUrl: "",
   supabaseUrl: "",
@@ -8268,7 +8269,7 @@ function _legacyApplySwaps(ingredients) {
 // overwrite the family plan with defaults); (2) every upload is a 3-way merge against what
 // this device last synced, so MK's edit and Andrew's edit to different things both survive.
 const STORAGE_KEY = "lemmonMealPlan_v2";
-const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek"];
+const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek"];
 const DEVICE_KEYS = ["readAloud","voiceAutoStart","voiceTipSeen","vaultAudience","vaultQuick","vaultUseUp"];
 let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
@@ -8801,6 +8802,9 @@ function makeAheadHtml(r){
     <div style="font-size:11px;color:var(--dim);margin-top:6px">Checkmarks sync to both phones, so whoever cooks can see what's already done.</div>
   </div>`;
 }
+function normPhone(v){ const d = String(v || "").replace(/[^\d+]/g, ""); if (!d) return ""; const digits = d.replace(/\D/g, ""); if (d.startsWith("+")) return "+" + digits; if (digits.length === 10) return "+1" + digits; if (digits.length === 11 && digits[0] === "1") return "+" + digits; return digits; }
+function smsHref(phone, body){ const ios = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent); return "sms:" + (phone || "") + (ios ? "&" : "?") + "body=" + encodeURIComponent(body); }
+function prettyPhone(p){ const m = String(p || "").match(/^\+1(\d{3})(\d{3})(\d{4})$/); return m ? "(" + m[1] + ") " + m[2] + "-" + m[3] : p; }
 function prepShareText(rids){
   const parts = rids.map(rid => { const r = byIdAll(rid); if (!r || !(r.makeAhead || []).length) return ""; const day = plannedDayFor(rid); const done = prepDoneList(rid);
     const todo = r.makeAhead.map((t, i) => ({ t, i })).filter(x => !done.includes(x.i));
@@ -8817,10 +8821,11 @@ function openPrepShare(ridOrList){
     <pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.5;color:#cbd5e1;background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;max-height:40vh;overflow:auto">${esc(text)}</pre>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
       ${navigator.share ? `<button onclick="navigator.share({title:${JSON.stringify(subj).replace(/"/g, "&quot;")},text:prepShareText(${JSON.stringify(rids).replace(/"/g, "&quot;")})}).catch(()=>{})" style="grid-column:1/-1;padding:13px;border-radius:12px;border:none;background:#14b8a6;color:#04201c;font-weight:800;font-size:15px;cursor:pointer">Share… (Messages, Mail, WhatsApp)</button>` : ""}
-      <a href="sms:&body=${encodeURIComponent(text)}" style="text-align:center;padding:12px;border-radius:12px;background:rgba(16,185,129,0.15);color:#34d399;font-weight:800;text-decoration:none">💬 Text</a>
+      <a href="${smsHref(state.wifePhone, text)}" style="text-align:center;padding:12px;border-radius:12px;background:rgba(16,185,129,0.15);color:#34d399;font-weight:800;text-decoration:none">💬 Text${state.wifePhone ? " MK" : ""}</a>
       <a href="mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}" style="text-align:center;padding:12px;border-radius:12px;background:rgba(99,102,241,0.15);color:#a5b4fc;font-weight:800;text-decoration:none">✉️ Email${to ? " MK" : ""}</a>
       <button onclick="navigator.clipboard.writeText(prepShareText(${JSON.stringify(rids).replace(/"/g, "&quot;")})).then(()=>{this.textContent='✅ Copied'})" style="grid-column:1/-1;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:14px;cursor:pointer">📋 Copy text</button>
-    </div>`;
+    </div>
+    <div style="text-align:center;font-size:12px;color:var(--dim);margin-top:10px">${state.wifePhone ? `Goes to MK at ${esc(prettyPhone(state.wifePhone))} · <a href="${smsHref("", text)}" style="color:var(--muted)">text someone else</a>` : `Add MK's cell in Settings and 💬 Text goes straight to her.`}</div>`;
   openModal(html);
 }
 // Deep links: #r=<id> opens a recipe, #prep=<id> opens it at the make-ahead list
@@ -11212,11 +11217,13 @@ function renderSettings() {
     </div>
 
     <div style="background:var(--surface);border-radius:var(--radius);padding:18px;margin-bottom:14px">
-      <div style="font-size:14px;color:var(--green);font-weight:600;margin-bottom:14px">📧 Email Delivery</div>
+      <div style="font-size:14px;color:var(--green);font-weight:600;margin-bottom:14px">📧 Email &amp; Text</div>
       <label class="form-label">Your Email</label>
       <input class="form-input" id="set-email" value="${esc(state.userEmail)}">
       <label class="form-label">Wife's Email</label>
       <input class="form-input" id="set-wemail" value="${esc(state.wifeEmail)}">
+      <label class="form-label">MK's Cell <span style="font-weight:400;color:var(--dim)">(prep texts go straight to her)</span></label>
+      <input class="form-input" id="set-wphone" type="tel" inputmode="tel" autocomplete="off" placeholder="(404) 555-0123" value="${esc(state.wifePhone||"")}">
       <button onclick="saveSettings()" style="margin-top:12px;width:100%;padding:11px;border-radius:12px;border:none;background:var(--surface);border:1.5px solid var(--green);color:var(--green);font-weight:600;font-size:13px;cursor:pointer">Save Settings</button>
     </div>
 
@@ -11377,6 +11384,7 @@ async function saveSupabase() {
 function saveSettings() {
   state.userEmail = (document.getElementById("set-email")||{}).value||state.userEmail;
   state.wifeEmail = (document.getElementById("set-wemail")||{}).value||state.wifeEmail;
+  const wp = document.getElementById("set-wphone"); if (wp) state.wifePhone = normPhone(wp.value);
   state.store      = (document.getElementById("set-store")||{}).value||state.store;
   scheduleSave();
   renderSettings();
