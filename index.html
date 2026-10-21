@@ -8283,7 +8283,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102103;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102104;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9608,6 +9608,18 @@ function sideIdForRecipe(r){ if(!r) return null; if(r.sideId && SIDES_BY_ID[r.si
 function sideUsesUp(x){ try { const items=useUpUnplanned(); if(!items.length) return null; const txt=(x.name+" "+(x.ingredients||[]).join(" ")).toLowerCase(); const hit=items.find(it=>useUpTokens(it.text).some(t=>t.length>2&&!/^(chopped|sliced|diced|minced|leftover|leftovers|cooked|fresh|frozen|small|large|bag|half|extra|some|raw|cut|whole)$/.test(t)&&new RegExp("\\b"+t).test(txt))); return hit?hit.text:null; } catch(e){ return null; } }
 // Side chooser on a planned dinner: every side, with an honest fit label. Manual picks always allowed.
 let sidePickOpen=null;
+function openSideView(sideId){
+  const x = SIDES_BY_ID[sideId]; if (!x) return;
+  if (x.recipeId && byIdAll(x.recipeId)) { viewRecipeById(x.recipeId); return; }
+  openModal(`<div class="modal-header"><div><div style="font-size:34px">${x.emoji || "🥦"}</div><div class="modal-title">${esc(x.name)}</div>
+      <div style="color:var(--dim);font-size:13px;margin-top:4px">Side${x.method ? " · " + esc(x.method) : ""}${x.kidFav ? " · 👧 kid favorite" : ""}</div></div><button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    ${x.kidNote ? `<div class="info-box" style="border-color:rgba(244,114,182,0.35)"><span class="info-label" style="color:#f472b6">👧 KIDS:</span>${esc(x.kidNote)}</div>` : ""}
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.8px;color:var(--dim);margin:14px 0 6px">INGREDIENTS</div>
+    ${(x.ingredients || []).map(i => `<div style="padding:6px 0;border-top:1px solid rgba(255,255,255,0.06);font-size:14px;color:#cbd5e1">• ${esc(i)}</div>`).join("")}
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.8px;color:var(--dim);margin:14px 0 6px">STEPS</div>
+    ${(x.steps || []).map((st, i) => `<div class="recipe-step"><div class="step-num">${i + 1}</div><div style="color:#cbd5e1;font-size:14px;line-height:1.6">${esc(st)}</div></div>`).join("")}
+    <div style="font-size:12px;color:var(--dim);margin-top:12px">In cook mode, the side's steps come after the main's.</div>`);
+}
 function openSidePicker(day, slot){ sidePickOpen=(sidePickOpen&&sidePickOpen.day===day&&sidePickOpen.slot===slot)?null:{day,slot}; renderPlan(); }
 function chooseSide(day, slot, id){ const plan=activePlan(); const e=planGet(plan,day,slot); if(!e) return; e.side=id; e.sideManual=true; delete e.noSide; planSet(plan,day,slot,e); sidePickOpen=null; scheduleSave(); renderPlan(); }
 function sidePickerHtml(day, slot, r, cur){
@@ -9617,7 +9629,7 @@ function sidePickerHtml(day, slot, r, cur){
     let why = fits ? (ranked.indexOf(x.id)<3?'<span style="color:#86efac">good match</span>':'<span style="color:var(--dim)">works</span>')
       : (mp.starch && x.role==="starch" ? '<span style="color:#fbbf24">2nd starch</span>' : mp.rich && x.rich ? '<span style="color:#fbbf24">heavy with this</span>' : '<span style="color:var(--dim)">ok</span>');
     const tags=[x.kidFav?'👧':'', uu?'<span style="color:#86efac">🥡 uses '+esc(uu)+'</span>':''].filter(Boolean).join(' ');
-    return `<button onclick="event.stopPropagation();chooseSide('${day}','${slot}','${x.id}')" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 8px;border-radius:8px;border:1px solid ${x.id===cur?'rgba(134,239,172,0.55)':'rgba(255,255,255,0.07)'};background:${x.id===cur?'rgba(16,185,129,0.12)':'transparent'};color:var(--text);font-size:12.5px;cursor:pointer;margin-bottom:4px"><span style="font-size:16px">${x.emoji}</span><span style="flex:1;min-width:0"><b style="font-weight:600">${esc(x.name)}</b><span style="display:block;font-size:11px">${why}${tags?' · '+tags:''}</span></span>${x.recipeId?`<span onclick="event.stopPropagation();spPeek('${x.recipeId}')" style="font-size:11px;color:var(--dim);padding:2px 6px;border:1px solid rgba(255,255,255,0.12);border-radius:6px">👁</span>`:''}</button>`;
+    return `<button onclick="event.stopPropagation();chooseSide('${day}','${slot}','${x.id}')" style="display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 8px;border-radius:8px;border:1px solid ${x.id===cur?'rgba(134,239,172,0.55)':'rgba(255,255,255,0.07)'};background:${x.id===cur?'rgba(16,185,129,0.12)':'transparent'};color:var(--text);font-size:12.5px;cursor:pointer;margin-bottom:4px"><span style="font-size:16px">${x.emoji}</span><span style="flex:1;min-width:0"><b style="font-weight:600">${esc(x.name)}</b><span style="display:block;font-size:11px">${why}${tags?' · '+tags:''}</span></span>${`<span onclick="event.stopPropagation();openSideView('${x.id}')" title="See the recipe" style="font-size:11px;color:var(--dim);padding:2px 6px;border:1px solid rgba(255,255,255,0.12);border-radius:6px">👁</span>`}</button>`;
   }).join("");
   return `<div class="plan-move-pop" onclick="event.stopPropagation()" style="margin:-2px 0 6px;padding:8px;border-radius:10px;background:rgba(16,185,129,0.05);border:1px dashed rgba(134,239,172,0.35)"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:11px;color:var(--dim)">Pick the side — best fits first</span><button onclick="sidePickOpen=null;renderPlan()" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:14px">✕</button></div>${rows}</div>`;
 }
@@ -10403,7 +10415,7 @@ function renderPlan() {
             </div>
           </div>
           ${slot.key==="dinner" ? (entry.side && SIDES_BY_ID[entry.side]
-            ? `<div class="side-line" style="display:flex;align-items:center;gap:6px;padding:4px 10px 6px 76px;margin:-2px 0 4px;font-size:12px;color:#86efac"><span onclick="openSidePicker('${day}','${slot.key}')" title="Choose the side" style="flex:1;min-width:0;cursor:pointer;text-decoration:underline dotted rgba(134,239,172,0.4);text-underline-offset:3px">🥦 + ${esc(SIDES_BY_ID[entry.side].name)}${SIDES_BY_ID[entry.side].kidFav?' <span title="Kid favorite">👧</span>':''}</span><button onclick="cycleSide('${day}','${slot.key}')" title="Different side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">↻</button><button onclick="removeSide('${day}','${slot.key}')" title="No side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">✕</button></div>`
+            ? `<div class="side-line" style="display:flex;align-items:center;gap:6px;padding:4px 10px 6px 76px;margin:-2px 0 4px;font-size:12px;color:#86efac"><span onclick="openSideView('${entry.side}')" title="See the side's recipe" style="flex:1;min-width:0;cursor:pointer;text-decoration:underline dotted rgba(134,239,172,0.4);text-underline-offset:3px">🥦 + ${esc(SIDES_BY_ID[entry.side].name)}${SIDES_BY_ID[entry.side].kidFav?' <span title="Kid favorite">👧</span>':''}</span><button onclick="openSidePicker('${day}','${slot.key}')" title="Pick a different side" style="background:none;border:1px solid rgba(255,255,255,0.14);border-radius:8px;color:var(--muted);font-size:12px;cursor:pointer;padding:3px 8px">change</button><button onclick="removeSide('${day}','${slot.key}')" title="No side" style="background:none;border:none;color:var(--dim);font-size:13px;cursor:pointer;padding:2px 6px;min-width:28px">✕</button></div>`
             : (recipe.noSide ? "" : `<div class="side-line" style="padding:2px 10px 6px 76px;margin:-2px 0 4px;font-size:12px"><button onclick="openSidePicker('${day}','${slot.key}')" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;padding:2px 0;min-height:28px">🥦 + add a side</button></div>`)) + (sidePickOpen&&sidePickOpen.day===day&&sidePickOpen.slot===slot.key ? sidePickerHtml(day, slot.key, recipe, entry.side) : "") : ""}${planMoveOpen&&planMoveOpen.day===day&&planMoveOpen.slot===slot.key ? planMovePopoverHtml(day, slot.key) : ""}`;
       } else {
         return `
