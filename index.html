@@ -801,6 +801,14 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
 body[class*="plan-dragging-"] .plan-slot-row,body[class*="plan-dragging-"] .plan-slot-empty{transition:outline 0.1s}
 @media (max-width:1023px){.plan-slot-row{-webkit-user-drag:none}}
 @media (max-width:767px){.sp-row{flex-wrap:wrap}.sp-row .sp-row-actions{width:100%;justify-content:flex-end;order:3;margin-top:4px}.sp-row .sp-row-actions button{min-height:38px;padding:6px 12px !important}}
+
+.star-row{display:flex;gap:2px;margin:2px 0 8px}
+.star-btn{background:none;border:none;cursor:pointer;font-size:28px;line-height:1;padding:2px 3px;color:#fbbf24}
+.star-btn.dim{opacity:0.55}
+.rating-chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 4px}
+.rating-chip{padding:6px 11px;border-radius:999px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--muted);font-size:12px;cursor:pointer}
+.rating-chip.selected{border-color:rgba(16,185,129,0.7);background:rgba(16,185,129,0.15);color:#34d399;font-weight:700}
+.rating-summary{background:rgba(255,255,255,0.03);border-radius:10px;padding:8px 10px;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -9649,11 +9657,11 @@ function kidComfort(r){
   const base = Math.max(1, Math.min(5, r.kidTier || 3));
   const rt = (state.ratings||{})[r.id] || {};
   const wins = ((rt.kidLog||[]).length) + ((rt.chips||[]).includes("Kids loved it 👧❤️") ? 1 : 0);
-  const refused = (rt.chips||[]).includes("Kids refused 😬") ? 1 : 0;
+  const refused = ((rt.chips||[]).includes("Kids refused 😬") || kidRefusedLast(r.id)) ? 1 : 0;
   const adj = Math.min(1, wins * 0.5) - refused;
   return Math.max(1, Math.min(5, Math.round((base + adj) * 2) / 2));
 }
-function kidRecipeWon(r){ const rt=(state.ratings||{})[r.id]||{}; return ((rt.kidLog||[]).length>0 || (rt.chips||[]).includes("Kids loved it 👧❤️")) && !(rt.chips||[]).includes("Kids refused 😬"); }
+function kidRecipeWon(r){ const rt=(state.ratings||{})[r.id]||{}; return ((rt.kidLog||[]).length>0 || (rt.chips||[]).includes("Kids loved it 👧❤️")) && !(rt.chips||[]).includes("Kids refused 😬") && !kidRefusedLast(r.id); }
 // Household level = the comfort floor for regular family nights. Starts at 5 (safest). Drops one rung once the girls
 // have eaten ≥3 different recipes at or below the next rung. Regular family nights allow level−1 and up; the weekly
 // stretch night reaches one more rung down.
@@ -10608,7 +10616,7 @@ function recipeChips(r, o) {
   if (isDinner && aud !== "adults") {
     const w = typeof kidWins === "function" ? kidWins(r.id) : { Livia: 0, Lucy: 0 };
     const who = [w.Livia ? "Liv" : "", w.Lucy ? "Lucy" : ""].filter(Boolean);
-    if ((rt.chips || []).includes("Kids refused 😬")) out.push(chip("😬 refused", "#fca5a5", "rgba(239,68,68,0.10)", "The girls refused this last time"));
+    if ((rt.chips || []).includes("Kids refused 😬") || kidRefusedLast(r.id)) out.push(chip("😬 refused", "#fca5a5", "rgba(239,68,68,0.10)", "The girls refused this last time"));
     else if (who.length) out.push(chip("✓ " + who.join(" + "), "#86efac", "rgba(16,185,129,0.10)", "Ate it before"));
   }
   if (r.leftoverDays) out.push(chip("🔁 leftovers", "#a5b4fc", "rgba(99,102,241,0.12)", "Makes a second night (keeps " + r.leftoverDays + " days)"));
@@ -11525,11 +11533,6 @@ function setAlexaStatus(type, msg) {
 }
 
 const RATING_CHIPS = [
-  "Kids loved it 👧❤️",
-  "Kids refused 😬",
-  "Livia ate it 👧",
-  "Lucy ate it 👧",
-  "Adults loved it 😍",
   "Make again soon 🔁",
   "Needs tweaking 🔧",
   "Too time-consuming ⏱",
@@ -11551,6 +11554,38 @@ function applyKidLog(cur, chip, turnedOn){
   return Object.assign({}, cur, { kidLog: log });
 }
 function kidWins(id){ const log=((state.ratings||{})[id]||{}).kidLog||[]; return { Livia: log.filter(x=>x.kid==="Livia").length, Lucy: log.filter(x=>x.kid==="Lucy").length }; }
+// ── Per-person ratings: one row per family member per cook, "Not there" allowed ──
+const FAMILY = [{ k: "Andrew", e: "🧔" }, { k: "MK", e: "👩" }, { k: "Livia", e: "👧" }, { k: "Lucy", e: "👧" }];
+const FACES = [{ v: 3, e: "😍", l: "Loved it" }, { v: 2, e: "🙂", l: "Liked it" }, { v: 1, e: "😐", l: "Meh" }, { v: 0, e: "🙅", l: "Wouldn't eat it" }, { v: "na", e: "—", l: "Not there" }];
+const faceOf = v => FACES.find(f => f.v === v);
+// The meal being rated: the most recent cook of it in the last 3 days, else today
+function ratingDateFor(id){ const cut = Date.now() - 3 * 86400000; const h = (state.cookHistory || []).filter(x => x.recipeId === id && new Date(x.date + "T12:00:00").getTime() >= cut).sort((a, b) => a.date < b.date ? 1 : -1)[0]; return h ? h.date : localISODate(); }
+function mealRatings(id, date){ return ((((state.ratings || {})[id] || {}).meals) || {})[date] || {}; }
+function setPersonRating(id, person, v, after){
+  state.ratings = state.ratings || {}; const cur = Object.assign({}, state.ratings[id] || {}); const date = ratingDateFor(id);
+  const meals = Object.assign({}, cur.meals || {}); const m = Object.assign({}, meals[date] || {});
+  if (m[person] === v) delete m[person]; else m[person] = v;
+  if (Object.keys(m).length) meals[date] = m; else delete meals[date];
+  cur.meals = meals;
+  // Keep the kid-win log (used by the planner's kid-comfort ladder) in step: a 🙂 or 😍 from Livia/Lucy = they ate it
+  if (person === "Livia" || person === "Lucy") { let log = (cur.kidLog || []).filter(x => !(x.kid === person && x.date === date)); if (m[person] === 2 || m[person] === 3) log.push({ date, kid: person }); cur.kidLog = log; }
+  state.ratings[id] = cur; scheduleSave(); rerenderRating(id, after);
+}
+function rerenderRating(id, after){ try { if (after === "done") renderCookScreen(); else if (after === "plan") renderPlan(); else if (after && after.startsWith("card:")) viewRecipe(after.slice(5), id); } catch (e) {} }
+// Has this kid's most recent rating been "wouldn't eat it"?
+function kidRefusedLast(id){ const meals = (((state.ratings || {})[id] || {}).meals) || {}; const dates = Object.keys(meals).sort().reverse(); for (const d of dates) { const m = meals[d]; const ks = ["Livia", "Lucy"].filter(k => typeof m[k] === "number"); if (ks.length) return ks.some(k => m[k] === 0); } return false; }
+function personSummary(id){ const meals = (((state.ratings || {})[id] || {}).meals) || {}; const out = {}; FAMILY.forEach(p => { const vals = Object.keys(meals).sort().map(d => meals[d][p.k]).filter(v => typeof v === "number"); if (vals.length) out[p.k] = { n: vals.length, last: vals[vals.length - 1], avg: vals.reduce((a, b) => a + b, 0) / vals.length }; }); return out; }
+function familyRatingHtml(id, after, compact){
+  const date = ratingDateFor(id); const m = mealRatings(id, date);
+  const label = date === localISODate() ? "tonight" : new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
+  const sz = compact ? 20 : 24;
+  const rows = FAMILY.map(p => `<div style="display:flex;align-items:center;gap:6px;padding:4px 0">
+      <span style="width:${compact ? 64 : 76}px;font-size:${compact ? 13 : 14}px;font-weight:700;color:var(--text);white-space:nowrap">${p.e} ${p.k}</span>
+      <div style="display:flex;gap:4px;flex:1;flex-wrap:wrap">${FACES.map(f => { const on = m[p.k] === f.v; return `<button title="${f.l}" aria-label="${p.k}: ${f.l}" onclick="setPersonRating('${id}','${p.k}',${f.v === "na" ? "'na'" : f.v},'${after}')" style="min-width:${sz + 18}px;height:${sz + 16}px;border-radius:10px;cursor:pointer;font-size:${f.v === "na" ? 12 : sz}px;font-weight:700;border:1.5px solid ${on ? "rgba(16,185,129,0.8)" : "rgba(255,255,255,0.12)"};background:${on ? "rgba(16,185,129,0.18)" : "transparent"};color:${on ? "#34d399" : "var(--muted)"};opacity:${m[p.k] === undefined || on ? 1 : 0.45}">${f.v === "na" ? "N/A" : f.e}</button>`; }).join("")}</div></div>`).join("");
+  return `<div style="margin:8px 0 4px"><div style="font-size:11px;font-weight:800;letter-spacing:0.6px;color:var(--dim);margin-bottom:2px">WHO LIKED IT · ${esc(label.toUpperCase())}</div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:4px">😍 loved · 🙂 liked · 😐 meh · 🙅 wouldn't eat · N/A not there</div>${rows}</div>`;
+}
+function personSummaryLine(id){ const ps = personSummary(id); const parts = FAMILY.filter(p => ps[p.k]).map(p => { const x = ps[p.k]; return `${p.k} ${faceOf(x.last).e}${x.n > 1 ? `<span style="color:var(--dim);font-size:11px"> (${x.n}×, avg ${faceOf(Math.round(x.avg)).e})</span>` : ""}`; }); return parts.length ? parts.join(" · ") : ""; }
 function kidWinsBadge(id, long){ const k=kidWins(id); if(!k.Livia&&!k.Lucy) return ""; return long ? `Kid wins: Livia ${k.Livia} · Lucy ${k.Lucy}` : `👧 L×${k.Livia} · Lu×${k.Lucy}`; }
 
 function isActive(id) {
@@ -11600,7 +11635,7 @@ function buildRatingHtml(id, section) {
   } else if (kidWinsBadge(id,true)) {
     summaryHtml = '<div class="rating-summary"><span style="font-size:12px;color:#f472b6;font-weight:700">' + kidWinsBadge(id,true) + '</span></div>';
   }
-  { const kr = byIdAll(id); if (kr && kr.kidTier && (kr.audience||"family") !== "adults") { const rt0 = (state.ratings||{})[id]||{}; const kw = kidWins(id); const won = kw.Livia + kw.Lucy + ((rt0.chips||[]).includes("Kids loved it 👧❤️")?1:0); const ref = (rt0.chips||[]).includes("Kids refused 😬")?1:0; summaryHtml += '<div style="font-size:12px;color:#fbbf24;margin:4px 0 2px">👧 Kid comfort ' + kidStars(kidComfort(kr)) + ' · ' + won + ' win' + (won===1?'':'s') + ' · ' + ref + ' refused</div>'; } }
+  { const kr = byIdAll(id); if (kr && kr.kidTier && (kr.audience||"family") !== "adults") { const rt0 = (state.ratings||{})[id]||{}; const kw = kidWins(id); const won = kw.Livia + kw.Lucy + ((rt0.chips||[]).includes("Kids loved it 👧❤️")?1:0); const ref = ((rt0.chips||[]).includes("Kids refused 😬")||kidRefusedLast(id))?1:0; summaryHtml += '<div style="font-size:12px;color:#fbbf24;margin:4px 0 2px">👧 Kid comfort ' + kidStars(kidComfort(kr)) + ' · ' + won + ' win' + (won===1?'':'s') + ' · ' + ref + ' refused</div>'; } }
 
   return `
     <div style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px">
@@ -11608,7 +11643,10 @@ function buildRatingHtml(id, section) {
         ${stars ? "✏️ Update rating" : "⭐ Rate this recipe"}
       </div>
       ${summaryHtml}
+      ${personSummaryLine(id) ? `<div style="font-size:13px;color:var(--muted);margin:2px 0 6px">👨‍👩‍👧‍👧 Last time: ${personSummaryLine(id)}</div>` : ""}
+      <div style="font-size:11px;font-weight:800;letter-spacing:0.6px;color:var(--dim);margin-top:4px">OVERALL</div>
       <div class="star-row">${starHtml}</div>
+      ${familyRatingHtml(id, "card:" + section, false)}
       <div class="rating-chips">${chipHtml}</div>
       <input class="form-input" id="rating-note-${id}" value="${esc(note)}" placeholder="Quick note (optional)..." style="margin-top:6px;font-size:13px" oninput="debounceSaveNote('${id}','${section}')">
       <div style="display:flex;gap:8px;margin-top:8px"><input class="form-input" id="rating-log-${id}" placeholder="Add a dated note (what to change next time)…" style="flex:1;font-size:13px"><button onclick="addRatingLog('${id}','${section}')" style="padding:8px 12px;border-radius:10px;border:none;background:rgba(16,185,129,0.2);color:#34d399;font-weight:700;cursor:pointer">💬 Add</button></div>
@@ -11659,7 +11697,7 @@ function doneSetStars(id,n){ if(!state.ratings)state.ratings={}; const cur=state
 function doneToggleChip(id,chip){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const chips=cur.chips||[]; const on=!chips.includes(chip); state.ratings[id]={...applyKidLog(cur,chip,on),chips:on?[...chips,chip]:chips.filter(c=>c!==chip),date:cur.date||new Date().toISOString()}; scheduleSave(); renderCookScreen(); }
 function doneSaveNote(id){ const el=document.getElementById("done-note"); if(!el||!el.value.trim())return; cookState.noteDraft=""; if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const log=cur.log||[]; log.unshift({date:localISODate(),text:el.value.trim()}); state.ratings[id]={...cur,log,note:el.value.trim(),date:cur.date||new Date().toISOString()}; scheduleSave(); el.value=""; const st=document.getElementById("done-note-status"); if(st){st.textContent="✅ Saved";} setTimeout(()=>renderCookScreen(),600); }
 // Unrated cooks from the last 3 days → nudge on the Plan tab
-function unratedRecentCooks(){ const cut=Date.now()-3*86400000; return (state.cookHistory||[]).filter(h=>{ const d=new Date(h.date+"T12:00:00").getTime(); if(d<cut)return false; const r=(state.ratings||{})[h.recipeId]; return !(r&&r.date&&new Date(r.date).getTime()>=d-43200000); }).filter((h,i,a)=>a.findIndex(x=>x.recipeId===h.recipeId)===i); }
+function unratedRecentCooks(){ const cut=Date.now()-3*86400000; return (state.cookHistory||[]).filter(h=>{ const d=new Date(h.date+"T12:00:00").getTime(); if(d<cut)return false; const r=(state.ratings||{})[h.recipeId]; const m=((r&&r.meals)||{})[h.date]||{}; if(FAMILY.every(p=>m[p.k]!==undefined))return false; return !(r&&r.date&&new Date(r.date).getTime()>=d-43200000); }).filter((h,i,a)=>a.findIndex(x=>x.recipeId===h.recipeId)===i); }
 
 // ── Girls' weekday breakfast card: cereal stays, upgrade it ──
 function girlsBreakfastSuggestion(){
@@ -11692,7 +11730,7 @@ function renderGirlsBreakfastCard(){
 }
 function addGirlsSunday(id){ const plan=state.weekPlan=state.weekPlan||{}; planSet(plan,"Sunday","breakfast3",{recipeId:id,section:"breakfast"}); scheduleSave(); renderPlan(); }
 function addCerealUpgrades(btn){ state.needsGrocery=state.needsGrocery||[]; const want=["Fairlife 2% milk","Kodiak Power Waffles","String cheese","Yogurt tubes (freeze them)","Blueberries or strawberries"]; let n=0; want.forEach(w=>{ const has=state.needsGrocery.some(x=>(typeof x==="string"?x:(x.text||"")).toLowerCase().startsWith(w.toLowerCase().slice(0,10))); if(!has){ state.needsGrocery.push({text:w,sources:["🥣 Girls' breakfast"]}); n++; } }); scheduleSave(); if(btn){ btn.textContent=n?"✓ added "+n+" to Shop":"✓ already on the list"; } }
-function renderRatingNudge(){ const list=unratedRecentCooks(); if(!list.length)return ""; return list.slice(0,2).map(h=>{ const when=h.date===localISODate()?"tonight":"on "+new Date(h.date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long"}); return '<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#fbbf24">⭐ RATE IT WHILE IT\'S FRESH</div><div style="font-size:15px;font-weight:700">'+esc(h.name)+' <span style="font-weight:400;color:var(--dim)">— cooked '+when+'</span></div></div><div style="display:flex;gap:2px">'+[1,2,3,4,5].map(n=>'<button onclick="nudgeRate(\''+h.recipeId+'\','+n+')" style="font-size:26px;background:none;border:none;cursor:pointer;padding:2px 4px;opacity:0.6">☆</button>').join("")+'</div><button onclick="viewRecipeById(\''+h.recipeId+'\')" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:13px;cursor:pointer">+ note</button><button onclick="dismissNudge(\''+h.recipeId+'\')" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button></div>'; }).join(""); }
+function renderRatingNudge(){ const list=unratedRecentCooks(); if(!list.length)return ""; return list.slice(0,2).map(h=>{ const when=h.date===localISODate()?"tonight":"on "+new Date(h.date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long"}); return '<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#fbbf24">⭐ RATE IT WHILE IT\'S FRESH</div><div style="font-size:15px;font-weight:700">'+esc(h.name)+' <span style="font-weight:400;color:var(--dim)">— cooked '+when+'</span></div></div><div style="display:flex;gap:2px">'+[1,2,3,4,5].map(n=>'<button onclick="nudgeRate(\''+h.recipeId+'\','+n+')" style="font-size:26px;background:none;border:none;cursor:pointer;padding:2px 4px;opacity:0.6">☆</button>').join("")+'</div><button onclick="viewRecipeById(\''+h.recipeId+'\')" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:13px;cursor:pointer">+ note</button><button onclick="dismissNudge(\''+h.recipeId+'\')" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button><div style="flex-basis:100%">'+familyRatingHtml(h.recipeId,"plan",true)+'</div></div>'; }).join(""); }
 function nudgeRate(id,n){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,stars:n,date:new Date().toISOString()}; const h=(state.cookHistory||[]).find(x=>x.recipeId===id); if(h)h.rating=n; scheduleSave(); renderPlan(); }
 function dismissNudge(id){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,date:new Date().toISOString()}; scheduleSave(); renderPlan(); }
 async function scheduleRatingReminder(id, name, section) {
@@ -14181,6 +14219,7 @@ function renderCookScreen() {
       <div style="background:#111827;border:2px solid #1f2937;border-radius:16px;padding:18px;margin:0 0 14px;width:100%;text-align:left">
         <div style="color:#10b981;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">⭐ Rate it now (or later — it's always on the recipe card)</div>
         <div style="display:flex;justify-content:center;gap:2px;margin:4px 0 10px">${starBtns}</div>
+        ${familyRatingHtml(recipe.id, "done", false)}
         <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:12px">${chipBtns}</div>
         <textarea id="done-note" oninput="cookState.noteDraft=this.value" placeholder="Notes for next time — what to change, what the girls thought…" style="width:100%;min-height:76px;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:15px;box-sizing:border-box;font-family:inherit">${esc(cookState.noteDraft||"")}</textarea>
         <button onclick="doneSaveNote('${recipe.id}')" style="margin-top:8px;width:100%;padding:12px;border-radius:12px;border:none;background:rgba(16,185,129,0.2);color:#34d399;font-weight:700;font-size:15px;cursor:pointer">💬 Save note</button>
