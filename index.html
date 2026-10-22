@@ -8340,7 +8340,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102202;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102203;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -10555,7 +10555,7 @@ function renderPlan() {
     ${renderRatingNudge()}
     ${renderUseUpCard()}
     ${planWeekView==="this" ? renderGirlsBreakfastCard() : ""}
-    ${planWeekView==="this" ? lbPackCard(false) : ""}
+    ${planWeekView==="this" ? lbPackCard(!lbCardOpen()) : ""}
     <div id="autoplan-modal" class="sp-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:300;align-items:flex-end;justify-content:center" onclick="if(event.target===this)closeAutoplanModal()">
       <div class="sp-box" style="background:#0f172a;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:720px;max-height:92vh;overflow-y:auto"></div>
     </div>
@@ -10582,19 +10582,17 @@ function renderPlan() {
       <div style="color:var(--dim);font-size:14px">${planWeekView==="next"?"Planned ahead — roll it into this week on Sunday":"Tap + Add to plan a day · Tap a recipe to view it"}</div>
     </div>
 
-    <div class="stats-row" style="margin-bottom:16px">
-      <div class="stat-box"><div class="stat-icon">📅</div><div class="stat-val">${assigned.length}/7</div><div class="stat-label">planned</div></div>
-      <div class="stat-box"><div class="stat-icon">💪</div><div class="stat-val">${avgProt}g</div><div class="stat-label">avg protein</div></div>
-      <div class="stat-box"><div class="stat-icon">⏱️</div><div class="stat-val">${totalMins}</div><div class="stat-label">total mins</div></div>
-      <div class="stat-box" onclick="showTab('grocery')" style="cursor:pointer"><div class="stat-icon">🛒</div><div class="stat-val">${assigned.length}</div><div class="stat-label">shop for</div></div>
+    <div style="display:flex;align-items:center;gap:6px 16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:0 0 8px;padding:0 2px">
+      <span>📅 <b style="color:var(--text)">${assigned.length}/7</b> planned</span>
+      <span>💪 <b style="color:var(--text)">${avgProt}g</b> avg protein</span>
+      <span>⏱️ <b style="color:var(--text)">${totalMins}</b> min cooking</span>
+      <span onclick="showTab('grocery')" style="cursor:pointer">🛒 <b style="color:var(--text)">${assigned.length}</b> to shop for →</span>
+      ${assigned.length > 0 ? `<button onclick="clearWeekPlan()" style="margin-left:auto;background:none;border:none;color:rgba(239,68,68,0.75);font-size:12px;cursor:pointer;padding:2px 0">🗑️ Clear week</button>` : ""}
     </div>
     ${varietyStrip}
     ${renderTonightCard(plan, allRecipes)}
 
-    ${assigned.length > 0 ? `
-    <button onclick="clearWeekPlan()" style="width:100%;padding:10px;border-radius:12px;border:1.5px solid rgba(239,68,68,0.2);background:transparent;color:#ef4444;font-weight:600;font-size:13px;cursor:pointer;margin-bottom:12px">
-      🗑️ Clear week & start fresh
-    </button>` : `
+    ${assigned.length > 0 ? "" : `
     <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:12px;padding:14px;margin-bottom:14px;text-align:center">
       <div style="font-size:14px;color:var(--green);font-weight:700;margin-bottom:4px">Plan your week!</div>
       <div style="font-size:13px;color:var(--dim)">Tap + Add on any day, or browse the 🗄️ Vault to pick recipes</div>
@@ -11843,12 +11841,16 @@ function girlsBreakfastSuggestion(){
   return pool[wk % pool.length];
 }
 function renderGirlsBreakfastCard(){
-  const collapsed=!!(state.uiPrefs&&state.uiPrefs.girlsCardCollapsed);
+  const collapsed=!(state.uiPrefs&&state.uiPrefs.girlsCardCollapsed===false);
   const sug=girlsBreakfastSuggestion();
   const sunEntry=planGet(state.weekPlan||{}, "Sunday", "breakfast3"); const onSunday=sug&&sunEntry&&sunEntry.recipeId===sug.id;
   const sugName=sug?esc(sug.name):"";
+  if(collapsed) return `<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 14px;margin:0 0 10px;border-radius:12px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.25);font-size:13px;color:#c7d2fe">
+      <span style="flex:1;min-width:0">🥣 <b>Girls' breakfast</b>${sug?` · make-ahead: <span style="cursor:pointer;text-decoration:underline dotted" onclick="viewRecipeById('${sug.id}')">${sugName}</span>`:""}</span>
+      ${sug?(onSunday?`<span style="color:#34d399;font-weight:700;font-size:12px">✓ on Sunday</span>`:`<button onclick="addGirlsSunday('${sug.id}')" style="padding:4px 10px;border-radius:8px;border:none;background:rgba(99,102,241,0.25);color:#c7d2fe;font-weight:700;font-size:12px;cursor:pointer">+ Sunday</button>`):""}
+      <button onclick="state.uiPrefs=state.uiPrefs||{};state.uiPrefs.girlsCardCollapsed=false;scheduleSave();renderPlan()" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer">tips ▸</button></div>`;
   return `<div style="background:rgba(99,102,241,0.07);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:12px 16px;margin:0 0 12px">
-    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="state.uiPrefs=state.uiPrefs||{};state.uiPrefs.girlsCardCollapsed=!${collapsed};scheduleSave();renderPlan()">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer" onclick="state.uiPrefs=state.uiPrefs||{};state.uiPrefs.girlsCardCollapsed=true;scheduleSave();renderPlan()">
       <div style="flex:1;font-size:13px;font-weight:800;letter-spacing:0.6px;color:#a5b4fc">🥣 GIRLS THIS WEEK — cereal stays, upgrade it</div>
       <span style="color:var(--dim);font-size:13px">${collapsed?"▸ show":"▾ hide"}</span>
     </div>
@@ -15042,6 +15044,9 @@ function lbGroceryItems(weekKey){
 }
 
 // ── Pack tonight / Morning view (Plan tab + Done screen) ──
+// Lunch packing happens after school — keep the checklist folded 9am–3pm unless someone opens it
+function lbCardOpen(){ const pref = (state.uiPrefs || {}).lbCard; if (pref && pref.date === localISODate()) return !!pref.open; const h = new Date().getHours(); return h < 9 || h >= 15; }
+function lbToggleCard(){ state.uiPrefs = state.uiPrefs || {}; state.uiPrefs.lbCard = { date: localISODate(), open: !lbCardOpen() }; scheduleSave(); if (currentTab === "plan") renderPlan(); }
 function lbPackCard(compact){
   const lb = lbState();
   const now = new Date(); const hour = now.getHours();
@@ -15070,6 +15075,7 @@ function lbPackCard(compact){
   const thermosNote = thermosItems.length ? `<div style="font-size:12px;color:#fbbf24;margin-top:6px">🫙 ${thermosItems.some(r=>r.item.thermos==="hot")?"Hot thermos: fill with boiling water 5 min before packing, dump, then add food piping hot.":""} ${thermosItems.some(r=>r.item.thermos==="cold")?"Cold thermos: put it in the freezer tonight; frozen treat goes in frozen in the morning.":""}</div>` : "";
   return `<div style="background:rgba(99,102,241,0.08);border:1.5px solid rgba(99,102,241,0.3);border-radius:14px;padding:12px 16px;margin:0 0 12px">
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div style="flex:1;min-width:180px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#a5b4fc">${morning?"⏰ THIS MORNING — "+dayName.toUpperCase()+"'S LUNCHES":"🌙 PACK TONIGHT — "+dayName.toUpperCase()+"'S LUNCHES"}</div><div style="font-size:12px;color:var(--dim)">${done}/${total} packed · ${(LB_BY_ID[dp.livia.main]||{}).name||""}${dp.livia.main!==dp.lucy.main?" / "+((LB_BY_ID[dp.lucy.main]||{}).name||""):""}</div></div>
+      ${currentTab === "plan" ? `<button onclick="lbToggleCard()" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:12px;cursor:pointer">${compact ? "▾ Show list" : "▴ Hide"}</button>` : ""}
       <button onclick="showTab('lunchbox')" style="padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:12px;cursor:pointer">Open 🍱</button>
       ${morning?"":`<button onclick="lbSkipTomorrow()" style="background:none;border:none;color:var(--dim);font-size:12px;cursor:pointer;text-decoration:underline">No school tomorrow</button>`}</div>
     ${compact ? "" : `<div style="margin-top:6px">${showRows.map(line).join("")}</div>
