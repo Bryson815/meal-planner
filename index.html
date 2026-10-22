@@ -1700,7 +1700,7 @@ const DEFAULT_LUNCHES = [
       "¼ clove garlic, grated",
       "1 tsp fresh lemon juice",
       "¼ tsp dried dill (or ¾ tsp fresh)",
-      "Salt & pepper to taste",
+      "⅛ tsp kosher salt + a pinch of black pepper",
       "--- THE REST ---",
       "Salt, black pepper and a drizzle of olive oil (to season the grains)"
     ],
@@ -2503,8 +2503,11 @@ const DEFAULT_DINNERS = [
       "1 tsp Italian seasoning (or Burlap & Barrel Herbes de Provence for deeper, more aromatic flavor)",
       "--- ⓑ Homemade Cottage Cheese Alfredo (Sauces tab) — white version (choose one: the sauce) ---",
       "1½ cups Good Culture 4% cottage cheese — sub: any full-fat cottage cheese (Kroger Simple Truth, Daisy, or Hood)",
-      "3 tbsp Parmesan, grated",
+      "6 tbsp Parmesan, grated",
       "1½ cloves garlic, minced (or ¾ tsp garlic powder)",
+      "⅜ tsp black pepper + a pinch of nutmeg",
+      "1½ tsp fresh lemon juice",
+      "Salt only after tasting — cottage cheese is already salty",
       "½ cup pasta water or Fairlife milk to thin (save it from the pasta pot)",
       "--- SERVING ---",
       "12 oz Brami protein pasta (cook per package — al dente, do not rinse)",
@@ -8314,7 +8317,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102106;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102107;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -15499,7 +15502,7 @@ function showImportStatus(msg) {
 
 // Bump RECIPE_REV whenever built-in recipes are edited in code. On next load, saved copies of
 // built-in recipes take the new content once (ratings, notes, plans are stored separately and untouched).
-const RECIPE_REV = "2026-10-21g";
+const RECIPE_REV = "2026-10-21h";
 function refreshBuiltInRecipes() {
   try {
     if (state.recipeRev === RECIPE_REV) return false;
