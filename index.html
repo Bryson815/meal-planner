@@ -792,6 +792,12 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
 }
 @media (max-width:767px){.cond-foot{flex-direction:column !important;align-items:stretch !important}.cond-btns{display:flex !important;width:100%}.cond-btns button{flex:1;min-height:44px;white-space:nowrap}.cond-where{margin-bottom:4px;justify-content:flex-start}}
 .cook-voice-btn.on{background:rgba(239,68,68,0.18) !important;border-color:rgba(239,68,68,0.6) !important;color:#fca5a5 !important}
+.cook-voice-btn.armed{background:rgba(16,185,129,0.22) !important;border-color:rgba(16,185,129,0.8) !important;color:#6ee7b7 !important}
+.cook-voice-btn.armed .vdot{background:#10b981 !important}
+#cook-heard.vs{cursor:pointer}
+#cook-heard.vs-armed{color:#6ee7b7 !important;font-weight:700}
+#cook-heard.vs-live{color:#cbd5e1 !important;font-style:italic}
+#cook-heard.vs-ok{color:#a7f3d0 !important}
 .cook-voice-btn.on .vdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#ef4444;margin-right:6px;animation:cookPulse 1s infinite;vertical-align:middle}
 .cook-voice-btn.active{background:rgba(16,185,129,0.15) !important;border-color:rgba(16,185,129,0.5) !important;color:#34d399 !important}
 .cook-voice-btn.thinking{opacity:0.7}
@@ -877,7 +883,7 @@ body[class*="plan-dragging-"] .plan-slot-row,body[class*="plan-dragging-"] .plan
     <button onclick="exitCook()" style="padding:8px 18px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:15px;font-weight:600;cursor:pointer;transition:background 0.15s">← Back</button>
     <div style="font-size:16px;font-weight:800;color:var(--text);letter-spacing:-0.3px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="cook-overlay-title">Cook Mode</div>
     <span id="cook-wake-pill" style="display:none;font-size:11px;font-weight:700;color:#fbbf24;background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.3);border-radius:999px;padding:4px 10px;white-space:nowrap;flex-shrink:0">☀️ Screen stays on</span>
-    <span id="cook-heard" style="display:none;font-size:12px;color:var(--dim);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1;min-width:0"></span>
+    <span id="cook-heard" onclick="toggleVoiceTip()" title="Voice tips" style="display:none;font-size:12px;color:var(--dim);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:1;min-width:0"></span>
     <button id="cook-mic-btn" class="cook-voice-btn" onclick="toggleVoice()" title="Voice control — say 'Chef, next'" style="display:none;padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;white-space:nowrap">🎙</button>
     <button id="cook-read-btn" class="cook-voice-btn" onclick="toggleReadAloud()" title="Read each step aloud" style="padding:8px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0">🔊</button>
     <button onclick="openCookChat()" style="padding:8px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#07090f;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0">👨‍🍳 Ask</button>
@@ -8806,7 +8812,7 @@ let state = {
   groceryNotes: {},
   vaultSort: "name",
   anthropicKey: "",  // stored locally only, never sent to Supabase
-  readAloud: false, voiceAutoStart: false, voiceTipSeen: false,
+  readAloud: false, voiceAutoStart: false, voiceTipSeen: false, voiceLoose: false,
 };
 
 let supabase = null;
@@ -8882,12 +8888,12 @@ function _legacyApplySwaps(ingredients) {
 // this device last synced, so MK's edit and Andrew's edit to different things both survive.
 const STORAGE_KEY = "lemmonMealPlan_v2";
 const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek"];
-const DEVICE_KEYS = ["readAloud","voiceAutoStart","voiceTipSeen","vaultAudience","vaultQuick","vaultUseUp"];
+const DEVICE_KEYS = ["readAloud","voiceAutoStart","voiceTipSeen","voiceLoose","vaultAudience","vaultQuick","vaultUseUp"];
 let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102303;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102304;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -14990,7 +14996,7 @@ function renderCookScreen() {
     const tipHtml=(step===total-1&&recipe.tips)?`<div class="cook-tip-box"><div class="cook-tip-label">💡 Pro tip</div><div class="cook-tip-text">${esc(recipe.tips)}</div></div>`:"";
     const eqHtml=(step===0&&recipe.equipment&&recipe.equipment.length)?`<div style="background:rgba(245,158,11,0.08);border:2px solid rgba(245,158,11,0.3);border-radius:14px;padding:14px 18px;margin-bottom:16px"><div style="color:#fbbf24;font-size:13px;font-weight:800;letter-spacing:0.6px;margin-bottom:8px">🍳 YOU'LL NEED</div><div style="display:flex;flex-wrap:wrap;gap:8px">${recipe.equipment.map(e=>`<span style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:999px;padding:6px 14px;font-size:clamp(15px,1.4vw,19px);color:#f1f5f9;font-weight:600">${esc(e)}</span>`).join("")}</div></div>`:"";
     const secHtml=(showSectionBanner&&sectionHeader)?`<div style="background:rgba(16,185,129,0.1);border:2px solid rgba(16,185,129,0.4);border-radius:14px;padding:14px 20px;margin-bottom:20px;align-self:flex-start"><div style="color:#34d399;font-size:12px;font-weight:800;letter-spacing:1.2px;margin-bottom:4px">${backToMain?"↩ BACK TO THE MAIN DISH":PARALLEL_RE.test(sectionHeader)?"⇄ SIDE TASK — RUNS IN PARALLEL":"▶ SWITCHING TO"}</div><div style="color:#f1f5f9;font-size:clamp(20px,2.2vw,28px);font-weight:800;text-transform:none;letter-spacing:-0.3px">${esc(sectionHeader.charAt(0)+sectionHeader.slice(1).toLowerCase())}</div></div>`:"";
-    const voiceTip=(cookState.showVoiceTip)?`<div style="background:rgba(239,68,68,0.08);border:2px solid rgba(239,68,68,0.3);border-radius:14px;padding:14px 18px;margin-bottom:16px;position:relative"><button onclick="cookState.showVoiceTip=false;renderCookScreen()" style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button><div style="color:#fca5a5;font-size:12px;font-weight:800;letter-spacing:0.8px;margin-bottom:6px">🎙 VOICE IS ON — START EVERY COMMAND WITH “CHEF”</div><div style="color:#f1f5f9;font-size:clamp(15px,1.3vw,18px);line-height:1.6">“Chef, next” · “Chef, repeat” · “Chef, how much garlic” · “Chef, set a timer for 8 minutes” · “Chef, how much time is left” · “Chef, should this be covered?” · “Chef, help”</div></div>`:"";
+    const voiceTip=(cookState.showVoiceTip)?`<div style="background:rgba(239,68,68,0.08);border:2px solid rgba(239,68,68,0.3);border-radius:14px;padding:14px 18px;margin-bottom:16px;position:relative"><button onclick="cookState.showVoiceTip=false;renderCookScreen()" style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button><div style="color:#fca5a5;font-size:12px;font-weight:800;letter-spacing:0.8px;margin-bottom:6px">🎙 VOICE IS ON — SAY “CHEF” FIRST</div><div style="color:#f1f5f9;font-size:clamp(15px,1.3vw,18px);line-height:1.6;margin-bottom:8px">Two ways, both work: say it in one go — <b>“Chef, next”</b> — or say <b>“Chef”</b>, wait for the <b>beep</b> and the green <b>Go ahead…</b>, then say the command (you have about 8 seconds).</div><div style="color:var(--dim);font-size:clamp(13px,1.1vw,15px);line-height:1.6;margin-bottom:10px">“Chef, next” · “Chef, repeat” · “Chef, how much garlic” · “Chef, set a timer for 8 minutes” · “Chef, how much time is left” · “Chef, should this be covered?” · “Chef, help”</div><label style="display:flex;gap:10px;align-items:flex-start;cursor:pointer;color:#f1f5f9;font-size:14px;line-height:1.5;margin-bottom:8px"><input type="checkbox" ${state.voiceLoose?"checked":""} onchange="state.voiceLoose=this.checked;scheduleSave()" style="margin-top:4px;width:18px;height:18px;flex-shrink:0"><span>Let me skip “chef” for the basics — <b>next</b>, <b>back</b>, <b>repeat</b>, <b>start timer</b>, <b>pause timer</b>, <b>ingredients</b> (said on their own)</span></label><div style="color:var(--dim);font-size:13px;line-height:1.5">The top bar shows what it's hearing as you talk — tap it to bring these tips back. Talking over the read-aloud is fine: saying “chef” cuts it off.</div></div>`:"";
     const hvHtml=voiceTip+secHtml+eqHtml+((step===0&&recipe.hiddenVeg)?`<div style="background:rgba(139,92,246,0.1);border:2px solid rgba(139,92,246,0.3);border-radius:14px;padding:14px 18px;margin-bottom:20px"><div style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px">🥦 HIDDEN VEG</div><div style="color:#d1d5db;font-size:15px">${esc(recipe.hiddenVeg)}</div></div>`:"");
     const scaleNote=cookScale!==1?'<span class="cook-step-scale-note">'+(cookScale===0.5?'½':cookScale===1.5?'1½':cookScale)+'× RECIPE</span>':'';
     body=`<div class="cook-layout"><div class="cook-main">
@@ -15696,8 +15702,9 @@ function speak(text,opts){
     const u=new SpeechSynthesisUtterance(cleanForSpeech(text));
     u.rate=(opts&&opts.rate)||1.0; u.lang="en-US";
     if(!_speakVoice) _speakVoice=pickVoice(); if(_speakVoice) u.voice=_speakVoice;
+    window._spokenText=voiceNorm(cleanForSpeech(text)); window._spokenUntil=Date.now()+60000;
     u.onstart=()=>{ window._speaking=true; };
-    u.onend=u.onerror=()=>{ setTimeout(()=>{ window._speaking=false; },250); };
+    u.onend=u.onerror=()=>{ window._spokenUntil=Date.now()+2500; setTimeout(()=>{ window._speaking=false; },250); };
     speechSynthesis.speak(u);
   }catch(e){}
 }
@@ -15717,15 +15724,55 @@ function speakCurrentStep(){
 function toggleReadAloud(){ state.readAloud=!state.readAloud; scheduleSave(); if(cookState) cookState._lastSpokenStep=cookState.step; renderCookScreen(); if(state.readAloud){ speakCurrentStep(); } else { try{speechSynthesis.cancel();}catch(e){} } }
 function updateVoiceButtons(){
   const r=document.getElementById("cook-read-btn"); if(r){ r.classList.toggle("active",!!state.readAloud); r.innerHTML=(state.readAloud?"🔊":"🔈")+'<span class="vlbl">'+(state.readAloud?" Reading aloud":"")+'</span>'; }
-  const m=document.getElementById("cook-mic-btn"); if(m){ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; m.style.display=SR?"":"none"; const on=!!(cookState&&cookState.voiceOn); m.classList.toggle("on",on); m.classList.toggle("thinking",!!window._voiceThinking); m.innerHTML=on?'<span class="vdot"></span>🎙<span class="vlbl"> '+(window._voiceThinking?"Thinking…":"Listening")+'</span>':'🎙<span class="vlbl"> Voice</span>'; }
+  const m=document.getElementById("cook-mic-btn"); if(m){ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; m.style.display=SR?"":"none"; const on=!!(cookState&&cookState.voiceOn); m.classList.toggle("on",on); const armed=on&&voiceArmed(); m.classList.toggle("armed",armed); m.classList.toggle("thinking",!!window._voiceThinking); m.innerHTML=on?'<span class="vdot"></span>🎙<span class="vlbl"> '+(window._voiceThinking?"Thinking…":armed?"Go ahead…":"Listening")+'</span>':'🎙<span class="vlbl"> Voice</span>'; }
+  setVoiceStatus(null);
 }
-function showHeard(t){ const el=document.getElementById("cook-heard"); if(!el) return; el.textContent="heard: “"+t+"”"; el.style.display=""; clearTimeout(window._heardT); window._heardT=setTimeout(()=>{ el.style.display="none"; },4000); }
+function setVoiceStatus(kind,text){
+  const el=document.getElementById("cook-heard"); if(!el) return;
+  const on=!!(cookState&&cookState.voiceOn);
+  if(kind){ window._vsKind=kind; window._vsText=text; clearTimeout(window._heardT); if(kind!=="armed") window._heardT=setTimeout(()=>{ window._vsKind=null; setVoiceStatus(null); },kind==="live"?2500:4000); }
+  else if(window._vsKind==="armed"&&!voiceArmed()) window._vsKind=null;
+  const k=on?window._vsKind:null;
+  el.className=on?("vs"+(k?" vs-"+k:"")):"";
+  if(!on){ el.style.display="none"; return; }
+  el.style.display="";
+  el.textContent=k==="armed"?"🟢 Go ahead — say the command":k==="live"?"hearing: “"+window._vsText+"”":k==="ok"?"✓ “"+window._vsText+"”":"say “Chef, …” · tips";
+}
+function showHeard(t){ setVoiceStatus("ok",t); }
+function toggleVoiceTip(){ if(!cookState) return; cookState.showVoiceTip=!cookState.showVoiceTip; renderCookScreen(); }
 
 // ── Speech recognition ─────────────────────────────────────────────────────
-let _rec=null, _lastFinal="", _lastFinalAt=0;
+// Reliability notes:
+//  • The wake word is caught from live (interim) results — we don't wait for the browser to
+//    "finalize", which can take seconds. A simple command that stops changing for ~0.7 s runs.
+//  • "Chef" on its own arms an 8-second window (beep + green "Go ahead…"): the next thing said
+//    runs without needing "chef" again.
+//  • Recognition restarts itself when the browser ends it, and a watchdog restarts a stalled one.
+//  • What the app itself is saying is ignored (so read-aloud can't trigger commands), but anything
+//    else — including "chef" — cuts the read-aloud off.
+let _rec=null, _recConsumed={}, _recPend=null, _recLastEvent=0, _recStartAt=0, _recQuickEnds=0, _recWatch=null;
+let _voiceArmedUntil=0, _voiceArmT=null, _lastCmdKey="", _lastCmdAt=0, _voiceCtx=null;
+const VOICE_ARM_MS=8000;
+function voiceArmed(){ return Date.now()<_voiceArmedUntil; }
+function voiceArm(){ _voiceArmedUntil=Date.now()+VOICE_ARM_MS; voiceChime(); setVoiceStatus("armed"); updateVoiceButtons(); clearTimeout(_voiceArmT); _voiceArmT=setTimeout(()=>{ _voiceArmedUntil=0; updateVoiceButtons(); },VOICE_ARM_MS+50); }
+function voiceDisarm(){ _voiceArmedUntil=0; clearTimeout(_voiceArmT); if(window._vsKind==="armed") window._vsKind=null; updateVoiceButtons(); }
+function voiceChime(){
+  try{ const ctx=_voiceCtx||(_voiceCtx=new(window.AudioContext||window.webkitAudioContext)()); if(ctx.state==="suspended") ctx.resume();
+    [[660,0],[990,0.09]].forEach(([f,d])=>{ const o=ctx.createOscillator(),g=ctx.createGain(); o.type="sine"; o.frequency.value=f; o.connect(g); g.connect(ctx.destination); const t0=ctx.currentTime+d; g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(0.18,t0+0.015); g.gain.exponentialRampToValueAtTime(0.0001,t0+0.13); o.start(t0); o.stop(t0+0.15); });
+  }catch(e){}
+}
+function voiceChimeOk(){ try{ const ctx=_voiceCtx; if(!ctx) return; const o=ctx.createOscillator(),g=ctx.createGain(); o.frequency.value=1320; o.connect(g); g.connect(ctx.destination); const t0=ctx.currentTime; g.gain.setValueAtTime(0.0001,t0); g.gain.exponentialRampToValueAtTime(0.08,t0+0.01); g.gain.exponentialRampToValueAtTime(0.0001,t0+0.08); o.start(t0); o.stop(t0+0.1); }catch(e){} }
+function voiceNorm(raw){ return String(raw||"").toLowerCase().replace(/(?<!\d)\.|\.(?!\d)/g," ").replace(/[,!?'"’]/g," ").replace(/\s+/g," ").trim(); }
+// True when what we heard is just the app's own read-aloud coming back through the mic
+function heardOwnVoice(norm){
+  if(!norm||!window._spokenText) return false;
+  if(!window._speaking&&Date.now()>(window._spokenUntil||0)) return false;
+  return (" "+window._spokenText+" ").includes(" "+norm+" ");
+}
 function toggleVoice(){
   if(!cookState) return;
   if(cookState.voiceOn){ stopVoice(); speak("Voice off."); return; }
+  try{ if(!_voiceCtx) _voiceCtx=new(window.AudioContext||window.webkitAudioContext)(); if(_voiceCtx.state==="suspended") _voiceCtx.resume(); }catch(e){}   // unlock audio for the beep while we have a tap
   startVoice(true);
 }
 function startVoice(userTap){
@@ -15733,20 +15780,84 @@ function startVoice(userTap){
   cookState.voiceOn=true;
   if(userTap&&!state.voiceTipSeen){ state.voiceTipSeen=true; scheduleSave(); cookState.showVoiceTip=true; }
   renderCookScreen();
-  if(userTap) speak("Listening. Start every command with chef.");
+  if(userTap) speak("Listening. Say chef, then what you need.");
   const run=()=>{
     if(!cookState||!cookState.voiceOn) return;
+    try{ if(_rec){ _rec.onend=null; _rec.onresult=null; _rec.onerror=null; try{_rec.abort();}catch(e){} } }catch(e){}
     try{
-      _rec=new SR(); _rec.continuous=true; _rec.interimResults=true; _rec.lang="en-US";
-      _rec.onresult=(ev)=>{ for(let i=ev.resultIndex;i<ev.results.length;i++){ const r=ev.results[i]; if(!r.isFinal) continue; const txt=(r[0].transcript||"").trim(); if(!txt) continue; if(window._speaking) continue; const now=Date.now(); if(txt.toLowerCase()===_lastFinal&&now-_lastFinalAt<1500) continue; _lastFinal=txt.toLowerCase(); _lastFinalAt=now; handleVoiceText(txt); } };
-      _rec.onerror=(e)=>{ if(e.error==="not-allowed"||e.error==="service-not-allowed"){ stopVoice(); state.voiceAutoStart=false; scheduleSave(); alert("Microphone access was blocked. Allow the mic for this site in your browser settings, then tap 🎙 again."); } };
-      _rec.onend=()=>{ if(cookState&&cookState.voiceOn) setTimeout(run,300); };
-      _rec.start();
+      const rec=new SR(); _rec=rec; _recConsumed={}; clearTimeout(_recPend); _recPend=null;
+      rec.continuous=true; rec.interimResults=true; rec.lang="en-US"; try{ rec.maxAlternatives=3; }catch(e){}
+      _recStartAt=Date.now(); _recLastEvent=Date.now();
+      const alive=()=>{ _recLastEvent=Date.now(); };
+      rec.onstart=rec.onaudiostart=rec.onsoundstart=rec.onspeechstart=alive;
+      rec.onresult=(ev)=>{ if(rec!==_rec) return; alive(); voiceOnResult(ev); };
+      rec.onerror=(e)=>{
+        if(e.error==="not-allowed"||e.error==="service-not-allowed"){ stopVoice(); state.voiceAutoStart=false; scheduleSave(); alert("Microphone access was blocked. Allow the mic for this site in your browser settings, then tap 🎙 again."); return; }
+        if(e.error==="audio-capture"){ setVoiceStatus("live","no microphone found — check the mic"); }
+        // no-speech / aborted / network: onend fires next and restarts us
+      };
+      rec.onend=()=>{
+        if(rec!==_rec) return;
+        if(!(cookState&&cookState.voiceOn)) return;
+        // if the browser keeps ending right away, back off a little instead of spinning
+        if(Date.now()-_recStartAt<1500) _recQuickEnds++; else _recQuickEnds=0;
+        setTimeout(run,_recQuickEnds>4?2000:120);
+      };
+      rec.start();
     }catch(e){ setTimeout(()=>{ if(cookState&&cookState.voiceOn) run(); },800); }
   };
+  window._voiceRestart=()=>{ if(cookState&&cookState.voiceOn) run(); };
+  clearInterval(_recWatch);
+  _recWatch=setInterval(()=>{
+    if(!(cookState&&cookState.voiceOn)){ clearInterval(_recWatch); return; }
+    // a session that has gone quiet for 40 s is often silently dead (esp. Safari) — refresh it
+    if(Date.now()-_recLastEvent>40000&&!_recPend&&!voiceArmed()) run();
+  },10000);
   run();
 }
-function stopVoice(){ if(cookState) cookState.voiceOn=false; try{ if(_rec){ _rec.onend=null; _rec.stop(); } }catch(e){} _rec=null; updateVoiceButtons(); }
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"&&cookState&&cookState.voiceOn&&window._voiceRestart) setTimeout(window._voiceRestart,300); });
+function stopVoice(){ if(cookState) cookState.voiceOn=false; clearInterval(_recWatch); clearTimeout(_recPend); _recPend=null; voiceDisarm(); try{ if(_rec){ _rec.onend=null; _rec.stop(); } }catch(e){} _rec=null; updateVoiceButtons(); }
+
+// Commands that are safe to run from a live (not-yet-final) result once it stops changing.
+// Free-form ones (questions, "how much…", "set a timer for…") wait for the final result.
+const VOICE_INTERIM_OK=new Set(["ack","next","back","repeat","ingr_open","ingr_close","timer_start","timer_pause","timer_reset","where","help","mute","voiceoff","scale"]);
+function voiceOnResult(ev){
+  for(let i=ev.resultIndex;i<ev.results.length;i++){
+    const r=ev.results[i]; const full=(r[0]&&r[0].transcript)||"";
+    const used=_recConsumed[i]||0;
+    const rest=full.length>used?full.slice(used):"";
+    const norm=voiceNorm(rest);
+    if(!norm){ if(r.isFinal) _recConsumed[i]=full.length; continue; }
+    if(!heardOwnVoice(norm)){
+      setVoiceStatus("live",rest.trim());
+      // barge-in: "chef" (or anything while armed) cuts off the read-aloud right away
+      if(window._speaking&&(voiceArmed()||parseVoiceCommand(rest,{}))){ try{speechSynthesis.cancel();}catch(e){} window._speaking=false; }
+    }
+    if(r.isFinal){
+      clearTimeout(_recPend); _recPend=null; _recConsumed[i]=full.length;
+      let ok=voiceInput(rest,true);
+      // the recognizer sometimes hears "chef" better in an alternative
+      for(let a=1;!ok&&a<r.length;a++){ const alt=(r[a]&&r[a].transcript)||""; if(alt.length>used) ok=voiceInput(alt.slice(used),true,true); }
+    } else {
+      clearTimeout(_recPend); const idx=i, flen=full.length, txt=rest;
+      _recPend=setTimeout(()=>{ _recPend=null; if((_recConsumed[idx]||0)>=flen) return; if(voiceInput(txt,false)) _recConsumed[idx]=flen; },700);
+    }
+  }
+}
+// Returns true when it ran something (or armed the window)
+function voiceInput(txt,isFinal,quiet){
+  if(!cookState||!cookState.recipe) return false;
+  const norm=voiceNorm(txt); if(!norm) return false;
+  if(heardOwnVoice(norm)) return false;
+  const c=parseVoiceCommand(txt,{armed:voiceArmed(),loose:!!state.voiceLoose});
+  if(!c) return false;
+  if(!isFinal&&!VOICE_INTERIM_OK.has(c.cmd)) return false;
+  const key=c.cmd+"|"+(c.arg||""), now=Date.now();
+  if(c.cmd!=="ack"&&key===_lastCmdKey&&now-_lastCmdAt<600) return true;   // same thing heard twice
+  _lastCmdKey=key; _lastCmdAt=now;
+  handleVoiceText(txt,c);
+  return true;
+}
 
 const NUM_WORDS={a:1,an:1,one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,eleven:11,twelve:12,thirteen:13,fourteen:14,fifteen:15,sixteen:16,seventeen:17,eighteen:18,nineteen:19,twenty:20,thirty:30,forty:40,fifty:50,sixty:60,ninety:90,half:0.5};
 function wordsToNumber(s){ s=(s||"").trim().toLowerCase(); if(/^\d+(\.\d+)?$/.test(s)) return parseFloat(s);
@@ -15754,13 +15865,33 @@ function wordsToNumber(s){ s=(s||"").trim().toLowerCase(); if(/^\d+(\.\d+)?$/.te
   if(/^(a\s+)?half$/.test(s)) return 0.5;
   s=s.replace(/^(a|an)\s+(?=\w)/,"");   // "a minute" stays 1 below; "a twenty" → twenty
   let total=0,found=false; s.split(/[\s-]+/).forEach(w=>{ if(NUM_WORDS[w]!==undefined){ total+=NUM_WORDS[w]; found=true; } }); return found?total:null; }
-// Returns {cmd,arg} or null when there is no wake word
-function parseVoiceCommand(raw){
-  let t=String(raw||"").toLowerCase().replace(/(?<!\d)\.|\.(?!\d)/g," ").replace(/[,!?'"’]/g," ").replace(/\s+/g," ").trim();
-  const wake=t.match(/^(?:ok |okay |hey |hi |yo )?(?:chef|shef|jeff|chefs|cheff)\b[\s,]*/);
-  if(!wake) return null;
-  t=t.slice(wake[0].length).trim();
-  if(!t) return {cmd:"ack"};
+// Returns {cmd,arg} or null when it isn't meant for us.
+// opts.armed: "chef" was just said on its own, so no wake word is needed now.
+// opts.loose: allow a few exact bare commands ("next", "back", "repeat"…) without "chef".
+const VOICE_WAKE_RE=/(?:^|\s)(?:(?:ok|okay|hey|hi|yo|alright|all right)\s)?(?:chef|chefs|cheff|cheffe|sheff|shef|shefs|chief|jeff|geoff|chev|shep)(?:\ss)?(?=\s|$)/g;
+const VOICE_LOOSE_RE=/^(next|next step|go back|back|previous step|repeat|repeat that|read it again|start( the)? timer|pause( the)? timer|stop( the)? timer|ingredients|show( me)?( the)? ingredients|hide( the)? ingredients)$/;
+function parseVoiceCommand(raw,opts){
+  opts=opts||{};
+  let t=voiceNorm(raw);
+  if(!t) return null;
+  let last=null, mm; VOICE_WAKE_RE.lastIndex=0;
+  while((mm=VOICE_WAKE_RE.exec(t))){ last={start:mm.index,end:mm.index+mm[0].length}; }
+  let midSentence=false;
+  if(last){
+    const before=t.slice(0,last.start).trim();
+    midSentence=before?before.split(" ").length>2:false;   // "um okay chef next" is fine; "you're such a good chef tonight" isn't a question
+    t=t.slice(last.end).trim();
+    if(!t) return midSentence?null:{cmd:"ack"};
+  } else if(opts.armed){
+    // fine — the wake word came just before
+  } else if(opts.loose&&VOICE_LOOSE_RE.test(t)){
+    // fine — a bare basic command
+  } else return null;
+  const c=parseVoiceBody(t);
+  if(midSentence&&c.cmd==="ask") return null;
+  return c;
+}
+function parseVoiceBody(t){
   let m;
   if(/^(stop listening|turn off|voice off|go to sleep)\b/.test(t)) return {cmd:"voiceoff"};
   if(/^(mute|stop talking|quiet|shush|be quiet)\b/.test(t)) return {cmd:"mute"};
@@ -15809,17 +15940,18 @@ async function voiceAsk(q){
   window._voiceThinking=false; updateVoiceButtons();
 }
 function formatTimerSpoken(s){ s=Math.max(0,Math.round(s)); const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60; const parts=[]; if(h) parts.push(h+(h===1?" hour":" hours")); if(m) parts.push(m+(m===1?" minute":" minutes")); if(ss&&!h) parts.push(ss+" seconds"); return parts.join(" ")||"zero seconds"; }
-function handleVoiceText(txt){
+function handleVoiceText(txt,c){
   if(!cookState||!cookState.recipe) return;
-  const c=parseVoiceCommand(txt); if(!c) return;
-  showHeard(txt);
+  if(!c) c=parseVoiceCommand(txt,{armed:voiceArmed(),loose:!!state.voiceLoose}); if(!c) return;
+  if(c.cmd==="ack"){ voiceArm(); return; }
+  voiceDisarm(); voiceChimeOk();
+  showHeard(txt.trim());
   const steps=(cookState.recipe.instructions||[]).filter(x=>!x.startsWith("──"));
   const t=cookState.timers&&cookState.timers[cookState.step];
   switch(c.cmd){
-    case "ack": speak("Yes?"); break;
     case "voiceoff": stopVoice(); speak("Voice off."); break;
     case "mute": try{speechSynthesis.cancel();}catch(e){} break;
-    case "help": speak("Say chef, then: next, back, repeat, ingredients, start timer, pause, set a timer for 8 minutes, how much time is left, how much garlic, what step am I on, scale half, or ask me any cooking question."); break;
+    case "help": speak("Say chef, then the command, in one go or after the beep: next, back, repeat, ingredients, start timer, pause, set a timer for 8 minutes, how much time is left, how much garlic, what step am I on, scale half, or ask me any cooking question."); break;
     case "next": if(window._voiceThinking) break; if(cookState.step>=steps.length) break; cookNext(); if(!state.readAloud) speak(cookState.step>=steps.length?"That's it. All done.":"Step "+(cookState.step+1)+"."); break;
     case "back": cookPrev(); if(!state.readAloud) speak("Step "+(cookState.step+1)+"."); break;
     case "repeat": speakCurrentStep(); break;
