@@ -5020,9 +5020,10 @@ const DEFAULT_DINNERS = [
       "Red pepper flakes for adults",
       "--- ADULT UPGRADES (optional) ---",
       "Optional: 2 oz prosciutto, added after baking (heat destroys it)",
-      "Arugula tossed in lemon oil on top after baking",
-      "Optional: 1 ball (4 oz) burrata, broken over the top right before serving",
-      "Optional: 1 tsp truffle oil, for drizzling"
+      "Optional: 1 big handful (about 1 cup) baby arugula, for after baking",
+      "Optional: lemon oil for the arugula — 1 tbsp extra-virgin olive oil + 1½ tsp fresh lemon juice (about ½ small lemon) + a pinch of flaky or kosher salt + black pepper",
+      "Optional: 1 ball (4 oz) burrata — out of the fridge 20 min before serving, patted dry",
+      "Optional: ½–1 tsp truffle oil, for drizzling (strong — a few drops goes a long way)"
     ],
     instructions:[
       "── OVEN ON FIRST ──",
@@ -5051,7 +5052,7 @@ const DEFAULT_DINNERS = [
       "ACID FINISH: fresh basil torn over the top immediately after coming out of the oven — the heat wilts it perfectly.",
       "Red pepper flakes for the adults.",
       "Rest 3 min before slicing — cheese needs to set slightly.",
-      "ADULT UPGRADES (adult half, after baking) — lay on prosciutto, pile on arugula tossed in lemon oil, break burrata over the top right before serving, finish with a drizzle of truffle oil.",
+      "ADULT UPGRADES (adult half, after baking, in this order) — 1) Lay on the prosciutto. 2) Lemon oil: in a medium bowl, whisk 1 tbsp olive oil + 1½ tsp lemon juice + a pinch of salt + pepper; toss in the arugula right before it goes on so it stays crisp (dressed, not soggy). Pile it on. 3) Tear the room-temp burrata open over the top and spoon the creamy center around. 4) Finish with a pinch of red pepper flakes and a few drops (½–1 tsp) of truffle oil — never bake truffle oil, heat kills the aroma.",
       "🫙 CONDIMENT IDEAS — hot honey drizzle on the pepperoni half · chopped peppadews · Momofuku chili crunch for the adults."
     ],
     tips:"FIT FLOUR DOUGH TEXTURE: Denser and less elastic than regular pizza dough — do not try to toss it. Press it out with your palms on parchment. It will not stretch as far as regular dough but bakes up with a great crispy-chewy texture. | PRE-BAKE THE CRUST: 5 min pre-bake before adding toppings is the single best trick for crispier pizza at home — prevents soggy center. | PIZZA STONE: If you have one use it — it goes in cold and heats the whole time the oven preheats (the longer the better), slide pizza on with parchment. Makes a dramatic difference in crust texture. | FRIK & FRAK SAUCE: Do not oversauce — a thin even layer. Too much sauce = soggy pizza. | FRESH MOZZARELLA: Tear it by hand rather than slicing — irregular pieces melt better and look more artisan. Pat it dry first — fresh mozzarella has water that can pool. | 72g PROTEIN: The whole pizza dough before toppings has 72g protein. With cheese and toppings a 2-slice serving hits 50-60g protein. This is genuinely remarkable for pizza.",
@@ -8435,7 +8436,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102207;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102301;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -15666,7 +15667,7 @@ function showImportStatus(msg) {
 
 // Bump RECIPE_REV whenever built-in recipes are edited in code. On next load, saved copies of
 // built-in recipes take the new content once (ratings, notes, plans are stored separately and untouched).
-const RECIPE_REV = "2026-10-22d";
+const RECIPE_REV = "2026-10-23a";
 function refreshBuiltInRecipes() {
   try {
     if (state.recipeRev === RECIPE_REV) return false;
