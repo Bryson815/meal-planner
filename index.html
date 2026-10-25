@@ -9352,7 +9352,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102409;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102410;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -10835,7 +10835,10 @@ function rolloverWeeks(){
   if (nextMon === cur) { state.weekPlan = normalizePlan(Object.assign({}, state.nextWeekPlan || {})); state.nextWeekPlan = {}; }
   else { state.weekPlan = {}; state.nextWeekPlan = {}; }
   state.weekPlanMonday = cur;
-  state.grocery = {}; state.groceryNotes = {}; state.prepDone = {}; state.groceryExcluded = {};
+  // Shopping done over the weekend was for the week that just started — keep those ticks, notes and left-off recipes.
+  // Only wipe them when we skipped ahead (no plan carried over).
+  if (nextMon !== cur) { state.grocery = {}; state.groceryNotes = {}; state.groceryExcluded = {}; }
+  state.groceryScope = null; state.prepDone = {};
   scheduleSave();
   return true;
 }
