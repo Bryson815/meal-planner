@@ -9354,7 +9354,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102411;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102412;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9578,6 +9578,8 @@ function productPhrase(text) {
   t = t.replace(/\s+(drizzle|sprinkle|dusting)\s*$/i, "");
   t = t.replace(/\([^)]*\)/g, " ");                 // (notes)
   t = t.split(/\s[—–-]\s/)[0];                      // — trailing notes
+  // "butter or Bibb lettuce" / "flour or corn tortillas" → keep the noun ("butter lettuce", "flour tortillas") before trimming the "or …" alternative
+  t = t.replace(/\b([a-z-]+) or ([a-z-]+) (lettuce|tortillas?|onions?|tomatoes|peppers?|beans|potatoes|cheese|noodles|pasta|rice)\b/i, "$1 $3");
   t = t.replace(/\b(sub|substitute|or)\b:?.*$/i, m => /^or\s/i.test(m) ? "" : "").trim();
   t = t.split(/,|;|\bplus\b|\bfor\b|\binstead of\b|\bor crispy\b/i)[0];        // , diced / for serving / instead of
   t = t.replace(/^[\d\s\/½¼¾⅓⅔⅛⅜⅝⅞.\-–×x]+(?:(?:cups?|tbsp|tsp|oz|ounces?|lbs?|pounds?|g|kg|ml|cloves?|cans?|jars?|bags?|packs?|packages?|pouches?|slices?|bunch|heads?|stalks?|sprigs?|sheets?|pints?|quarts?|large|medium|small|whole|extra|handfuls?|box(?:es)?|bottles?|tubs?|containers?|loaf|loaves|dozen|pinch(?:es)?|dash(?:es)?|ripe)\b)?\s*(?:of\s+)?/i, "");
