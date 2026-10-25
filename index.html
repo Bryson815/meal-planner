@@ -9355,13 +9355,13 @@ function _legacyApplySwaps(ingredients) {
 // overwrite the family plan with defaults); (2) every upload is a 3-way merge against what
 // this device last synced, so MK's edit and Andrew's edit to different things both survive.
 const STORAGE_KEY = "lemmonMealPlan_v2";
-const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek","groceryExcluded","groceryLunchbox","groceryScope","recipeScale","haveStats","planProposal","cartRequest"];
+const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek","groceryExcluded","groceryLunchbox","groceryScope","recipeScale","haveStats","planProposal","cartRequest","productPrefs","leftovers","aisleOrder"];
 const DEVICE_KEYS = ["vaultSort","readAloud","voiceAutoStart","voiceTipSeen","voiceLoose","vaultAudience","vaultQuick","vaultUseUp"];
 let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102516;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102517;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9639,7 +9639,8 @@ function buildClaudeListText() {
     if (v.sec !== cur) { if (cur) lines.push(""); cur = v.sec; lines.push("## " + cur); }
     const qty = (v.text.match(/^([\d½¼¾⅓⅔⅛.\/\s-]+)\s*(lbs?|oz|cups?|cans?|jars?|bags?|packs?|packages?|pouches?|bunch(?:es)?|heads?)\b/i) || [])[0];
     const lead = !qty && (v.text.match(/^(\d+)\s+(?!(?:tbsp|tsp|cups?)\b)/i) || [])[1];
-    lines.push("- " + v.phrase + (qty ? " (~" + qty.trim() + ")" : lead && +lead > 1 ? " ×" + lead : (v.count > 1 ? " ×" + v.count : "")) + (v.opt ? " (optional)" : ""));
+    const pp = preferredProduct(v.phrase);
+    lines.push("- " + v.phrase + (pp ? " — buy: " + pp : "") + (qty ? " (~" + qty.trim() + ")" : lead && +lead > 1 ? " ×" + lead : (v.count > 1 ? " ×" + v.count : "")) + (v.opt ? " (optional)" : ""));
   });
   lines.push("");
   if (state.alexaOnlyItems && state.alexaOnlyItems.length) { lines.push("## Extra items (Alexa)"); state.alexaOnlyItems.forEach(i => lines.push("- " + i)); lines.push(""); }
@@ -9682,7 +9683,7 @@ function shopPickState(phrase, text, opt){
 }
 function shopPreviewItems(){
   const grouped = collectShoppingItems(false);
-  const order = ["Produce","Proteins","Dairy & Eggs","Bread & Grains","Frozen","Pantry","Condiments","Spices & Seasonings","Other"];
+  const order = grocerySectionOrder();
   const out = [];
   const seen = {};
   order.concat(Object.keys(grouped).filter(k=>!order.includes(k))).forEach(sec => {
@@ -9701,6 +9702,27 @@ function shopPickReset(){ state.shopPicks = {}; scheduleSave(); renderShopPrevie
 function shopWeekKey(){ const d=new Date(); const day=(d.getDay()+6)%7; d.setDate(d.getDate()-day); return localISODate(d); }
 function openShopPreview(){ if (state.shopPicksWeek !== shopWeekKey()) { state.shopPicks = {}; state.shopPicksWeek = shopWeekKey(); } let m=document.getElementById("shop-preview"); if(!m){ m=document.createElement("div"); m.id="shop-preview"; m.className="sp-modal"; m.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:420;display:flex;align-items:flex-end;justify-content:center"; m.onclick=e=>{ if(e.target===m) closeShopPreview(); }; document.body.appendChild(m); } m.style.display="flex"; document.body.classList.add("sheet-open"); renderShopPreview(); }
 function closeShopPreview(){ const m=document.getElementById("shop-preview"); if(m) m.style.display="none"; document.body.classList.remove("sheet-open"); }
+// ── Preferred products: the exact thing to buy for an ingredient (synced; set from the review screen) ──
+const DEFAULT_PRODUCT_PREFS = [
+  [/\bground turkey\b/, "Jennie-O lean ground turkey (1 lb pack)"],
+  [/\b(brami|protein\+|barilla protein)\b/, "Barilla Protein+ pasta (same shape)"],
+  [/\bcheddar\b/, "Tillamook sharp cheddar block"],
+  [/\brao'?s\b.*marinara|^rao'?s marinara$|\bmarinara\b/, "Rao's Homemade marinara, 24 oz"],
+  [/\b(5%|full[- ]fat).*greek yogurt|^greek yogurt$|fage 5/, "Fage Total 5% plain Greek yogurt"],
+  [/\b2%.*greek yogurt|fage 2/, "Fage Total 2% plain Greek yogurt"],
+  [/\bkosher salt\b/, "Diamond Crystal kosher salt"],
+];
+function preferredProduct(phrase){
+  const k = shopKey(phrase); const mine = (state.productPrefs || {})[k];
+  if (mine !== undefined) return mine || "";                         // "" = explicitly no preference
+  const low = String(phrase || "").toLowerCase(); const hit = DEFAULT_PRODUCT_PREFS.find(([re]) => re.test(low)); if (!hit) return "";
+  if (low.startsWith(hit[1].toLowerCase().split(/\s+/)[0])) return "";      // the recipe already names that brand — its wording is more specific
+  return hit[1];
+}
+function setProductPref(k, current){
+  const v = prompt("Exact product to buy for \"" + k + "\" (brand, size). Leave blank for no preference.", current || "");
+  if (v === null) return; state.productPrefs = Object.assign({}, state.productPrefs || {}); state.productPrefs[k] = v.trim(); scheduleSave(); renderShopPreview();
+}
 function renderShopPreview(){
   const m=document.getElementById("shop-preview"); if(!m) return;
   const items = shopPreviewItems(); const onN = items.filter(i=>i.on).length;
@@ -9710,7 +9732,8 @@ function renderShopPreview(){
     return `<label style="display:flex;align-items:flex-start;gap:10px;padding:9px 10px;border-radius:10px;margin-bottom:4px;background:${it.on?"rgba(16,185,129,0.07)":"rgba(255,255,255,0.02)"};border:1px solid ${it.on?"rgba(16,185,129,0.25)":"rgba(255,255,255,0.06)"};cursor:pointer;opacity:${it.on?1:0.65}">
       <input type="checkbox" ${it.on?"checked":""} onchange="shopPickToggle('${k}', this.checked)" style="width:20px;height:20px;margin-top:1px;accent-color:#10b981;flex-shrink:0">
       <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:var(--text)">${esc(it.phrase)}${it.count>1?` <span style="color:var(--dim);font-weight:500">×${it.count}</span>`:""}${qty?` <span style="color:var(--dim);font-weight:500">(~${esc(qty.trim())})</span>`:""}</div>
-      <div style="font-size:11px;color:var(--dim);margin-top:2px">${esc(it.sources.slice(0,2).join(" · "))}${it.reason?` · <span style="color:${it.on?"#fbbf24":"#94a3b8"}">${esc(it.reason)}</span>`:""}</div></div></label>`;
+      ${(()=>{ const pp=preferredProduct(it.phrase); const btn=(lbl)=>`<a href="#" onclick="event.preventDefault();event.stopPropagation();setProductPref('${k}',${JSON.stringify(pp).replace(/"/g,"&quot;").replace(/'/g,"\\'")})" style="color:var(--dim);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2)">${lbl}</a>`;
+        return (pp?`<div style="font-size:12px;margin-top:3px;color:#a7f3d0">→ ${esc(pp)} · ${btn("change")}</div>`:"")+`<div style="font-size:11px;color:var(--dim);margin-top:2px">${esc(it.sources.slice(0,2).join(" · "))}${it.reason?` · <span style="color:${it.on?"#fbbf24":"#94a3b8"}">${esc(it.reason)}</span>`:""}${pp?"":" · "+btn("set brand")}</div>`; })()}</div></label>`;
   };
   let html = "", cur = "";
   // 🔀 Choose-one groups for planned recipes: pick the path, check/uncheck the whole group or single items
@@ -9746,7 +9769,7 @@ function renderShopPreview(){
   </div>`;
 }
 async function openInstacartList(btn) {
-  const items = shopPreviewItems().filter(i => i.on).map(i => ({ name: i.phrase, display: i.text.replace(/\s*\([^)]*\)\s*/g, " ").trim().slice(0, 150), quantity: 1 }));
+  const items = shopPreviewItems().filter(i => i.on).map(i => ({ name: preferredProduct(i.phrase) || i.phrase, display: i.text.replace(/\s*\([^)]*\)\s*/g, " ").trim().slice(0, 150), quantity: 1 }));
   if (!items.length) { alert("Nothing unchecked on the list."); return; }
   const orig = btn ? btn.textContent : "";
   if (btn) { btn.disabled = true; btn.textContent = "⏳ Building Instacart list…"; }
@@ -9969,6 +9992,32 @@ function prepShareText(rids){
     return head + "\n" + todo.map((x, n) => (n + 1) + ". " + x.t.task + ((x.t.when || x.t.store) ? "\n   ⏰ " + [x.t.when, x.t.store].filter(Boolean).join(" · ") : "")).join("\n") + "\n📖 Full recipe: " + recipeLink(rid, "prep"); }).filter(Boolean);
   return "Prep ahead 🙏\n\n" + parts.join("\n\n") + "\n\nTick each one off in the app when it's done.";
 }
+// ── Send MK the week: dinners by day + what to thaw / marinate / make ahead, as one text ──
+function weekShareText(){
+  const wk = planWeekView === "next" ? "next" : "this"; const plan = wk === "next" ? (state.nextWeekPlan || {}) : (state.weekPlan || {});
+  const mon = wk === "next" ? addDaysISO(mondayISO(), 7) : mondayISO(); const today = localISODate();
+  const lines = [];
+  PLAN_DAYS.forEach((d, i) => { const iso = addDaysISO(mon, i); if (wk === "this" && iso < today) return; const e = planGet(plan, d, "dinner"); if (!e) return;
+    const lbl = d.slice(0, 3) + " " + new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "numeric", day: "numeric" });
+    if (e.leftoverOf) { const s = byIdAll(e.leftoverOf); lines.push(lbl + " — leftovers" + (s ? ": " + s.name : "")); return; }
+    const r = byIdAll(e.recipeId); if (!r) return; const sd = e.side && SIDES_BY_ID[e.side];
+    lines.push(lbl + " — " + r.name + (sd ? " + " + sd.name : "") + " (" + timeLabel(r, true) + ")" + (e.note ? "\n   📝 " + e.note : "")); });
+  if (!lines.length) return "";
+  let prep = []; try { const g = buildPrepList(plan); ["thaw", "marinate", "ahead", "sauces"].forEach(k => (g[k] || []).forEach(x => prep.push("• " + x.text + (x.detail ? " — " + x.detail : "")))); } catch (e) {}
+  return (wk === "next" ? "Next week's dinners 🍽" : "Dinners this week 🍽") + "\n\n" + lines.join("\n") + (prep.length ? "\n\nAhead of time:\n" + prep.slice(0, 10).join("\n") : "") + "\n\nRecipes + shopping list: " + location.origin + location.pathname;
+}
+function openWeekShare(){
+  const text = weekShareText(); if (!text) { alert("Nothing planned for the rest of this week yet."); return; }
+  const subj = (planWeekView === "next" ? "Next week's dinners" : "This week's dinners");
+  openModal(`<div class="modal-header"><div><div class="modal-title">💬 Send MK the week</div><div style="color:var(--dim);font-size:13px;margin-top:4px">Dinners, what to thaw or prep and when, and a link to the app.</div></div><button class="modal-close" onclick="closeModalForce()">✕</button></div>
+    <pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;line-height:1.5;color:#cbd5e1;background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;max-height:45vh;overflow:auto">${esc(text)}</pre>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">
+      <a href="${smsHref(state.wifePhone, text)}" style="text-align:center;padding:12px;border-radius:12px;background:rgba(16,185,129,0.15);color:#34d399;font-weight:800;text-decoration:none">💬 Text${state.wifePhone ? " MK" : ""}</a>
+      <a href="mailto:${encodeURIComponent(state.wifeEmail || "")}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(text)}" style="text-align:center;padding:12px;border-radius:12px;background:rgba(99,102,241,0.15);color:#a5b4fc;font-weight:800;text-decoration:none">✉️ Email</a>
+      <button onclick="navigator.clipboard.writeText(weekShareText()).then(()=>{this.textContent='✅ Copied'})" style="grid-column:1/-1;padding:11px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-weight:700;cursor:pointer">📋 Copy</button>
+    </div>
+    <div style="text-align:center;font-size:12px;color:var(--dim);margin-top:10px">${state.wifePhone ? "Goes to MK at " + esc(prettyPhone(state.wifePhone)) : "Add MK's cell in Settings to text her directly"}</div>`);
+}
 function openPrepShare(ridOrList){
   const rids = Array.isArray(ridOrList) ? ridOrList : [ridOrList]; const text = prepShareText(rids);
   const subj = "Prep ahead: " + rids.map(id => (byIdAll(id) || {}).name).filter(Boolean).join(", ");
@@ -10053,6 +10102,37 @@ function cartRequestHtml(){
   if (c.status === "done") return `<div style="margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.35);font-size:13px;color:#a7f3d0">✅ Claude filled your ${esc(c.store || state.store)} cart ${t(c.doneAt || c.at)}${c.result ? " — " + esc(c.result) : ""}. Open Instacart to check out.</div>`;
   if (c.status === "error") return `<div style="margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.35);font-size:13px;color:#fecaca">⚠️ Claude couldn't fill the cart: ${esc(c.result || "unknown problem")}. Use 🛒 Copy for Claude instead.</div>`;
   return "";
+}
+
+// ══ LEFTOVERS IN THE FRIDGE — logged when dinner is cooked; good 3–4 days, never frozen ══
+function leftoversList(){ const cut = addDaysISO(localISODate(), -6); return (Array.isArray(state.leftovers) ? state.leftovers : []).filter(x => x && x.status !== "gone" && x.made >= cut); }
+function leftoversAdd(recipeId, date){
+  if (!(state.dinners || []).some(d => d.id === recipeId)) return; const r = byIdAll(recipeId); if (!r) return; date = date || localISODate();
+  const L = Array.isArray(state.leftovers) ? state.leftovers.slice() : []; if (L.some(x => x.recipeId === recipeId && x.made === date)) return;
+  L.unshift({ id: "lo" + Date.now().toString(36), recipeId, name: r.name, emoji: r.emoji || "🍽️", made: date, portions: 2, status: "open" });
+  state.leftovers = L.filter(x => x.made >= addDaysISO(localISODate(), -21)).slice(0, 30);
+}
+function leftoverUpdate(id, fn){ state.leftovers = (state.leftovers || []).map(x => x.id === id ? fn(Object.assign({}, x)) : x); scheduleSave(); renderPlan(); }
+function leftoverEat(id){ leftoverUpdate(id, x => { x.portions = Math.max(0, (x.portions || 1) - 1); if (!x.portions) x.status = "gone"; return x; }); }
+function leftoverMore(id){ leftoverUpdate(id, x => { x.portions = (x.portions || 0) + 1; return x; }); }
+function leftoverGone(id){ leftoverUpdate(id, x => { x.status = "gone"; return x; }); }
+function renderLeftoversCard(){
+  if (planWeekView !== "this") return ""; const L = leftoversList(); if (!L.length) return "";
+  const today = localISODate(); const dayN = d => Math.round((new Date(today + "T12:00:00") - new Date(d + "T12:00:00")) / 86400000);
+  const wd = iso => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { weekday: "short" });
+  const rows = L.map(x => { const n = dayN(x.made); const eatBy = addDaysISO(x.made, 3);
+    const planned = PLAN_DAYS.find((d, i) => { const e = planGet(state.weekPlan || {}, d, "dinner"); return e && e.leftoverOf === x.recipeId && addDaysISO(state.weekPlanMonday || mondayISO(), i) >= today; });
+    const st = n >= 5 ? { c: "#fca5a5", t: "past day 4 — toss it" } : n >= 3 ? { c: "#fbbf24", t: n === 3 ? "eat today or tomorrow" : "last day — eat today" } : { c: "#86efac", t: "good through " + wd(eatBy) };
+    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,0.06)">
+      <span style="font-size:22px">${x.emoji}</span>
+      <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:700;line-height:1.25;cursor:pointer" onclick="viewRecipeById('${x.recipeId}')">${esc(x.name)}</div>
+        <div style="font-size:12px;color:var(--dim)">Made ${n === 0 ? "today" : n === 1 ? "yesterday" : wd(x.made)} · <span style="color:${st.c};font-weight:700">${st.t}</span>${planned ? ` · 🍽 ${planned.slice(0, 3)} dinner` : " · 🍱 pack for lunch"}</div></div>
+      <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+        <button onclick="leftoverEat('${x.id}')" title="Ate one portion" style="padding:6px 10px;border-radius:10px;border:1px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);color:#6ee7b7;font-size:13px;font-weight:700;cursor:pointer">${x.portions || 0} left −1</button>
+        <button onclick="leftoverMore('${x.id}')" title="More portions than that" style="padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:13px;cursor:pointer">+</button>
+        <button onclick="leftoverGone('${x.id}')" title="All gone / tossed" style="padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--dim);font-size:13px;cursor:pointer">✕</button></div></div>`; }).join("");
+  return `<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:10px 14px 4px;margin-bottom:14px">
+    <div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#5eead4;margin-bottom:2px">🥡 IN THE FRIDGE</div>${rows}</div>`;
 }
 
 // ══ TONIGHT (planned) ═════════════════════════════════════════════════════════
@@ -10499,9 +10579,18 @@ async function runImportParser(section, input) {
   try {
     const tools = input.type === "url" ? [{ type: "web_search_20250305", name: "web_search" }] : undefined;
     const res = await callClaude({
-        model:"claude-sonnet-4-20250514", max_tokens:1500,
+        model:"claude-sonnet-4-6", max_tokens:4000,
         ...(tools ? { tools } : {}),
-        system:`You are a recipe parser. Return ONLY a raw JSON object, no markdown. Format: {"name":"...","emoji":"🍽️","description":"one sentence","calories":500,"protein":40,"activeTime":"15 min","totalTime":"30 min","serves":"4 servings",${dayHint}"kidFriendly":false,"prepNote":"","ingredients":["..."],"instructions":["..."],"tips":"one tip","sourceUrl":"if URL provided"} Estimate calories/protein for family of 4 if not stated. For URL inputs, fetch the page content and extract the full recipe.`,
+        system:`You are a recipe parser. Return ONLY a raw JSON object, no markdown. Format: {"name":"...","emoji":"🍽️","description":"one sentence","calories":500,"protein":40,"activeTime":"15 min","totalTime":"30 min","serves":"4 servings",${dayHint}"kidFriendly":false,"prepNote":"","ingredients":["..."],"instructions":["..."],"tips":"one tip","sourceUrl":"if URL provided"} Estimate calories/protein per serving if not stated. For URL inputs, fetch the page content and extract the full recipe.
+Also include: "proteinType" (one of chicken, turkey, beef, pork, fish, shellfish, veg, egg), "quick" (true if total time ≤ 30 min), "audience" ("family" unless it's clearly adults-only), "kidTier" (1–5, how likely a 5- and 7-year-old eat it happily; herbs and spices are fine, chili heat is not), and "reviewNotes": an array of short strings, one per change or concern.
+HOUSE RULES — apply them while you transcribe and log every change in reviewNotes:
+1. Soundness: check leavening, liquid-to-flour ratios, salt amount (assume Diamond Crystal kosher salt), pan size, times and temperatures. Fix anything that would not work and say what you fixed. Keep the author's intent and flavor — do not "healthify" it into a different dish; lighter swaps only where they cost no flavor.
+2. Doneness targets in the step itself: chicken breast 150–155°F then rest; chicken thighs 170–175°F; ground meat 160°F; pork 140°F rising to 145°F as it rests; cod 130–135°F; salmon 120–125°F.
+3. Full flavor for everyone: the kids eat herbs, spices, garlic and aromatics. Only chili heat (hot sauce, sriracha, cayenne, chili flakes, fresh hot chiles) comes out of the shared pot — it goes on at the table or is stirred into the adults' share after the girls' portions are served; write that into the step. Never cut other seasoning.
+4. Size: dinner for 4 plus 1–2 lunch portions, rounded to whole store packages (1 or 2 lb of meat, full cans, whole bunches). Note the scaling if you changed it.
+5. Leftovers keep 3–4 days in the fridge; never suggest freezing cooked leftovers.
+6. Greek yogurt in sauces and cooking = Fage 5%.
+Put the target temperature and any "after the girls' share" instruction into the instructions, not just the notes.`,
         messages:[{role:"user", content: messageContent}]
       }).then(d => ({ ok: true, json: async () => d })).catch(e => ({ ok: false, json: async () => ({ content: [], error: e.message }) }));
     const data = await res.json();
@@ -10534,6 +10623,7 @@ async function runImportParser(section, input) {
         <button class="modal-close" onclick="closeModalForce()">✕</button>
       </div>
       ${diffHtml}
+      ${(recipe.reviewNotes||[]).length ? `<div class="info-box" style="margin-bottom:12px;background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.35);border-radius:12px;padding:10px 12px"><div style="font-weight:800;color:#a5b4fc;font-size:13px;margin-bottom:4px">🔎 Checked against the house rules</div>${recipe.reviewNotes.map(n=>`<div style="font-size:12.5px;color:#cbd5e1;margin-top:3px;line-height:1.4">• ${esc(n)}</div>`).join("")}</div>` : ""}
       ${ingrPreview}
       <div style="color:var(--dim);font-size:12px;margin:12px 0">💡 Macros estimated — edit anytime after adding.</div>
       <div style="display:flex;gap:8px">
@@ -11044,6 +11134,10 @@ function smartPlan(opts) {
     // same protein within the last 2 days (beyond the consecutive-night check)
     const two = timeline[idx - 2]; if (two && two.dinner && two.dinner.recipeId) { const o = byId[two.dinner.recipeId]; if (o && mainProtein(o) === mainProtein(r)) s -= 8; }
     if (r.vegForward && vegN < 1) s += 10;
+    // ⭐ lean on proven hits, but try about one new recipe a week (never on a quick night)
+    { const hs = hitStatus(r.id); const newN = wkDinners.filter(o => o.id !== r.id && hitStatus(o.id) === "new").length;
+      if (hs === "hit") s += 25; else if (hs === "miss") s -= 40;
+      else if (hs === "new") s += newN >= 1 ? -35 : (wantQuick ? -10 : 12); }
     s += Math.random() * 8;
     return s;
   }
@@ -11058,6 +11152,7 @@ function smartPlan(opts) {
     timeline.forEach((t, j) => { if (t.dinner && t.dinner.recipeId && Math.abs(j - idx) <= 3 && j !== idx) { const o = byId[t.dinner.recipeId]; if (!o) return; const sh = [...keysOf(o)].filter(k => mine.has(k)).map(cleanShareName).filter(Boolean); const uniq = [...new Set(sh)]; if (uniq.length >= 2) sharedWith.push(t.day.slice(0, 3) + ": " + uniq.slice(0, 3).join(", ")); } });
     if (sharedWith.length) reasons.push("🧺 shares " + sharedWith[0]);
     if (wantAdult) reasons.push("🍷 adults night"); if (wantQuick && r.quick) reasons.push("⚡ quick night");
+    { const hs = hitStatus(r.id); if (hs === "hit") reasons.push("⭐ proven hit"); else if (hs === "new") reasons.push("🆕 this week's something new"); }
     const rt = (state.ratings || {})[r.id] || {}; if (rt.favorite) reasons.push("⭐ favorite");
     if (!reasons.length) reasons.push(daysSinceCooked(r.id) > 60 ? "🆕 haven't made this in a while" : "✅ good fit");
     return reasons.slice(0, 2).join(" · ");
@@ -11463,7 +11558,7 @@ function buildPrepList(plan){
   const short=d=>d.slice(0,3);
   const groups={ sauces:[], chop:[], marinate:[], thaw:[], ahead:[] };
   // (a) sauces referenced by planned recipes
-  (DEFAULT_SAUCES||state.sauces||[]).forEach(sc=>{ const nm=sc.name.toLowerCase(); const users=recipes.filter(x=>(x.r.ingredients||[]).some(l=>typeof l==="string"&&l.toLowerCase().includes(nm)&&!/\bor\b/i.test(l.replace(new RegExp(nm,"i"),""))&&!/optional|fun twist|if you like|for a change/i.test(l))); if(users.length) groups.sauces.push({text:`Make ${sc.name} (${sc.batchNote?"½ batch":"small batch"})`, detail:users.map(u=>short(u.day)+" "+u.r.name).join(", "), key:"sauce-"+sc.id}); });
+  (DEFAULT_SAUCES||state.sauces||[]).forEach(sc=>{ const nm=sc.name.toLowerCase(); const users=recipes.filter(x=>((typeof ingredientsChosen==="function"?ingredientsChosen(x.r):null)||x.r.ingredients||[]).some(l=>typeof l==="string"&&!l.startsWith("---")&&l.toLowerCase().includes(nm)&&!/\bor\b/i.test(l.replace(new RegExp(nm,"i"),""))&&!/optional|fun twist|if you like|for a change/i.test(l))); if(users.length) groups.sauces.push({text:`Make ${sc.name} (${sc.batchNote?"½ batch":"small batch"})`, detail:users.map(u=>short(u.day)+" "+u.r.name).join(", "), key:"sauce-"+sc.id}); });
   // (b) chop/grate across recipes
   const chopRules=[
     {re:/(\d+(?:\.\d+)?|½|¼|¾|an?|one|two|three|four)\s+(large |medium |small |yellow |sweet |red )*onions?\b/i, label:"Dice onions", unit:"onion"},
@@ -11653,6 +11748,7 @@ function renderPlan() {
     ${renderNextWeekNudge()}
     ${renderTonightPlanned(plan)}
     ${renderRatingNudge()}
+    ${renderLeftoversCard()}
     ${renderUseUpCard()}
     ${planWeekView==="this" ? renderGirlsBreakfastCard() : ""}
     ${planWeekView==="this" ? lbPackCard(!lbCardOpen()) : ""}
@@ -11674,6 +11770,7 @@ function renderPlan() {
         </div>
         <div style="display:flex;gap:8px">
           ${planWeekView==="next"&&Object.keys(state.nextWeekPlan||{}).length?`<button onclick="rollNextWeek()" style="padding:8px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.5);background:rgba(129,140,248,0.1);color:#a5b4fc;font-size:13px;font-weight:700;cursor:pointer">↻ Roll into this week</button>`:""}
+          ${assigned.length?`<button onclick="openWeekShare()" title="Text MK the week's dinners and prep" style="padding:8px 14px;border-radius:20px;border:1px solid rgba(16,185,129,0.45);background:rgba(16,185,129,0.08);color:#34d399;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">💬 Send MK</button>`:""}
           ${assigned.length?`<button onclick="openPrepList()" style="padding:8px 14px;border-radius:20px;border:1px solid rgba(245,158,11,0.45);background:rgba(245,158,11,0.08);color:#fbbf24;font-size:13px;font-weight:700;cursor:pointer">🧺 Prep list</button>`:""}
           ${assigned.length?`<button onclick="saveThisWeek()" title="Save this week's dinners so you can repeat them later" style="padding:8px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.14);background:transparent;color:var(--muted);font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap">⭐ Save</button>`:""}
           <button onclick="showAutoplanOptions()" style="padding:8px 14px;border-radius:20px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#fff;font-size:13px;font-weight:700;cursor:pointer">✨ Plan my week</button>
@@ -11920,7 +12017,7 @@ function renderVault() {
             </div>
             <div style="font-size:12px;color:var(--dim)">${r.calories||""}cal · ${r.protein||""}g protein · ⏱ ${esc(timeLabel(r,true))}</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-              ${recipeChips(r,{mt:0})}
+              ${hitBadge(r.id)}${recipeChips(r,{mt:0})}
               ${cookCount?`<span style="font-size:11px;color:var(--dim);align-self:center">Made ${cookCount}x</span>`:""}
               ${assignedDay?`<span style="font-size:11px;color:var(--green)">✅ ${assignedDay[0].replace("_"," ")}</span>`:""}
               ${(function(){ const hits=useUpUnplanned().filter(it=>useUpRecipeMatch(it,r).score>0).map(it=>it.text); return hits.length?`<span style="font-size:11px;color:#86efac;background:rgba(16,185,129,0.12);padding:1px 7px;border-radius:999px">🥡 uses: ${esc(hits.join(", "))}</span>`:""; })()}
@@ -12292,6 +12389,27 @@ function condimentOwned(text){
     return keys.some(k=>t.includes(k)) || (c.id==="c-cholula"&&t.includes("cholula")) || (c.id==="c-franks"&&t.includes("frank"));
   });
 }
+// ── Store order: sections listed in the order you walk your store (editable per store, synced) ──
+const BASE_SECTIONS = ["Produce","Proteins","Dairy & Eggs","Bread & Grains","Frozen","Pantry","Condiments","Spices & Seasonings","Other"];
+const STORE_WALK = { Publix: ["Produce","Bread & Grains","Proteins","Pantry","Condiments","Spices & Seasonings","Dairy & Eggs","Frozen","Other"] };
+function grocerySectionOrder(){
+  const mine = (state.aisleOrder || {})[state.store]; const base = (Array.isArray(mine) && mine.length) ? mine : (STORE_WALK[state.store] || BASE_SECTIONS);
+  return base.filter(x => BASE_SECTIONS.includes(x)).concat(BASE_SECTIONS.filter(x => !base.includes(x)));
+}
+function moveAisle(sec, dir){ const o = grocerySectionOrder().slice(); const i = o.indexOf(sec), j = i + dir; if (i < 0 || j < 0 || j >= o.length) return; [o[i], o[j]] = [o[j], o[i]]; state.aisleOrder = Object.assign({}, state.aisleOrder || {}, { [state.store]: o }); scheduleSave(); renderGrocery(); }
+function resetAisles(){ const a = Object.assign({}, state.aisleOrder || {}); a[state.store] = []; state.aisleOrder = a; scheduleSave(); renderGrocery(); }
+function aisleEditorHtml(){
+  if (!window._aisleEdit) return "";
+  const o = grocerySectionOrder();
+  return `<div style="margin:0 0 12px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.1)">
+    <div style="font-size:13px;font-weight:700;color:var(--muted);margin-bottom:4px">🏬 Order you walk ${esc(state.store)}</div>
+    <div style="font-size:12px;color:var(--dim);margin-bottom:8px">Layouts differ store to store — set it once for yours and the list, review screen and copied list follow it.</div>
+    ${o.map((sec, i) => `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-top:${i ? "1px solid rgba(255,255,255,0.05)" : "none"}"><span style="width:20px;color:var(--dim);font-size:12px">${i + 1}</span><span style="flex:1;font-size:14px">${esc(sec)}</span>
+      <button onclick="moveAisle('${sec}',-1)" ${i ? "" : "disabled"} style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);cursor:pointer;opacity:${i ? 1 : 0.3}">↑</button>
+      <button onclick="moveAisle('${sec}',1)" ${i < o.length - 1 ? "" : "disabled"} style="padding:4px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);cursor:pointer;opacity:${i < o.length - 1 ? 1 : 0.3}">↓</button></div>`).join("")}
+    <div style="display:flex;gap:8px;margin-top:8px"><button onclick="resetAisles()" style="padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">Reset</button><button onclick="window._aisleEdit=false;renderGrocery()" style="flex:1;padding:7px 12px;border-radius:10px;border:none;background:var(--green);color:#0a0f1a;font-weight:800;font-size:13px;cursor:pointer">Done</button></div>
+  </div>`;
+}
 function renderGrocery() {
   const el = document.getElementById("page-grocery");
   const useSmartList = !state.useStaticGrocery;
@@ -12307,7 +12425,7 @@ function renderGrocery() {
   const displayCats = useSmartList ? smartCatsWithAlexa : GROCERY_DATA.map(({cat, items}) => ({cat, items: items.map(text => ({text, sources:[]}))}));
 
   // Group items by store section
-  const sectionOrder = ["Produce","Proteins","Dairy & Eggs","Bread & Grains","Frozen","Pantry","Condiments","Spices & Seasonings","Other"];
+  const sectionOrder = grocerySectionOrder();
   const sectionMap = {};
   displayCats.forEach(({cat, items}) => {
     items.forEach((item, i) => {
@@ -12362,6 +12480,7 @@ function renderGrocery() {
       </div>
       <div style="display:flex;gap:6px">
         <button onclick="checkStaples()" title="Check off common pantry staples you probably already have" style="padding:7px 12px;border-radius:10px;border:1.5px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);color:var(--green);font-size:12px;font-weight:700;cursor:pointer">✓ I have the staples</button>
+        <button onclick="window._aisleEdit=!window._aisleEdit;renderGrocery()" title="Put the sections in the order you walk your store" style="padding:7px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.18);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">🏬 Store order</button>
         <button onclick="clearGrocery()" style="padding:7px 12px;border-radius:10px;border:1.5px solid var(--dim);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">Clear</button>
       </div>
     </div>
@@ -12374,6 +12493,7 @@ function renderGrocery() {
     <div style="font-size:12px;color:var(--dim);margin:-4px 0 10px">Both buttons open a review screen first — untick anything you don't need, then send. 🔎 on any item opens that product search at ${esc(state.store)}.</div>
     <div id="copy-claude-status" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:4px 0;margin-bottom:8px"></div>
     ${cartRequestHtml()}
+    ${aisleEditorHtml()}
 
     <div style="display:flex;gap:6px;margin-bottom:10px">
       <button onclick="state.useStaticGrocery=false;scheduleSave();renderGrocery()" style="flex:1;padding:7px;border-radius:10px;border:none;background:${!useSmartList?"var(--green)":"rgba(255,255,255,0.06)"};color:${!useSmartList?"#0a0f1a":"var(--muted)"};font-weight:600;font-size:12px;cursor:pointer">✨ From recipes</button>
@@ -13000,7 +13120,7 @@ function mealRatings(id, date){ return ((((state.ratings || {})[id] || {}).meals
 function setPersonRating(id, person, v, after, forDate){
   state.ratings = state.ratings || {}; const cur = Object.assign({}, state.ratings[id] || {}); const date = forDate || ratingDateFor(id);
   // Rating a planned dinner that was never opened in cook mode → log the cook so history and "recently made" stay right
-  if (forDate && !(state.cookHistory || []).some(x => x.recipeId === id && x.date === forDate)) { const r = byIdAll(id); state.cookHistory = [{ recipeId: id, name: r ? r.name : id, date: forDate, rating: 0 }, ...(state.cookHistory || [])].slice(0, 200); }
+  if (forDate && !(state.cookHistory || []).some(x => x.recipeId === id && x.date === forDate)) { const r = byIdAll(id); state.cookHistory = [{ recipeId: id, name: r ? r.name : id, date: forDate, rating: 0 }, ...(state.cookHistory || [])].slice(0, 200); try { leftoversAdd(id, forDate); } catch (e) {} }
   const meals = Object.assign({}, cur.meals || {}); const m = Object.assign({}, meals[date] || {});
   if (m[person] === v) delete m[person]; else m[person] = v;
   if (Object.keys(m).length) meals[date] = m; else delete meals[date];
@@ -13023,6 +13143,21 @@ function familyRatingHtml(id, after, compact, forDate){
   return `<div style="margin:8px 0 4px"><div style="font-size:11px;font-weight:800;letter-spacing:0.6px;color:var(--dim);margin-bottom:2px">WHO LIKED IT · ${esc(label.toUpperCase())}</div>
     <div style="font-size:11px;color:var(--dim);margin-bottom:4px">😍 loved · 🙂 liked · 😐 meh · 🙅 wouldn't eat · N/A not there</div>${rows}</div>`;
 }
+// ⭐ proven hit / 🆕 never made / miss — from the per-person faces (falls back to old stars)
+function hitStatus(id){
+  const r = byIdAll(id); const ps = personSummary(id); const rt = (state.ratings || {})[id] || {};
+  const vals = FAMILY.map(p => ps[p.k]).filter(Boolean); const cooked = (state.cookHistory || []).some(h => h.recipeId === id);
+  if (!vals.length) { if (rt.stars) return rt.stars >= 4 ? "hit" : rt.stars <= 2 ? "miss" : ""; return cooked ? "" : "new"; }
+  const fam = !r || (r.audience || "family") !== "adults"; const kids = ["Livia", "Lucy"].map(k => ps[k]).filter(Boolean);
+  const avg = vals.reduce((a, x) => a + x.avg, 0) / vals.length;
+  if ((fam && kids.some(x => x.last === 0)) || avg < 1.5) return "miss";
+  if (avg >= 2.2 && (!fam || kids.every(x => x.avg >= 2))) return "hit";
+  return "";
+}
+function hitBadge(id){ const h = hitStatus(id);
+  if (h === "hit") return `<span style="font-size:11px;font-weight:800;color:#fde68a;background:rgba(251,191,36,0.14);padding:1px 7px;border-radius:999px;align-self:center">⭐ Proven hit</span>`;
+  if (h === "miss") return `<span style="font-size:11px;color:#fca5a5;background:rgba(248,113,113,0.1);padding:1px 7px;border-radius:999px;align-self:center">👎 missed last time</span>`;
+  return ""; }
 function personSummaryLine(id){ const ps = personSummary(id); const parts = FAMILY.filter(p => ps[p.k]).map(p => { const x = ps[p.k]; return `${p.k} ${faceOf(x.last).e}${x.n > 1 ? `<span style="color:var(--dim);font-size:11px"> (${x.n}×, avg ${faceOf(Math.round(x.avg)).e})</span>` : ""}`; }); return parts.length ? parts.join(" · ") : ""; }
 function kidWinsBadge(id, long){ const k=kidWins(id); if(!k.Livia&&!k.Lucy) return ""; return long ? `Kid wins: Livia ${k.Livia} · Lucy ${k.Lucy}` : `👧 L×${k.Livia} · Lu×${k.Lucy}`; }
 
@@ -13564,6 +13699,7 @@ function logCook(recipeId, recipeName, rating) {
   });
   // Keep last 200 entries
   if (state.cookHistory.length > 200) state.cookHistory = state.cookHistory.slice(0, 200);
+  try { leftoversAdd(recipeId); } catch (e) {}
   scheduleSave();
 }
 
