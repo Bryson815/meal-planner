@@ -9352,7 +9352,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102408;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102409;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9622,7 +9622,8 @@ function buildClaudeListText() {
   items.forEach(v => {
     if (v.sec !== cur) { if (cur) lines.push(""); cur = v.sec; lines.push("## " + cur); }
     const qty = (v.text.match(/^([\d½¼¾⅓⅔⅛.\/\s-]+)\s*(lbs?|oz|cups?|cans?|jars?|bags?|packs?|packages?|pouches?|bunch(?:es)?|heads?)\b/i) || [])[0];
-    lines.push("- " + v.phrase + (qty ? " (~" + qty.trim() + ")" : (v.count > 1 ? " ×" + v.count : "")) + (v.opt ? " (optional)" : ""));
+    const lead = !qty && (v.text.match(/^(\d+)\s+(?!(?:tbsp|tsp|cups?)\b)/i) || [])[1];
+    lines.push("- " + v.phrase + (qty ? " (~" + qty.trim() + ")" : lead && +lead > 1 ? " ×" + lead : (v.count > 1 ? " ×" + v.count : "")) + (v.opt ? " (optional)" : ""));
   });
   lines.push("");
   if (state.alexaOnlyItems && state.alexaOnlyItems.length) { lines.push("## Extra items (Alexa)"); state.alexaOnlyItems.forEach(i => lines.push("- " + i)); lines.push(""); }
@@ -12041,6 +12042,75 @@ function combineQuantities(texts){
   const extras=texts.slice(1).map(t=>{ const p=parseQty(t); return p ? (fmtQty(p.n)+(p.u?" "+p.u:" "+p.rest.split(/[,(—]/)[0].trim())) : t.split(/[,(—]/)[0].trim(); });
   return texts[0]+" (+ "+extras.join(" + ")+")";
 }
+// ── Produce: add up what every recipe needs and turn it into what you actually buy ──
+// "Juice of 1 lemon" + "1 tbsp lemon juice" + "1-2 lemons, charred" → "4 lemons". 19 garlic cloves → "2 heads garlic".
+const PRODUCE = [
+  { k:"lemon",  re:/^lemons?\b(?!\s*(herb|pepper|curd|drizzle|oil))/, one:"lemon",  many:"lemons",  juiceTbsp:3 },
+  { k:"lime",   re:/^limes?\b/,  one:"lime", many:"limes", juiceTbsp:2 },
+  { k:"garlic", re:/^(?:garlic(?!\s*(?:powder|salt|bread|butter|paste|seasoning|herb))|cloves? (?:of )?garlic)\b/, garlic:true },
+  { k:"zucchini", re:/^zucchinis?\b/, one:"zucchini", many:"zucchini" },
+  { k:"carrots", re:/^carrots?\b(?!\s*cake)/, carrots:true },
+  { k:"onion",  re:/^(?:yellow |white |sweet )?onions?\b(?!\s*powder)/, one:"yellow onion", many:"yellow onions" },
+  { k:"red onion", re:/^red onions?\b/, one:"red onion", many:"red onions" },
+  { k:"shallot", re:/^shallots?\b/, one:"shallot", many:"shallots" },
+  { k:"avocado", re:/^avocados?\b(?!\s*oil)/, one:"avocado", many:"avocados" },
+  { k:"cucumber", re:/^(?:english |persian |mini )?cucumbers?\b/, one:"cucumber", many:"cucumbers" },
+  { k:"bell pepper", re:/^(?:red |green |yellow |orange )?bell peppers?\b/, one:"bell pepper", many:"bell peppers" },
+  { k:"jalapeño", re:/^jalape[nñ]os?\b/, one:"jalapeño", many:"jalapeños" },
+  { k:"green onions", re:/^(?:green onions?|scallions?)\b/, bunchOf:7, one:"bunch green onions", many:"bunches green onions" },
+  { k:"cilantro", re:/^cilantro\b/, herb:true, one:"bunch cilantro", many:"bunches cilantro" },
+  { k:"parsley", re:/^(?:flat-leaf |italian )?parsley\b/, herb:true, one:"bunch parsley", many:"bunches parsley" },
+  { k:"dill", re:/^dill\b(?!\s*pickle)/, herb:true, one:"bunch dill", many:"bunches dill" },
+  { k:"basil", re:/^basil\b/, herb:true, one:"bunch basil", many:"bunches basil" },
+  { k:"ginger", re:/^ginger\b(?!\s*(?:paste|ale|powder))/, ginger:true },
+  { k:"celery", re:/^celery\b(?!\s*(?:salt|seed))/, one:"bunch celery", many:"bunches celery", oneBunch:true },
+];
+function produceCore(text){
+  let t=String(text||"").toLowerCase().replace(/^\s*optional\s*[:—-]\s*/,"");
+  for(let i=0;i<4;i++){
+    t=t.replace(/^\s*(?:about|approx\.?|~)\s*/,"")
+       .replace(/^\s*[\d½¼¾⅓⅔⅛.\/]+(?:\s*(?:-|–|to)\s*[\d½¼¾⅓⅔⅛.\/]+)?\s*/,"")
+       .replace(/^(?:tbsp|tsp|tablespoons?|teaspoons?|cups?|large|medium|small|whole|heads?|bunch(?:es)?|handfuls?|stalks?|pieces?|inch(?:es)?|knobs?|-inch|sprigs?)\b\.?\s*/,"")
+       .replace(/^(?:of|the|a|an|fresh(?:ly)?|squeezed|finely|thinly|roughly|packed|sliced|diced|chopped|minced|grated|torn)\s+/,"")
+       .replace(/^(?:juice|zest)(?:\s+(?:and|\+|&)\s+(?:juice|zest))?\s+(?:of\s+)?/,"");
+  }
+  return t.trim();
+}
+function produceOf(text){ const c=produceCore(text); for(const p of PRODUCE){ if(p.re.test(c)) return p; } return null; }
+function qtyLead(text){
+  const t=String(text||"").replace(/^\s*optional\s*[:—-]\s*/i,"").replace(/^\s*(?:juice|zest)(?:\s+(?:and|\+|&)\s+(?:juice|zest))?\s+of\s+/i,"");
+  const p=(typeof parseQty==="function")?parseQty(t):null; return p?p:null;
+}
+// How many of the item one ingredient line needs
+function produceNeed(p, text){
+  const low=String(text).toLowerCase(); const q=qtyLead(text); const n=q?q.n:null; const u=q?q.u:"";
+  if(p.juiceTbsp){
+    if(/\bjuice of\b/.test(low)) return n||1;
+    if(u==="tbsp" && /juice/.test(low)) return n/p.juiceTbsp;
+    if(u==="tsp" && /juice/.test(low)) return n/(p.juiceTbsp*3);
+    if(u==="cup" && /juice/.test(low)) return n*16/p.juiceTbsp;
+    if(/\bzest\b/.test(low) && !/juice/.test(low)) return 0.5;
+    if(n!=null && !u) return n;
+    if(/wedges?|slices?|squeeze/.test(low)) return 0.5;
+    return 1;
+  }
+  if(p.garlic){ if(u==="head") return (n||1)*12; return n!=null?n:1; }      // in cloves
+  if(p.herb){ if(u==="cup") return n; if(u==="tbsp") return n/16; return 0.25; }   // in cups chopped
+  if(p.ginger){ if(u==="tbsp") return n; if(u==="tsp") return n/3; return 1; }     // in tbsp grated
+  if(p.bunchOf){ return n!=null&&!u?n:(u==="cup"?n*6:2); }                          // in stalks
+  if(p.oneBunch) return n!=null&&!u?n:1;
+  return n!=null?n:1;
+}
+function produceBuyText(p, texts){
+  const need=texts.reduce((a,t)=>a+produceNeed(p,t),0); const r=x=>Math.round(x*10)/10;
+  if(p.garlic){ const cl=Math.ceil(need-1e-9); const heads=Math.max(1,Math.ceil(cl/12)); return heads+" head"+(heads>1?"s":"")+" garlic ("+cl+" clove"+(cl>1?"s":"")+" needed)"; }
+  if(p.carrots){ const c=Math.ceil(need-1e-9); return c<=8 ? "1 bag (1 lb) carrots ("+c+" needed)" : Math.ceil(c/8)+" bags (1 lb) carrots ("+c+" needed)"; }
+  if(p.herb){ const b=Math.max(1,Math.ceil(need/1.5-1e-9)); return b+" "+(b>1?p.many:p.one)+(need>=0.5?" (about "+r(need)+" cups chopped)":""); }
+  if(p.ginger){ return need<=3 ? "1 piece fresh ginger (about 2 inches)" : Math.ceil(need/3)+" pieces fresh ginger (about 2 inches each)"; }
+  if(p.bunchOf){ const b=Math.max(1,Math.ceil(need/p.bunchOf-1e-9)); return b+" "+(b>1?p.many:p.one); }
+  if(p.oneBunch){ return "1 "+p.one; }
+  const c=Math.max(1,Math.ceil(need-1e-9)); return c+" "+(c>1?p.many:p.one)+(texts.length>1&&Math.abs(need-c)>0.01?" (about "+r(need)+" needed)":"");
+}
 function buildSmartGroceryList() {
   const planned = [...getPlannedRecipes(), ...plannedSides()];
   const raw = [];
@@ -12070,12 +12140,16 @@ function buildSmartGroceryList() {
   });
   const seen = new Map();
   raw.forEach(({text, source, opt, choice}) => {
-    const key = (typeof getIngredientKey === "function" ? getIngredientKey(text) : "") ||
+    const pr = produceOf(text);
+    const key = (pr ? "produce:" + pr.k : "") || (typeof getIngredientKey === "function" ? getIngredientKey(text) : "") ||
       text.toLowerCase().replace(/^[\d\s\/½¼¾⅓⅔⅛.,-]+(tbsp|tsp|cup|cups|oz|lb|lbs|g|cloves?|large|small|medium|can|cans|bunch)?\s*/i, "").split(/[,(]/)[0].trim();
-    if (!seen.has(key)) seen.set(key, { text, sources: [source], opt: !!opt, texts: [text], choice: choice || null });
+    if (!seen.has(key)) seen.set(key, { text, sources: [source], opt: !!opt, texts: [text], choice: choice || null, pr: pr || null });
     else { const e = seen.get(key); if (!e.sources.includes(source)) e.sources.push(source); if (!opt) e.opt = false; e.texts.push(text); } // needed by any recipe → not optional
   });
-  const items = [...seen.values()].map(e => { if (e.texts.length > 1) e.text = combineQuantities(e.texts); delete e.texts; return e; });
+  const items = [...seen.values()].map(e => {
+    if (e.pr) { e.text = produceBuyText(e.pr, e.texts); e.detail = e.texts.length > 1 ? "covers: " + e.texts.map(t => String(t).replace(/^\s*optional\s*[:—-]\s*/i,"").split(/\s[—–]\s|\(/)[0].trim()).join(" · ") : ""; }
+    else if (e.texts.length > 1) e.text = combineQuantities(e.texts);
+    delete e.texts; delete e.pr; return e; });
   const lunch = (state.groceryLunchbox && typeof lbGroceryItems === "function") ? lbGroceryItems(null) : [];
   const out = [];
   if (items.length) out.push({ cat: "📅 Planned meals", items });
@@ -12127,7 +12201,7 @@ function renderGrocery() {
       const key = groceryKey(cat, itemText);
       const inPantryCond = condimentOwned(itemText);
       const checked = (state.grocery[key] || inPantryCond) ? "checked" : "";
-      const sourceText = ((item && item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + '</span>' : "") + (inPantryCond ? ' <span class="grocery-source" style="color:var(--green);border:1px solid rgba(16,185,129,0.3)">in pantry</span>' : "");
+      const sourceText = ((item && item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + (item.sources.length > 1 ? ' +' + (item.sources.length - 1) + ' more' : '') + '</span>' : "") + (inPantryCond ? ' <span class="grocery-source" style="color:var(--green);border:1px solid rgba(16,185,129,0.3)">in pantry</span>' : "");
       const note = (state.groceryNotes && state.groceryNotes[key]) ? state.groceryNotes[key] : "";
       return `<div class="grocery-item ${checked}" onclick="toggleGrocery('${esc(key)}',this)" style="flex-direction:column;align-items:flex-start">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
@@ -12136,6 +12210,7 @@ function renderGrocery() {
           ${checked ? "" : `<a href="https://www.instacart.com/store/${instacartSlug()}/s?k=${encodeURIComponent(productPhrase(itemText))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Search this at ${esc(state.store)} on Instacart" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:var(--green);font-size:11px;text-decoration:none;flex-shrink:0">🔎</a>`}
           <button onclick="event.stopPropagation();openGroceryNote('${esc(key)}','${esc(note)}')" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:11px;cursor:pointer;flex-shrink:0">${note ? "✏️" : "+"}</button>
         </div>
+        ${(item && item.detail) ? `<div style="font-size:12px;color:var(--dim);padding:3px 0 0 24px;line-height:1.4">${esc(item.detail)}</div>` : ""}
         ${note ? `<div style="font-size:12px;color:var(--amber);padding:3px 0 0 24px;font-style:italic">📝 ${esc(note)}</div>` : ""}
       </div>`;
     }).join("");
