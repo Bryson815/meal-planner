@@ -9352,7 +9352,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102407;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102408;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -10834,7 +10834,7 @@ function rolloverWeeks(){
   if (nextMon === cur) { state.weekPlan = normalizePlan(Object.assign({}, state.nextWeekPlan || {})); state.nextWeekPlan = {}; }
   else { state.weekPlan = {}; state.nextWeekPlan = {}; }
   state.weekPlanMonday = cur;
-  state.grocery = {}; state.groceryNotes = {}; state.prepDone = {};
+  state.grocery = {}; state.groceryNotes = {}; state.prepDone = {}; state.groceryExcluded = {};
   scheduleSave();
   return true;
 }
@@ -11968,6 +11968,32 @@ function groceryPlanEntries(){
   if(sc!=="rest") Object.values(state.nextWeekPlan||{}).forEach(e=>out.push(e));
   return out;
 }
+// Recipes the family chose not to shop for this time (cleared when the week rolls over)
+function groceryExcluded(id){ return !!((state.groceryExcluded||{})[id]); }
+function toggleGroceryRecipe(id){ state.groceryExcluded=Object.assign({}, state.groceryExcluded||{}); if(state.groceryExcluded[id]) delete state.groceryExcluded[id]; else state.groceryExcluded[id]=true; scheduleSave(); renderGrocery(); }
+function toggleGroceryLunchbox(){ state.groceryLunchbox=!state.groceryLunchbox; scheduleSave(); renderGrocery(); }
+// Every recipe/side the current scope would shop for, excluded or not (for the picker)
+function groceryCandidates(){
+  const all=[...(state.dinners||[]),...(state.breakfasts||[]),...(state.lunches||[]),...(state.desserts||[])]; const out=[]; const seen=new Set();
+  const sc=groceryScope(); const add=(e,wk,key)=>{ if(!e) return; const day=String(key).split("_")[0];
+    if(e.recipeId&&!seen.has(e.recipeId)){ const r=all.find(x=>x.id===e.recipeId); if(r){ seen.add(r.id); out.push({id:r.id,name:r.name,emoji:r.emoji||"🍽",when:(wk==="next"?"next ":"")+day}); } }
+    if(e.side&&SIDES_BY_ID[e.side]&&!seen.has("side:"+e.side)){ seen.add("side:"+e.side); const sd=SIDES_BY_ID[e.side]; out.push({id:"side:"+sd.id,name:sd.name,emoji:sd.emoji||"🥦",when:"side",side:true}); } };
+  if(sc!=="next") Object.entries(state.weekPlan||{}).forEach(([k,e])=>{ if(groceryDayOk(k,"this")) add(e,"this",k); });
+  if(sc!=="rest") Object.entries(state.nextWeekPlan||{}).forEach(([k,e])=>add(e,"next",k));
+  return out;
+}
+function groceryPickerHtml(){
+  const c=groceryCandidates(); const lbOn=!!state.groceryLunchbox;
+  const lbCount=(typeof lbGroceryItems==="function")?lbGroceryItems(null).length:0;
+  const on=c.filter(x=>!groceryExcluded(x.id)).length;
+  const chip=(x)=>{ const off=groceryExcluded(x.id); return `<button onclick="toggleGroceryRecipe('${x.id}')" title="${off?"Add back to the list":"Leave off the list"}" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid ${off?"rgba(255,255,255,0.12)":"rgba(16,185,129,0.45)"};background:${off?"transparent":"rgba(16,185,129,0.1)"};color:${off?"var(--dim)":"var(--text)"};font-size:13px;cursor:pointer;${off?"text-decoration:line-through;":""}"><span>${off?"○":"✓"}</span>${x.emoji} ${esc(x.name)}<span style="color:var(--dim);font-size:11px">${esc(x.when)}</span></button>`; };
+  const open = (window._grocPickOpen!==undefined) ? window._grocPickOpen : true;
+  return `<details ${open?"open":""} ontoggle="window._grocPickOpen=this.open" style="margin:6px 0 14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08)">
+    <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--muted)">Shopping for ${on} of ${c.length} recipe${c.length===1?"":"s"}${lbOn?" + kids' lunchboxes":""} <span style="font-weight:400;color:var(--dim)">· tap to leave one off</span></summary>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${c.map(chip).join("") || `<span style="color:var(--dim);font-size:13px">Nothing planned for these days.</span>`}
+      <button onclick="toggleGroceryLunchbox()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px dashed ${lbOn?"rgba(251,191,36,0.6)":"rgba(255,255,255,0.18)"};background:${lbOn?"rgba(251,191,36,0.1)":"transparent"};color:${lbOn?"var(--text)":"var(--dim)"};font-size:13px;cursor:pointer"><span>${lbOn?"✓":"+"}</span>🍱 Kids' lunchboxes${lbCount?` <span style="color:var(--dim);font-size:11px">${lbCount} items</span>`:""}</button>
+    </div></details>`;
+}
 function groceryScopeLabel(){
   const sc=groceryScope(); const fmt=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
   const mon=new Date(); mon.setHours(12,0,0,0); mon.setDate(mon.getDate()-planTodayIdx()); const nmon=new Date(mon); nmon.setDate(mon.getDate()+7); const nsun=new Date(nmon); nsun.setDate(nmon.getDate()+6);
@@ -11981,7 +12007,7 @@ function getPlannedRecipes() {
   const seen = new Set();
   const out = [];
   groceryPlanEntries().forEach(a => {
-    if (!a || !a.recipeId || seen.has(a.recipeId)) return;
+    if (!a || !a.recipeId || seen.has(a.recipeId) || groceryExcluded(a.recipeId)) return;
     const r = all.find(x => x.id === a.recipeId);
     if (r) { seen.add(r.id); out.push(r); }
   });
@@ -11990,7 +12016,7 @@ function getPlannedRecipes() {
 
 function plannedSides(){
   const seen=new Set(); const out=[];
-  groceryPlanEntries().forEach(e=>{ if(e&&e.side&&SIDES_BY_ID[e.side]&&!seen.has(e.side)){ seen.add(e.side); const sd=SIDES_BY_ID[e.side]; out.push({id:sd.id,name:"Side: "+sd.name,ingredients:sd.ingredients}); } });
+  groceryPlanEntries().forEach(e=>{ if(e&&e.side&&SIDES_BY_ID[e.side]&&!seen.has(e.side)&&!groceryExcluded("side:"+e.side)){ seen.add(e.side); const sd=SIDES_BY_ID[e.side]; out.push({id:sd.id,name:"Side: "+sd.name,ingredients:sd.ingredients}); } });
   return out;
 }
 
@@ -12050,9 +12076,9 @@ function buildSmartGroceryList() {
     else { const e = seen.get(key); if (!e.sources.includes(source)) e.sources.push(source); if (!opt) e.opt = false; e.texts.push(text); } // needed by any recipe → not optional
   });
   const items = [...seen.values()].map(e => { if (e.texts.length > 1) e.text = combineQuantities(e.texts); delete e.texts; return e; });
-  const lunch = (typeof lbGroceryItems === "function") ? lbGroceryItems(null) : [];
+  const lunch = (state.groceryLunchbox && typeof lbGroceryItems === "function") ? lbGroceryItems(null) : [];
   const out = [];
-  if (items.length) out.push({ cat: "📅 This week", items });
+  if (items.length) out.push({ cat: "📅 Planned meals", items });
   if (lunch.length) out.push({ cat: "🍱 Lunchbox", items: lunch });
   return out;
 }
@@ -12155,12 +12181,12 @@ function renderGrocery() {
       <span style="font-size:10px;font-weight:400;color:#64748b">reads your Gmail for Alexa list email</span>
     </button>
     <div id="alexa-sync-status" style="display:none;font-size:12px;margin-bottom:10px;padding:8px 12px;border-radius:8px"></div>
-    ${(useSmartList && !cats) ? `<div style="text-align:center;padding:40px 20px;border:1.5px dashed rgba(255,255,255,0.15);border-radius:16px;margin-bottom:14px">
+    ${(useSmartList && !cats && groceryCandidates().length) ? groceryPickerHtml() : ""}${(useSmartList && !cats) ? `<div style="text-align:center;padding:40px 20px;border:1.5px dashed rgba(255,255,255,0.15);border-radius:16px;margin-bottom:14px">
         <div style="font-size:40px;margin-bottom:10px">🗓️</div>
         <div style="font-size:17px;font-weight:700;margin-bottom:6px">Nothing planned yet</div>
         <div style="color:var(--dim);font-size:14px;margin-bottom:16px">Add meals to this week on the Plan tab and your shopping list builds itself — grouped by store section, deduped across recipes.</div>
         <button onclick="showTab('plan')" style="padding:12px 22px;border-radius:12px;border:none;background:var(--green);color:#0a0f1a;font-weight:700;font-size:14px;cursor:pointer">Go to Plan →</button>
-      </div>` : `${(groceryScope()==="rest" && planTodayIdx()>=5 && !planHas(state.nextWeekPlan, PLAN_DAYS)) ? `<div style="margin:6px 0 14px;padding:12px 14px;border-radius:12px;background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.35);font-size:14px;color:var(--muted)">📅 Next week isn't planned yet — once it is, this list switches to next week's groceries on its own. <a href="#" onclick="planWeekView='next';showTab('plan');return false" style="color:#a5b4fc;font-weight:700">Plan next week →</a></div>` : ""}<div class="grocery-cats">${cats}</div>`}
+      </div>` : `${groceryPickerHtml()}${(groceryScope()==="rest" && planTodayIdx()>=5 && !planHas(state.nextWeekPlan, PLAN_DAYS)) ? `<div style="margin:6px 0 14px;padding:12px 14px;border-radius:12px;background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.35);font-size:14px;color:var(--muted)">📅 Next week isn't planned yet — once it is, this list switches to next week's groceries on its own. <a href="#" onclick="planWeekView='next';showTab('plan');return false" style="color:#a5b4fc;font-weight:700">Plan next week →</a></div>` : ""}<div class="grocery-cats">${cats}</div>`}
     <div style="background:rgba(0,168,232,0.06);border:2px solid rgba(0,168,232,0.25);border-radius:14px;padding:14px 16px;margin-top:14px;margin-bottom:10px">
       <div style="font-size:13px;font-weight:700;color:#00a8e8;margin-bottom:8px">📋 Before you open Instacart:</div>
       <div style="display:flex;flex-direction:column;gap:8px">
