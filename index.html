@@ -9355,13 +9355,13 @@ function _legacyApplySwaps(ingredients) {
 // overwrite the family plan with defaults); (2) every upload is a 3-way merge against what
 // this device last synced, so MK's edit and Andrew's edit to different things both survive.
 const STORAGE_KEY = "lemmonMealPlan_v2";
-const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek"];
-const DEVICE_KEYS = ["readAloud","voiceAutoStart","voiceTipSeen","voiceLoose","vaultAudience","vaultQuick","vaultUseUp"];
+const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek","groceryExcluded","groceryLunchbox","groceryScope","recipeScale","haveStats","planProposal","cartRequest"];
+const DEVICE_KEYS = ["vaultSort","readAloud","voiceAutoStart","voiceTipSeen","voiceLoose","vaultAudience","vaultQuick","vaultUseUp"];
 let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102415;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102516;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9618,7 +9618,7 @@ function collectShoppingItems(applyPicks) {
   const out = {};
   all.forEach(({cat, items}) => items.forEach((item, i) => {
     const key = groceryKey(cat, typeof item === "string" ? item : (item.text || ""));
-    if (state.grocery[key]) return; // checked = have it
+    if (groceryHave(key, typeof item === "string" ? item : (item.text || ""))) return; // checked (or usually have) = have it
     const text = typeof item === "string" ? item : (item.text || "");
     if (!text) return;
     if (typeof condimentOwned === "function" && condimentOwned(text)) return; // marked "Have it" in Our brands
@@ -9739,7 +9739,9 @@ function renderShopPreview(){
       <button onclick="shopPickReset()" style="padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:13px;cursor:pointer">Reset picks</button>
       <button onclick="copyListForClaude()" ${onN?"":"disabled"} style="flex:1;min-width:150px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-weight:800;font-size:14px;cursor:pointer">🛒 Copy ${onN} for Claude</button>
       <button onclick="openInstacartList(this)" ${onN?"":"disabled"} style="flex:1;min-width:150px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:800;font-size:14px;cursor:pointer">🥕 Send ${onN} to Instacart</button>
+      <button onclick="requestCartFill()" ${onN?"":"disabled"} title="Saves this exact list; Claude's scheduled check adds it to your ${esc(state.store)} cart" style="flex-basis:100%;padding:11px;border-radius:12px;border:1.5px solid rgba(129,140,248,0.5);background:rgba(129,140,248,0.08);color:#c7d2fe;font-weight:700;font-size:14px;cursor:pointer">🤖 Have Claude fill my ${esc(state.store)} cart (no pasting)</button>
     </div>
+    <div style="padding:0 18px">${cartRequestHtml()}</div>
     <div id="copy-claude-status-pv" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:0 0 12px"></div>
   </div>`;
 }
@@ -9990,6 +9992,69 @@ function openFromHash(){
 }
 window.addEventListener("hashchange", openFromHash);
 
+// ══ SUNDAY DRAFT (written by Claude's scheduled planning task into state.planProposal) ══
+// Shape: { id, week:"YYYY-MM-DD" (Monday), status:"pending"|"applied"|"dismissed", summary, busy:{Day:"why"}, slots:{"Day_dinner":{recipeId, side?, reason?}} }
+function proposalTarget(p){ if (!p || p.status !== "pending" || !p.slots) return null; const cur = mondayISO(); if (p.week === cur) return "this"; if (p.week === addDaysISO(cur, 7)) return "next"; return null; }
+function proposalRows(p){
+  return Object.entries(p.slots || {}).map(([k, e]) => { const [day, slot] = k.split("_"); return { k, day, slot: slot || "dinner", e, r: e && byIdAll(e.recipeId) }; })
+    .filter(x => x.r && PLAN_DAYS.includes(x.day)).sort((a, b) => PLAN_DAYS.indexOf(a.day) - PLAN_DAYS.indexOf(b.day));
+}
+function renderPlanProposal(){
+  const p = state.planProposal; const tgt = proposalTarget(p); if (!tgt) return "";
+  const plan = tgt === "this" ? (state.weekPlan || {}) : (state.nextWeekPlan || {});
+  const skip = window._propSkip || (window._propSkip = {});
+  const rows = proposalRows(p); if (!rows.length) return "";
+  const open = rows.filter(x => !planGet(plan, x.day, x.slot));
+  const busy = p.busy || {};
+  const rowHtml = x => { const taken = planGet(plan, x.day, x.slot); const off = taken || skip[x.k]; const sd = x.e.side && SIDES_BY_ID[x.e.side];
+    return `<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-top:1px solid rgba(255,255,255,0.06);${off ? "opacity:0.5" : ""}">
+      <input type="checkbox" ${off ? "" : "checked"} ${taken ? "disabled" : ""} onchange="window._propSkip['${x.k}']=!this.checked;renderPlan()" style="width:20px;height:20px;margin-top:2px;accent-color:#818cf8;flex-shrink:0">
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;color:#a5b4fc">${x.day.slice(0, 3).toUpperCase()}${busy[x.day] ? ` <span style="font-weight:600;color:#fbbf24">· 📅 ${esc(busy[x.day])}</span>` : ""}</div>
+        <div style="font-size:14px;font-weight:700;cursor:pointer" onclick="viewRecipeById('${x.r.id}')">${x.r.emoji || "🍽️"} ${esc(x.r.name)}${sd ? `<span style="font-weight:400;color:var(--dim)"> · 🥦 ${esc(sd.name)}</span>` : ""}</div>
+        ${taken ? `<div style="font-size:12px;color:var(--dim)">Already planned — this one stays as is</div>` : x.e.reason ? `<div style="font-size:12px;color:var(--dim);line-height:1.35">${esc(x.e.reason)}</div>` : ""}</div></div>`; };
+  const n = open.filter(x => !skip[x.k]).length;
+  return `<div style="background:linear-gradient(135deg,rgba(129,140,248,0.14),rgba(129,140,248,0.04));border:1.5px solid rgba(129,140,248,0.45);border-radius:16px;padding:14px 16px;margin-bottom:14px">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+      <div><div style="font-size:12px;font-weight:800;letter-spacing:0.8px;color:#a5b4fc">🤖 CLAUDE'S DRAFT · ${tgt === "next" ? "NEXT WEEK" : "THIS WEEK"}</div>
+      ${p.summary ? `<div style="font-size:13px;color:var(--muted);margin-top:4px;line-height:1.45">${esc(p.summary)}</div>` : ""}</div>
+      <button onclick="dismissPlanProposal()" title="Dismiss" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div style="margin-top:8px">${rows.map(rowHtml).join("")}</div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+      <button onclick="applyPlanProposal()" ${n ? "" : "disabled"} style="flex:2;min-width:160px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#818cf8,#6366f1);color:#fff;font-weight:800;font-size:15px;cursor:pointer;${n ? "" : "opacity:0.5"}">✓ Add ${n} to ${tgt === "next" ? "next week" : "this week"}</button>
+      <button onclick="dismissPlanProposal()" style="flex:1;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:14px;font-weight:700;cursor:pointer">Not this week</button>
+    </div>
+    <div style="font-size:11px;color:var(--dim);margin-top:6px">Only fills empty nights — nothing you've already planned changes. Swap any of them after.</div>
+  </div>`;
+}
+function applyPlanProposal(){
+  const p = state.planProposal; const tgt = proposalTarget(p); if (!tgt) return;
+  const plan = tgt === "this" ? (state.weekPlan = state.weekPlan || {}) : (state.nextWeekPlan = state.nextWeekPlan || {});
+  const skip = window._propSkip || {}; let n = 0;
+  proposalRows(p).forEach(x => { if (skip[x.k] || planGet(plan, x.day, x.slot)) return; const e = { recipeId: x.r.id, section: x.slot }; if (x.e.side && SIDES_BY_ID[x.e.side]) e.side = x.e.side; planSet(plan, x.day, x.slot, e); n++; });
+  state.planProposal = Object.assign({}, p, { status: "applied", appliedAt: new Date().toISOString(), appliedCount: n });
+  window._propSkip = {}; planWeekView = tgt; scheduleSave(); renderPlan();
+  try { const t = document.createElement("div"); t.textContent = "✓ Added " + n + " dinner" + (n === 1 ? "" : "s") + " — the shopping list has " + (n === 1 ? "it" : "them") + " now"; t.style.cssText = "position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111827;border:1px solid rgba(129,140,248,0.5);color:#e0e7ff;padding:10px 16px;border-radius:12px;font-size:14px;z-index:999"; document.body.appendChild(t); setTimeout(() => t.remove(), 3500); } catch (e) {}
+}
+function dismissPlanProposal(){ const p = state.planProposal; if (!p) return; state.planProposal = Object.assign({}, p, { status: "dismissed", dismissedAt: new Date().toISOString() }); window._propSkip = {}; scheduleSave(); renderPlan(); }
+
+// ── Ask Claude to fill the cart: the reviewed list is saved; a scheduled Claude task adds it to the store cart ──
+function requestCartFill(){
+  const { text, count } = buildClaudeListText(); if (!count) { alert("Nothing ticked on the list."); return; }
+  state.cartRequest = { id: "c" + Date.now(), status: "pending", at: new Date().toISOString(), store: state.store, count, text };
+  scheduleSave(); renderShopPreview(); try { renderGrocery(); } catch (e) {}
+}
+function cancelCartRequest(){ const c = state.cartRequest; if (!c) return; state.cartRequest = Object.assign({}, c, { status: "cancelled" }); scheduleSave(); try { renderShopPreview(); } catch (e) {} try { renderGrocery(); } catch (e) {} }
+function cartRequestHtml(){
+  const c = state.cartRequest; if (!c || !c.status || c.status === "cancelled") return "";
+  const age = Date.now() - new Date(c.doneAt || c.at).getTime(); if (age > 3 * 86400000) return "";
+  const t = d => new Date(d).toLocaleString("en-US", { weekday: "short", hour: "numeric", minute: "2-digit" });
+  if (c.status === "pending") return `<div style="margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.35);font-size:13px;color:#c7d2fe;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span style="flex:1;min-width:200px">🤖 Sent ${c.count} items to Claude ${t(c.at)} — it'll fill your ${esc(c.store || state.store)} cart at its next check (Fri–Sun, morning / afternoon / evening).</span><button onclick="cancelCartRequest()" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">Cancel</button></div>`;
+  if (c.status === "done") return `<div style="margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.35);font-size:13px;color:#a7f3d0">✅ Claude filled your ${esc(c.store || state.store)} cart ${t(c.doneAt || c.at)}${c.result ? " — " + esc(c.result) : ""}. Open Instacart to check out.</div>`;
+  if (c.status === "error") return `<div style="margin:0 0 10px;padding:10px 12px;border-radius:12px;background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.35);font-size:13px;color:#fecaca">⚠️ Claude couldn't fill the cart: ${esc(c.result || "unknown problem")}. Use 🛒 Copy for Claude instead.</div>`;
+  return "";
+}
+
 // ══ TONIGHT (planned) ═════════════════════════════════════════════════════════
 function renderTonightPlanned(plan){
   if (planWeekView !== "this") return "";
@@ -10021,6 +10086,7 @@ function renderTonightPlanned(plan){
 // ══ SUNDAY NUDGE: next week is empty → plan it in two taps ═════════════════════
 function renderNextWeekNudge(){
   if (planWeekView !== "this") return "";
+  if (proposalTarget(state.planProposal) === "next") return "";
   const t = (new Date().getDay() + 6) % 7; if (t < 4) return "";                     // Fri, Sat, Sun
   const nw = state.nextWeekPlan || {}; if (Object.keys(nw).some(k => /_dinner$/.test(k) && nw[k] && (nw[k].recipeId || nw[k].leftoverOf))) return "";
   if (((state.uiPrefs || {}).nudgeDismissed) === mondayISO()) return "";
@@ -11583,6 +11649,7 @@ function renderPlan() {
 
   el.innerHTML = `
     ${pickerModal}
+    ${renderPlanProposal()}
     ${renderNextWeekNudge()}
     ${renderTonightPlanned(plan)}
     ${renderRatingNudge()}
@@ -12251,17 +12318,21 @@ function renderGrocery() {
     });
   });
 
+  const usualShown = [];
   const cats = sectionOrder.filter(s => sectionMap[s] && sectionMap[s].length).map(section => {
     const itemHtml = sectionMap[section].map(({item, cat, i, itemText}) => {
       const key = groceryKey(cat, itemText);
       const inPantryCond = condimentOwned(itemText);
-      const checked = (state.grocery[key] || inPantryCond) ? "checked" : "";
+      const usual = usuallyHave(itemText); const outNow = usual && state.grocery[key] === false;
+      if (usual && !(key in state.grocery)) usualShown.push(itemText);
+      const checked = (groceryHave(key, itemText) || inPantryCond) ? "checked" : "";
+      const usualTag = usual ? (outNow ? ' <span title="You usually have this — marked out for this week" style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(248,113,113,0.12);color:#fca5a5;vertical-align:middle">out this week</span>' : ' <span title="Checked as already-have two weeks running. Tap the item if you\'re out." style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(16,185,129,0.12);color:#6ee7b7;vertical-align:middle">🏠 usually have</span>') : "";
       const sourceText = ((item && item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + (item.sources.length > 1 ? ' +' + (item.sources.length - 1) + ' more' : '') + '</span>' : "") + (inPantryCond ? ' <span class="grocery-source" style="color:var(--green);border:1px solid rgba(16,185,129,0.3)">in pantry</span>' : "");
       const note = (state.groceryNotes && state.groceryNotes[key]) ? state.groceryNotes[key] : "";
-      return `<div class="grocery-item ${checked}" onclick="toggleGrocery('${esc(key)}',this)" style="flex-direction:column;align-items:flex-start">
+      return `<div class="grocery-item ${checked}" data-text="${esc(itemText)}" data-usual="${usual ? 1 : 0}" onclick="toggleGrocery('${esc(key)}',this)" style="flex-direction:column;align-items:flex-start">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
           <div class="grocery-check ${checked}">${checked ? "✓" : ""}</div>
-          <span style="flex:1">${esc(itemText)}${sourceText}${storeHint(itemText) ? ' <span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(245,158,11,0.12);color:#fbbf24;vertical-align:middle">' + esc(storeHint(itemText)) + '</span>' : ""}</span>
+          <span style="flex:1">${esc(itemText)}${usualTag}${sourceText}${storeHint(itemText) ? ' <span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(245,158,11,0.12);color:#fbbf24;vertical-align:middle">' + esc(storeHint(itemText)) + '</span>' : ""}</span>
           ${checked ? "" : `<a href="https://www.instacart.com/store/${instacartSlug()}/s?k=${encodeURIComponent(productPhrase(itemText))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Search this at ${esc(state.store)} on Instacart" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:var(--green);font-size:11px;text-decoration:none;flex-shrink:0">🔎</a>`}
           <button onclick="event.stopPropagation();openGroceryNote('${esc(key)}','${esc(note)}')" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:11px;cursor:pointer;flex-shrink:0">${note ? "✏️" : "+"}</button>
         </div>
@@ -12272,7 +12343,8 @@ function renderGrocery() {
     return `<div class="grocery-cat"><h3>${section}</h3>${itemHtml}</div>`;
   }).join("");
 
-  const checkedCount = Object.values(state.grocery).filter(Boolean).length;
+  const checkedCount = Object.values(state.grocery).filter(Boolean).length + usualShown.length;
+  if (usualShown.length) setTimeout(() => haveRefresh(usualShown), 0);
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 8px;flex-wrap:wrap;gap:8px">
       <div>
@@ -12301,6 +12373,7 @@ function renderGrocery() {
     </div>
     <div style="font-size:12px;color:var(--dim);margin:-4px 0 10px">Both buttons open a review screen first — untick anything you don't need, then send. 🔎 on any item opens that product search at ${esc(state.store)}.</div>
     <div id="copy-claude-status" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:4px 0;margin-bottom:8px"></div>
+    ${cartRequestHtml()}
 
     <div style="display:flex;gap:6px;margin-bottom:10px">
       <button onclick="state.useStaticGrocery=false;scheduleSave();renderGrocery()" style="flex:1;padding:7px;border-radius:10px;border:none;background:${!useSmartList?"var(--green)":"rgba(255,255,255,0.06)"};color:${!useSmartList?"#0a0f1a":"var(--muted)"};font-weight:600;font-size:12px;cursor:pointer">✨ From recipes</button>
@@ -12337,7 +12410,7 @@ function checkStaples() {
     const txt = (el.querySelector("span") || {}).textContent || "";
     const key = (el.getAttribute("onclick") || "").match(/toggleGrocery\('([^']+)'/);
     if (!key) return;
-    if (STAPLES_RE.test(productPhrase(txt).toLowerCase()) && !state.grocery[key[1]]) { state.grocery[key[1]] = true; n++; }
+    if (STAPLES_RE.test(productPhrase(txt).toLowerCase()) && !groceryHave(key[1], el.dataset.text || txt)) { state.grocery[key[1]] = true; if (el.dataset.text) haveRecord(el.dataset.text, true); n++; }
   });
   scheduleSave();
   renderGrocery();
@@ -12345,13 +12418,48 @@ function checkStaples() {
   if (st) { st.style.display = "block"; st.textContent = n ? "✓ Checked off " + n + " pantry staple" + (n>1?"s":"") + " — uncheck anything you're actually out of" : "No unchecked staples found"; setTimeout(() => { if (st) st.style.display = "none"; }, 4000); }
 }
 
+// ── "We always have this" ── pantry / condiment / spice items checked as already-have in 2+ different weeks start checked.
+// Tapping one that started checked = "we're out" for this week only (stored as an explicit false in state.grocery).
+const HAVE_SECTIONS = ["Pantry","Condiments","Spices & Seasonings"];
+function havePk(text){ return shopKey(productPhrase(text || "")); }
+function haveWeek(){ return mondayISO(); }
+function usuallyHave(text){
+  if (!HAVE_SECTIONS.includes(categorizeGroceryItem(text))) return false;
+  const st = (state.haveStats || {})[havePk(text)]; if (!st) return false;
+  const wk = haveWeek(); const weeks = (st.w || []).filter(x => x !== wk); const outs = (st.o || []);
+  if (weeks.length < 2) return false;
+  const lastOut = outs.filter(x => x !== wk).sort().pop() || "", lastHave = weeks.slice().sort().pop();
+  // out two weeks running (or out more recently than last had it, twice) → stop assuming
+  if (outs.length >= 2 && lastOut > lastHave) return false;
+  return true;
+}
+function groceryHave(key, text){ if (state.grocery && key in state.grocery) return !!state.grocery[key]; return usuallyHave(text); }
+function haveRecord(text, had){
+  const pk = havePk(text); if (!pk || !HAVE_SECTIONS.includes(categorizeGroceryItem(text))) return;
+  const all = Object.assign({}, state.haveStats || {}); const st = Object.assign({ w: [], o: [] }, all[pk] || {}); const wk = haveWeek();
+  st.w = (st.w || []).filter(x => x !== wk); st.o = (st.o || []).filter(x => x !== wk);
+  if (had === true) st.w.push(wk); else if (had === false) st.o.push(wk);
+  st.w = st.w.sort().slice(-6); st.o = st.o.sort().slice(-4);
+  if (st.w.length || st.o.length) all[pk] = st; else delete all[pk];
+  state.haveStats = all;
+}
+// An auto-checked item that sat there all week still counts as "had it" — keeps the memory fresh without taps
+function haveRefresh(texts){
+  const wk = haveWeek(); let ch = false; const all = Object.assign({}, state.haveStats || {});
+  texts.forEach(t => { const pk = havePk(t); const st = all[pk]; if (!st || (st.w || []).includes(wk) || (st.o || []).includes(wk)) return; all[pk] = Object.assign({}, st, { w: [...(st.w || []), wk].sort().slice(-6) }); ch = true; });
+  if (ch) { state.haveStats = all; scheduleSave(); }
+}
+function forgetUsual(pk){ const all = Object.assign({}, state.haveStats || {}); delete all[pk]; state.haveStats = all; scheduleSave(); renderGrocery(); }
 function toggleGrocery(key, el) {
-  state.grocery[key] = !state.grocery[key];
-  el.classList.toggle("checked", state.grocery[key]);
-  el.querySelector(".grocery-check").classList.toggle("checked", state.grocery[key]);
-  el.querySelector(".grocery-check").textContent = state.grocery[key] ? "✓" : "";
+  const text = (el && el.dataset && el.dataset.text) || "";
+  const usual = !!(el && el.dataset && el.dataset.usual === "1");
+  const cur = (key in (state.grocery || {})) ? !!state.grocery[key] : usual;
+  state.grocery = state.grocery || {};
+  const next = !cur;
+  if (usual && next) delete state.grocery[key]; else state.grocery[key] = next;     // back to "usually have" = no explicit value
+  if (text) haveRecord(text, usual ? (next ? true : false) : (next ? true : null));
   scheduleSave();
-  document.querySelector("#page-grocery .nav-sub, #page-grocery div[style*='items checked']") && renderGrocery();
+  renderGrocery();
 }
 
 function clearGrocery() {
@@ -12889,8 +12997,10 @@ const faceOf = v => FACES.find(f => f.v === v);
 // The meal being rated: the most recent cook of it in the last 3 days, else today
 function ratingDateFor(id){ const cut = Date.now() - 3 * 86400000; const h = (state.cookHistory || []).filter(x => x.recipeId === id && new Date(x.date + "T12:00:00").getTime() >= cut).sort((a, b) => a.date < b.date ? 1 : -1)[0]; return h ? h.date : localISODate(); }
 function mealRatings(id, date){ return ((((state.ratings || {})[id] || {}).meals) || {})[date] || {}; }
-function setPersonRating(id, person, v, after){
-  state.ratings = state.ratings || {}; const cur = Object.assign({}, state.ratings[id] || {}); const date = ratingDateFor(id);
+function setPersonRating(id, person, v, after, forDate){
+  state.ratings = state.ratings || {}; const cur = Object.assign({}, state.ratings[id] || {}); const date = forDate || ratingDateFor(id);
+  // Rating a planned dinner that was never opened in cook mode → log the cook so history and "recently made" stay right
+  if (forDate && !(state.cookHistory || []).some(x => x.recipeId === id && x.date === forDate)) { const r = byIdAll(id); state.cookHistory = [{ recipeId: id, name: r ? r.name : id, date: forDate, rating: 0 }, ...(state.cookHistory || [])].slice(0, 200); }
   const meals = Object.assign({}, cur.meals || {}); const m = Object.assign({}, meals[date] || {});
   if (m[person] === v) delete m[person]; else m[person] = v;
   if (Object.keys(m).length) meals[date] = m; else delete meals[date];
@@ -12903,13 +13013,13 @@ function rerenderRating(id, after){ try { if (after === "done") renderCookScreen
 // Has this kid's most recent rating been "wouldn't eat it"?
 function kidRefusedLast(id){ const meals = (((state.ratings || {})[id] || {}).meals) || {}; const dates = Object.keys(meals).sort().reverse(); for (const d of dates) { const m = meals[d]; const ks = ["Livia", "Lucy"].filter(k => typeof m[k] === "number"); if (ks.length) return ks.some(k => m[k] === 0); } return false; }
 function personSummary(id){ const meals = (((state.ratings || {})[id] || {}).meals) || {}; const out = {}; FAMILY.forEach(p => { const vals = Object.keys(meals).sort().map(d => meals[d][p.k]).filter(v => typeof v === "number"); if (vals.length) out[p.k] = { n: vals.length, last: vals[vals.length - 1], avg: vals.reduce((a, b) => a + b, 0) / vals.length }; }); return out; }
-function familyRatingHtml(id, after, compact){
-  const date = ratingDateFor(id); const m = mealRatings(id, date);
+function familyRatingHtml(id, after, compact, forDate){
+  const date = forDate || ratingDateFor(id); const m = mealRatings(id, date); const fd = forDate ? `,'${forDate}'` : "";
   const label = date === localISODate() ? "tonight" : new Date(date + "T12:00:00").toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
   const sz = compact ? 20 : 24;
   const rows = FAMILY.map(p => `<div style="display:flex;align-items:center;gap:6px;padding:4px 0">
       <span style="width:${compact ? 64 : 76}px;font-size:${compact ? 13 : 14}px;font-weight:700;color:var(--text);white-space:nowrap">${p.e} ${p.k}</span>
-      <div style="display:flex;gap:4px;flex:1;flex-wrap:wrap">${FACES.map(f => { const on = m[p.k] === f.v; return `<button title="${f.l}" aria-label="${p.k}: ${f.l}" onclick="setPersonRating('${id}','${p.k}',${f.v === "na" ? "'na'" : f.v},'${after}')" style="min-width:${sz + 18}px;height:${sz + 16}px;border-radius:10px;cursor:pointer;font-size:${f.v === "na" ? 12 : sz}px;font-weight:700;border:1.5px solid ${on ? "rgba(16,185,129,0.8)" : "rgba(255,255,255,0.12)"};background:${on ? "rgba(16,185,129,0.18)" : "transparent"};color:${on ? "#34d399" : "var(--muted)"};opacity:${m[p.k] === undefined || on ? 1 : 0.45}">${f.v === "na" ? "N/A" : f.e}</button>`; }).join("")}</div></div>`).join("");
+      <div style="display:flex;gap:4px;flex:1;flex-wrap:wrap">${FACES.map(f => { const on = m[p.k] === f.v; return `<button title="${f.l}" aria-label="${p.k}: ${f.l}" onclick="setPersonRating('${id}','${p.k}',${f.v === "na" ? "'na'" : f.v},'${after}'${fd})" style="min-width:${sz + 18}px;height:${sz + 16}px;border-radius:10px;cursor:pointer;font-size:${f.v === "na" ? 12 : sz}px;font-weight:700;border:1.5px solid ${on ? "rgba(16,185,129,0.8)" : "rgba(255,255,255,0.12)"};background:${on ? "rgba(16,185,129,0.18)" : "transparent"};color:${on ? "#34d399" : "var(--muted)"};opacity:${m[p.k] === undefined || on ? 1 : 0.45}">${f.v === "na" ? "N/A" : f.e}</button>`; }).join("")}</div></div>`).join("");
   return `<div style="margin:8px 0 4px"><div style="font-size:11px;font-weight:800;letter-spacing:0.6px;color:var(--dim);margin-bottom:2px">WHO LIKED IT · ${esc(label.toUpperCase())}</div>
     <div style="font-size:11px;color:var(--dim);margin-bottom:4px">😍 loved · 🙂 liked · 😐 meh · 🙅 wouldn't eat · N/A not there</div>${rows}</div>`;
 }
@@ -13025,7 +13135,13 @@ function doneSetStars(id,n){ if(!state.ratings)state.ratings={}; const cur=state
 function doneToggleChip(id,chip){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const chips=cur.chips||[]; const on=!chips.includes(chip); state.ratings[id]={...applyKidLog(cur,chip,on),chips:on?[...chips,chip]:chips.filter(c=>c!==chip),date:cur.date||new Date().toISOString()}; scheduleSave(); renderCookScreen(); }
 function doneSaveNote(id){ const el=document.getElementById("done-note"); if(!el||!el.value.trim())return; cookState.noteDraft=""; if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; const log=cur.log||[]; log.unshift({date:localISODate(),text:el.value.trim()}); state.ratings[id]={...cur,log,note:el.value.trim(),date:cur.date||new Date().toISOString()}; scheduleSave(); el.value=""; const st=document.getElementById("done-note-status"); if(st){st.textContent="✅ Saved";} setTimeout(()=>renderCookScreen(),600); }
 // Unrated cooks from the last 3 days → nudge on the Plan tab
-function unratedRecentCooks(){ const cut=Date.now()-3*86400000; return (state.cookHistory||[]).filter(h=>{ const d=new Date(h.date+"T12:00:00").getTime(); if(d<cut)return false; const r=(state.ratings||{})[h.recipeId]; const m=((r&&r.meals)||{})[h.date]||{}; if(FAMILY.every(p=>m[p.k]!==undefined))return false; return !(r&&r.date&&new Date(r.date).getTime()>=d-43200000); }).filter((h,i,a)=>a.findIndex(x=>x.recipeId===h.recipeId)===i); }
+function unratedRecentCooks(){
+  const cut=Date.now()-3*86400000, today=localISODate(), hist=(state.cookHistory||[]).slice();
+  // Planned dinners from the last two days count too — most nights nobody opens cook mode
+  const planned=[]; const addPlanned=(plan,monday)=>{ if(!plan||!monday) return; PLAN_DAYS.forEach((d,i)=>{ const date=addDaysISO(monday,i); if(date>=today) return; const t=new Date(date+"T12:00:00").getTime(); if(t<Date.now()-2.5*86400000) return; const e=planGet(plan,d,"dinner"); if(!e||!e.recipeId||e.leftoverOf) return; const r=byIdAll(e.recipeId); if(!r) return; if(hist.some(x=>x.recipeId===r.id&&x.date===date)) return; planned.push({recipeId:r.id,name:r.name,date,planned:true}); }); };
+  try { addPlanned(state.weekPlan, state.weekPlanMonday); if(state.lastWeek) addPlanned(state.lastWeek.plan, state.lastWeek.monday); } catch(e) {}
+  return hist.concat(planned).filter(h=>{ const d=new Date(h.date+"T12:00:00").getTime(); if(d<cut)return false; if(h.date===today&&new Date().getHours()<17)return false; const r=(state.ratings||{})[h.recipeId]; const m=((r&&r.meals)||{})[h.date]||{}; if(FAMILY.every(p=>m[p.k]!==undefined))return false; return !(r&&r.date&&new Date(r.date).getTime()>=d-43200000); }).sort((a,b)=>a.date<b.date?1:-1).filter((h,i,a)=>a.findIndex(x=>x.recipeId===h.recipeId)===i);
+}
 
 // ── Girls' weekday breakfast card: cereal stays, upgrade it ──
 function girlsBreakfastSuggestion(){
@@ -13062,7 +13178,27 @@ function renderGirlsBreakfastCard(){
 }
 function addGirlsSunday(id){ const plan=state.weekPlan=state.weekPlan||{}; planSet(plan,"Sunday","breakfast3",{recipeId:id,section:"breakfast"}); scheduleSave(); renderPlan(); }
 function addCerealUpgrades(btn){ state.needsGrocery=state.needsGrocery||[]; const want=["Fairlife 2% milk","Kodiak Power Waffles","String cheese","Yogurt tubes (freeze them)","Blueberries or strawberries"]; let n=0; want.forEach(w=>{ const has=state.needsGrocery.some(x=>(typeof x==="string"?x:(x.text||"")).toLowerCase().startsWith(w.toLowerCase().slice(0,10))); if(!has){ state.needsGrocery.push({text:w,sources:["🥣 Girls' breakfast"]}); n++; } }); scheduleSave(); if(btn){ btn.textContent=n?"✓ added "+n+" to Shop":"✓ already on the list"; } }
-function renderRatingNudge(){ const list=unratedRecentCooks(); if(!list.length)return ""; return list.slice(0,2).map(h=>{ const when=h.date===localISODate()?"tonight":"on "+new Date(h.date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long"}); return '<div style="background:rgba(245,158,11,0.08);border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:12px 16px;margin:0 0 12px;display:flex;align-items:center;gap:12px;flex-wrap:wrap"><div style="flex:1;min-width:200px"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#fbbf24">⭐ RATE IT WHILE IT\'S FRESH</div><div style="font-size:15px;font-weight:700">'+esc(h.name)+' <span style="font-weight:400;color:var(--dim)">— cooked '+when+'</span></div></div><div style="display:flex;gap:2px">'+[1,2,3,4,5].map(n=>'<button onclick="nudgeRate(\''+h.recipeId+'\','+n+')" style="font-size:26px;background:none;border:none;cursor:pointer;padding:2px 4px;opacity:0.6">☆</button>').join("")+'</div><button onclick="viewRecipeById(\''+h.recipeId+'\')" style="padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:13px;cursor:pointer">+ note</button><button onclick="dismissNudge(\''+h.recipeId+'\')" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer">✕</button><div style="flex-basis:100%">'+familyRatingHtml(h.recipeId,"plan",true)+'</div></div>'; }).join(""); }
+function renderRatingNudge(){
+  if (planWeekView !== "this") return "";
+  const list=unratedRecentCooks(); if(!list.length) return "";
+  return list.slice(0,2).map(h=>{
+    const today=localISODate(), yest=addDaysISO(today,-1);
+    const when=h.date===today?"tonight":h.date===yest?"last night":new Date(h.date+"T12:00:00").toLocaleDateString("en-US",{weekday:"long"})+" night";
+    const r=byIdAll(h.recipeId)||{}; const fd=h.planned?h.date:null;
+    return `<div style="background:linear-gradient(135deg,rgba(245,158,11,0.10),rgba(245,158,11,0.03));border:1.5px solid rgba(245,158,11,0.35);border-radius:14px;padding:12px 14px;margin:0 0 12px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <span style="font-size:26px;line-height:1">${r.emoji||"🍽️"}</span>
+        <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:800;letter-spacing:0.6px;color:#fbbf24">⭐ HOW WAS ${esc(when.toUpperCase())}?</div>
+          <div style="font-size:15px;font-weight:700;line-height:1.3;cursor:pointer" onclick="viewRecipeById('${h.recipeId}')">${esc(h.name)}</div>
+          <div style="font-size:12px;color:var(--dim);margin-top:2px">One tap each — it steers what the planner picks next.</div></div>
+        <button onclick="dismissNudge('${h.recipeId}')" title="${h.planned?"We didn't make it / skip":"Skip"}" style="background:none;border:none;color:var(--dim);font-size:18px;cursor:pointer;padding:2px 6px">✕</button>
+      </div>
+      ${familyRatingHtml(h.recipeId,"plan",true,fd)}
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        <button onclick="viewRecipeById('${h.recipeId}')" style="padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--text);font-size:13px;cursor:pointer">+ add a note</button>
+        ${h.planned?`<button onclick="dismissNudge('${h.recipeId}')" style="padding:7px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:var(--dim);font-size:13px;cursor:pointer">We didn't make it</button>`:""}
+      </div></div>`; }).join("");
+}
 function nudgeRate(id,n){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,stars:n,date:new Date().toISOString()}; const h=(state.cookHistory||[]).find(x=>x.recipeId===id); if(h)h.rating=n; scheduleSave(); renderPlan(); }
 function dismissNudge(id){ if(!state.ratings)state.ratings={}; const cur=state.ratings[id]||{}; state.ratings[id]={...cur,date:new Date().toISOString()}; scheduleSave(); renderPlan(); }
 async function scheduleRatingReminder(id, name, section) {
