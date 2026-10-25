@@ -9352,7 +9352,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102406;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102407;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9627,7 +9627,7 @@ function buildClaudeListText() {
   lines.push("");
   if (state.alexaOnlyItems && state.alexaOnlyItems.length) { lines.push("## Extra items (Alexa)"); state.alexaOnlyItems.forEach(i => lines.push("- " + i)); lines.push(""); }
   const names = getPlannedRecipes().map(r => r.name);
-  lines.push("Recipes " + (state.groceryBothWeeks ? "these two weeks" : "this week") + ": " + (names.join(" · ") || "none planned"));
+  lines.push("Recipes (" + groceryScopeLabel().replace(/^.*?(—|·)\s*/,"") + "): " + (names.join(" · ") || "none planned"));
   return { text: lines.join("\n"), count: items.length };
 }
 async function shareListToMK() {
@@ -11948,12 +11948,39 @@ function categorizeGroceryItem(itemText) {
 }
 
 // Recipes assigned to a day in this week's plan (deduped), across all sections
+// ── Which days the grocery list covers ──────────────────────────────────────
+// "rest" = today through Sunday of this week (days already past were shopped for), "next" = next week,
+// "both" = both. Default picks itself: on the weekend, or when nothing's left this week, it's next week.
+function planTodayIdx(){ const d=new Date().getDay(); return d===0?6:d-1; }   // Mon=0 … Sun=6
+function planHas(plan, days){ return days.some(d=>["breakfast","lunch","dinner"].some(sl=>{ const e=planGet(plan||{},d,sl); return e&&(e.recipeId||e.leftoverOf); })); }
+function groceryScope(){
+  const s=state.groceryScope; if(s&&s.d===localISODate()&&["rest","next","both"].includes(s.v)) return s.v;
+  const ti=planTodayIdx(); const restHas=planHas(state.weekPlan, PLAN_DAYS.slice(ti)); const nextHas=planHas(state.nextWeekPlan, PLAN_DAYS);
+  if(!restHas) return "next";
+  if(ti>=5 && nextHas) return "next";
+  return "rest";
+}
+function setGroceryScope(v){ state.groceryScope={v, d:localISODate()}; scheduleSave(); renderGrocery(); }
+function groceryDayOk(key, week){ if(week==="next") return true; const day=String(key).split("_")[0]; const i=PLAN_DAYS.indexOf(day); return i<0 || i>=planTodayIdx(); }
+function groceryPlanEntries(){
+  const sc=groceryScope(); const out=[];
+  if(sc!=="next") Object.entries(state.weekPlan||{}).forEach(([k,e])=>{ if(groceryDayOk(k,"this")) out.push(e); });
+  if(sc!=="rest") Object.values(state.nextWeekPlan||{}).forEach(e=>out.push(e));
+  return out;
+}
+function groceryScopeLabel(){
+  const sc=groceryScope(); const fmt=d=>d.toLocaleDateString("en-US",{month:"short",day:"numeric"});
+  const mon=new Date(); mon.setHours(12,0,0,0); mon.setDate(mon.getDate()-planTodayIdx()); const nmon=new Date(mon); nmon.setDate(mon.getDate()+7); const nsun=new Date(nmon); nsun.setDate(nmon.getDate()+6);
+  const today=PLAN_DAYS[planTodayIdx()];
+  if(sc==="next") return "Next Week's Groceries · "+fmt(nmon)+" – "+fmt(nsun);
+  if(sc==="both") return "Groceries — Rest of This Week + Next";
+  return today==="Sunday" ? "Groceries — Today (Sunday)" : "Groceries — "+today+" through Sunday";
+}
 function getPlannedRecipes() {
   const all = [...(state.dinners||[]), ...(state.breakfasts||[]), ...(state.lunches||[]), ...(state.desserts||[])];
   const seen = new Set();
   const out = [];
-  const plans = state.groceryBothWeeks ? [state.weekPlan||{}, state.nextWeekPlan||{}] : [state.weekPlan||{}];
-  plans.flatMap(p => Object.values(p)).forEach(a => {
+  groceryPlanEntries().forEach(a => {
     if (!a || !a.recipeId || seen.has(a.recipeId)) return;
     const r = all.find(x => x.id === a.recipeId);
     if (r) { seen.add(r.id); out.push(r); }
@@ -11962,9 +11989,8 @@ function getPlannedRecipes() {
 }
 
 function plannedSides(){
-  const plans = state.groceryBothWeeks ? [state.weekPlan||{}, state.nextWeekPlan||{}] : [state.weekPlan||{}];
   const seen=new Set(); const out=[];
-  plans.flatMap(p=>Object.values(p)).forEach(e=>{ if(e&&e.side&&SIDES_BY_ID[e.side]&&!seen.has(e.side)){ seen.add(e.side); const sd=SIDES_BY_ID[e.side]; out.push({id:sd.id,name:"Side: "+sd.name,ingredients:sd.ingredients}); } });
+  groceryPlanEntries().forEach(e=>{ if(e&&e.side&&SIDES_BY_ID[e.side]&&!seen.has(e.side)){ seen.add(e.side); const sd=SIDES_BY_ID[e.side]; out.push({id:sd.id,name:"Side: "+sd.name,ingredients:sd.ingredients}); } });
   return out;
 }
 
@@ -12094,15 +12120,14 @@ function renderGrocery() {
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 8px;flex-wrap:wrap;gap:8px">
       <div>
-        <div style="font-size:20px;font-weight:700">🛒 ${state.groceryBothWeeks ? "Groceries — Both Weeks" : "This Week's Groceries"}</div>
+        <div style="font-size:20px;font-weight:700">🛒 ${groceryScopeLabel()}</div>
         <div style="color:var(--dim);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
           <span>${checkedCount} checked · ${displayCats.reduce((a,c)=>a+c.items.length,0)} items</span>
           <select onchange="state.store=this.value;scheduleSave();renderGrocery()" style="width:auto;flex:0 0 auto;padding:3px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--text);font-size:12px;font-weight:700">
             ${["Kroger","Publix","Whole Foods","Costco"].map(st => `<option ${state.store===st?"selected":""}>${st}</option>`).join("")}
           </select>
           <span style="display:inline-flex;background:rgba(255,255,255,0.06);border-radius:999px;padding:2px">
-            <button onclick="state.groceryBothWeeks=false;renderGrocery()" style="padding:3px 10px;border-radius:999px;border:none;background:${!state.groceryBothWeeks?"var(--green)":"transparent"};color:${!state.groceryBothWeeks?"#0a0f1a":"var(--muted)"};font-size:11px;font-weight:800;cursor:pointer">This week</button>
-            <button onclick="state.groceryBothWeeks=true;renderGrocery()" style="padding:3px 10px;border-radius:999px;border:none;background:${state.groceryBothWeeks?"#818cf8":"transparent"};color:${state.groceryBothWeeks?"#0a0f1a":"var(--muted)"};font-size:11px;font-weight:800;cursor:pointer">Both weeks</button>
+            ${(()=>{ const sc=groceryScope(); const btn=(v,l,c)=>`<button onclick="setGroceryScope('${v}')" style="padding:3px 10px;border-radius:999px;border:none;background:${sc===v?c:"transparent"};color:${sc===v?"#0a0f1a":"var(--muted)"};font-size:11px;font-weight:800;cursor:pointer">${l}</button>`; return btn("rest","Rest of this week","var(--green)")+btn("next","Next week","#818cf8")+btn("both","Both","#fbbf24"); })()}
           </span>
           ${state.alexaSyncTime ? "<span>🔵 Alexa synced " + state.alexaSyncTime + "</span>" : ""}
         </div>
@@ -12135,7 +12160,7 @@ function renderGrocery() {
         <div style="font-size:17px;font-weight:700;margin-bottom:6px">Nothing planned yet</div>
         <div style="color:var(--dim);font-size:14px;margin-bottom:16px">Add meals to this week on the Plan tab and your shopping list builds itself — grouped by store section, deduped across recipes.</div>
         <button onclick="showTab('plan')" style="padding:12px 22px;border-radius:12px;border:none;background:var(--green);color:#0a0f1a;font-weight:700;font-size:14px;cursor:pointer">Go to Plan →</button>
-      </div>` : `<div class="grocery-cats">${cats}</div>`}
+      </div>` : `${(groceryScope()==="rest" && planTodayIdx()>=5 && !planHas(state.nextWeekPlan, PLAN_DAYS)) ? `<div style="margin:6px 0 14px;padding:12px 14px;border-radius:12px;background:rgba(129,140,248,0.08);border:1px solid rgba(129,140,248,0.35);font-size:14px;color:var(--muted)">📅 Next week isn't planned yet — once it is, this list switches to next week's groceries on its own. <a href="#" onclick="planWeekView='next';showTab('plan');return false" style="color:#a5b4fc;font-weight:700">Plan next week →</a></div>` : ""}<div class="grocery-cats">${cats}</div>`}
     <div style="background:rgba(0,168,232,0.06);border:2px solid rgba(0,168,232,0.25);border-radius:14px;padding:14px 16px;margin-top:14px;margin-bottom:10px">
       <div style="font-size:13px;font-weight:700;color:#00a8e8;margin-bottom:8px">📋 Before you open Instacart:</div>
       <div style="display:flex;flex-direction:column;gap:8px">
@@ -16079,9 +16104,9 @@ function lbFeedback(itemId, kid, dateKey, r){
 
 // ── Grocery integration ──
 function lbGroceryItems(weekKey){
-  const lb = lbState(); const keys = weekKey ? [weekKey] : (state.groceryBothWeeks ? ["this","next"] : ["this"]);
+  const lb = lbState(); const sc = groceryScope(); const keys = weekKey ? [weekKey] : (sc==="both" ? ["this","next"] : sc==="next" ? ["next"] : ["this"]);
   const counts = {}; // phrase → {days:Set, item}
-  keys.forEach(wk => { const week = lb.plan[wk]; if (!week) return; Object.entries(week).forEach(([day, dp]) => {
+  keys.forEach(wk => { const week = lb.plan[wk]; if (!week) return; Object.entries(week).forEach(([day, dp]) => { if (!weekKey && wk === "this" && !groceryDayOk(day, "this")) return;
     LB_KIDS.forEach(k => { const p = dp[k.id]; if (!p) return; LB_SLOTS.forEach(s => { const it = LB_BY_ID[p[s]]; if (!it || !it.shop) return; it.shop.split(";").map(x=>x.trim()).filter(Boolean).forEach(ph => { const key = ph.toLowerCase(); if (!counts[key]) counts[key] = { phrase: ph, days: new Set(), item: it }; counts[key].days.add(wk+day); }); });
       if (p.fruitAdd) { const fi = LB_BY_ID[p.fruitAdd]; if (fi && fi.shop) fi.shop.split(";").map(x=>x.trim()).forEach(ph => { const key = ph.toLowerCase(); if (!counts[key]) counts[key] = { phrase: ph, days: new Set(), item: fi }; counts[key].days.add(wk+day); }); }
     }); }); });
