@@ -4193,7 +4193,7 @@ const DEFAULT_DINNERS = [
     active:true
   }
   ,{
-    id:"dinner25", serves:"Dinner for 4 + 1–2 lunch portions", aheadCovers:[{"task":0,"steps":[4]},{"task":1,"steps":[5]},{"task":2,"steps":[7]}], aheadPartial:[{"task":3,"step":8,"text":"Set 2 tbsp avocado oil by the stove. Tear basil for the finish."}], stepVariants:[{"i":29,"g":"the white sauce","v":{"ⓐ":"Serve over Brami pasta with extra marinara spooned over the pasta. For anyone who wants white sauce: warm the Cottage Cheese Alfredo gently (don't boil) and toss a portion of pasta in it. Adults: red pepper flakes at the table.","ⓑ":"Serve over Brami pasta with extra marinara spooned over the pasta. For anyone who wants pesto: toss a portion of pasta with 2-3 tbsp Rana pesto loosened with a splash of hot water. Adults: red pepper flakes at the table."}}], aheadVariants:[{"i":4,"g":"the white sauce","v":{"ⓐ":"Make the Cottage Cheese Alfredo: blend ½ cup cottage cheese + 2 tbsp Parmesan + ½ clove garlic + ⅛ tsp pepper + a pinch of nutmeg + ½ tsp lemon juice until smooth (salt only after tasting)","ⓑ":""}}], stepsN:30, makeAhead:[{"task":"Pound 4 chicken breasts to an even ½ inch between plastic wrap","when":"up to 1 day ahead","store":"covered container, bottom shelf of fridge"},{"task":"Breading: mix 1 cup panko + ¼ cup grated Parmesan + 1 tsp Italian seasoning + 1 tsp Dan-O's + 1 tsp garlic powder + ½ tsp salt + ¼ tsp pepper","when":"up to 3 days ahead","store":"airtight container, fridge","bowl":"🟡 Bowl 1"},{"task":"Sauce: stir 1 jar marinara + 1 small zucchini, finely grated and squeezed dry","when":"up to 2 days ahead","store":"airtight container, fridge","bowl":"🫙 Sauce Bowl"},{"task":"Cheese: combine 1 cup shredded mozzarella + ¼ cup grated Parmesan","when":"up to 3 days ahead","store":"airtight container, fridge","bowl":"🧀 Cheese Bowl"},{"task":"If using homemade Cottage Cheese Alfredo: blend ½ cup cottage cheese + 2 tbsp Parmesan + ½ clove garlic + ⅛ tsp pepper + a pinch of nutmeg + ½ tsp lemon juice until smooth (salt only after tasting); warm gently with 1 tbsp butter, only to the touch","when":"up to 2 days ahead","store":"jar, fridge"}], makeAheadNote:"With the chicken pounded and all the bowls filled ahead, only dredging, searing and baking are left.", kidTier:4,
+    id:"dinner25", serves:"Dinner for 4 + 1–2 lunch portions", aheadCovers:[{"task":0,"steps":[4]},{"task":1,"steps":[5]},{"task":2,"steps":[7]}], aheadPartial:[{"task":3,"step":8,"text":"Set 2 tbsp avocado oil by the stove. Tear basil for the finish."}], stepVariants:[{"i": 29, "g": "the white sauce", "v": {"ⓐ": "Serve over Brami pasta with extra marinara spooned over the pasta. Adults: red pepper flakes at the table.", "ⓑ": "Serve over Brami pasta with extra marinara spooned over the pasta. For anyone who wants white sauce: warm the Cottage Cheese Alfredo gently (don't boil) and toss a portion of pasta in it. Adults: red pepper flakes at the table.", "ⓒ": "Serve over Brami pasta with extra marinara spooned over the pasta. For anyone who wants pesto: toss a portion of pasta with 2-3 tbsp Rana pesto loosened with a splash of hot water. Adults: red pepper flakes at the table."}}], aheadVariants:[{"i": 4, "g": "the white sauce", "v": {"ⓐ": "", "ⓑ": "Make the Cottage Cheese Alfredo: blend ½ cup cottage cheese + 2 tbsp Parmesan + ½ clove garlic + ⅛ tsp pepper + a pinch of nutmeg + ½ tsp lemon juice until smooth (salt only after tasting)", "ⓒ": ""}}], stepsN:30, makeAhead:[{"task":"Pound 4 chicken breasts to an even ½ inch between plastic wrap","when":"up to 1 day ahead","store":"covered container, bottom shelf of fridge"},{"task":"Breading: mix 1 cup panko + ¼ cup grated Parmesan + 1 tsp Italian seasoning + 1 tsp Dan-O's + 1 tsp garlic powder + ½ tsp salt + ¼ tsp pepper","when":"up to 3 days ahead","store":"airtight container, fridge","bowl":"🟡 Bowl 1"},{"task":"Sauce: stir 1 jar marinara + 1 small zucchini, finely grated and squeezed dry","when":"up to 2 days ahead","store":"airtight container, fridge","bowl":"🫙 Sauce Bowl"},{"task":"Cheese: combine 1 cup shredded mozzarella + ¼ cup grated Parmesan","when":"up to 3 days ahead","store":"airtight container, fridge","bowl":"🧀 Cheese Bowl"},{"task":"If using homemade Cottage Cheese Alfredo: blend ½ cup cottage cheese + 2 tbsp Parmesan + ½ clove garlic + ⅛ tsp pepper + a pinch of nutmeg + ½ tsp lemon juice until smooth (salt only after tasting); warm gently with 1 tbsp butter, only to the touch","when":"up to 2 days ahead","store":"jar, fridge"}], makeAheadNote:"With the chicken pounded and all the bowls filled ahead, only dredging, searing and baking are left.", kidTier:4,
     audience:"family",
     name:"Baked Chicken Parmesan",
     emoji:"🍅", proteinType:"chicken", vegServings:1,
@@ -4232,7 +4232,9 @@ const DEFAULT_DINNERS = [
       "--- SERVING ---",
       "8 oz Brami protein pasta or Kaizen — sub: Barilla Protein+ or Banza chickpea pasta (both at Kroger/Publix)",
       "Kosher salt for the pasta water",
-      "--- ⓐ Homemade Cottage Cheese Alfredo (Sauces tab) (choose one: the white sauce) ---",
+      "--- ⓐ No white sauce — marinara only (choose one: the white sauce) ---",
+      "Serve with just the marinara — nothing extra to buy",
+      "--- ⓑ Homemade Cottage Cheese Alfredo (Sauces tab) (choose one: the white sauce) ---",
       "½ cup Good Culture 4% cottage cheese — sub: any full-fat cottage cheese (Kroger Simple Truth, Daisy, or Hood)",
       "2 tbsp Parmesan, grated",
       "1 tbsp butter",
@@ -4242,7 +4244,7 @@ const DEFAULT_DINNERS = [
       "Salt only after tasting — cottage cheese is already salty",
       "Burlap & Barrel Smoked Chipotle Chili Flakes (optional, adults only)",
       "2-3 tbsp pasta water or Fairlife milk to thin",
-      "--- ⓑ Store-bought pesto swap (choose one: the white sauce) ---",
+      "--- ⓒ Store-bought pesto swap (choose one: the white sauce) ---",
       "1 container (7 oz) Rana basil pesto — uses 2-3 tbsp"
     ],
     instructions:[
@@ -9354,7 +9356,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102412;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102414;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9574,16 +9576,21 @@ function productPhrase(text) {
   t = t.replace(/^\s*(?:the\s+)?(?:juice|zest)(?:\s+and\s+(?:juice|zest))?\s+of\s+(?:\d+\s*|½\s*|a\s+|an\s+|half\s+(?:a\s+)?)?/i, "");   // "Juice of 1 lemon" → lemon
   t = t.replace(/\b(wedges?|halves|slices?)\b(?!\s+of)/gi, m => /wedges?/i.test(m) ? "" : m);                         // "Lime wedge" → lime
   t = t.replace(/\bfreshly\b/gi, "");
+  t = t.replace(/^[A-Z][\w' -]{2,40}:\s+(?=[\d½¼¾⅓⅔⅛])/, "");                                  // "Quick-pickled red onion: ½ small red onion" → "½ small red onion"
+  t = t.split(/\.\s+[A-Z]/)[0];                                                                  // drop trailing sentences ("…salt. The soy sauce brings the rest.")
+  t = t.replace(/\bcooked (jasmine rice|basmati rice|brown rice|white rice|rice|farro|quinoa)\b/i, "$1");
   t = t.split(/\s(?:added|broken|drizzled|scattered|torn|tossed|right before|at the end)\b/i)[0];   // "Prosciutto added after baking" → Prosciutto
   t = t.replace(/\s+(drizzle|sprinkle|dusting)\s*$/i, "");
   t = t.replace(/\([^)]*\)/g, " ");                 // (notes)
+  t = t.replace(/\s+(?:to finish|to serve|to float|to thin|to garnish|to season|on top|stirred in|per (?:serving|person|lunchbox|jar|bowl|portion))\b.*$/i, "");
   t = t.split(/\s[—–-]\s/)[0];                      // — trailing notes
   // "butter or Bibb lettuce" / "flour or corn tortillas" → keep the noun ("butter lettuce", "flour tortillas") before trimming the "or …" alternative
   t = t.replace(/\b([a-z-]+) or ([a-z-]+) (lettuce|tortillas?|onions?|tomatoes|peppers?|beans|potatoes|cheese|noodles|pasta|rice)\b/i, "$1 $3");
   t = t.replace(/\b(sub|substitute|or)\b:?.*$/i, m => /^or\s/i.test(m) ? "" : "").trim();
   t = t.split(/,|;|\bplus\b|\bfor\b|\binstead of\b|\bor crispy\b/i)[0];        // , diced / for serving / instead of
-  t = t.replace(/^[\d\s\/½¼¾⅓⅔⅛⅜⅝⅞.\-–×x]+(?:(?:cups?|tbsp|tsp|oz|ounces?|lbs?|pounds?|g|kg|ml|cloves?|cans?|jars?|bags?|packs?|packages?|pouches?|slices?|bunch|heads?|stalks?|sprigs?|sheets?|pints?|quarts?|large|medium|small|whole|extra|handfuls?|box(?:es)?|bottles?|tubs?|containers?|loaf|loaves|dozen|pinch(?:es)?|dash(?:es)?|ripe)\b)?\s*(?:of\s+)?/i, "");
+  t = t.replace(/^[\d\s\/½¼¾⅓⅔⅛⅜⅝⅞.\-–×x]+(?:(?:fillets?|patties|links?|cups?|tbsp|tsp|oz|ounces?|lbs?|pounds?|g|kg|ml|cloves?|cans?|jars?|bags?|packs?|packages?|pouches?|slices?|bunch|heads?|stalks?|sprigs?|sheets?|pints?|quarts?|large|medium|small|whole|extra|handfuls?|box(?:es)?|bottles?|tubs?|containers?|loaf|loaves|dozen|pinch(?:es)?|dash(?:es)?|ripe)\b)?\s*(?:of\s+)?/i, "");
   t = t.replace(/\b(diced|minced|grated|shredded|sliced|chopped|softened|melted|drained|rinsed|cubed|cut|halved|quartered|peeled|trimmed|thinly|finely|roughly|fresh|frozen|cold|room temperature|at room temp|to taste|as needed|optional|divided|plus more|your favorite|ripe)\b(?!\s+tomato)/gi, " ");   // canned "diced tomatoes" stays distinct from fresh
+  t = t.replace(/\s*\([^)]*$/, "");                // a note cut off mid-parenthesis ("tuna (Wild Planet")
   t = t.replace(/\s+/g, " ").replace(/^[\s,.-]+|[\s,.-]+$/g, "").trim();
   return t || String(text || "").trim();
 }
@@ -12109,7 +12116,9 @@ function produceNeed(p, text){
   return n!=null?n:1;
 }
 function produceBuyText(p, texts){
-  const need=texts.reduce((a,t)=>a+produceNeed(p,t),0); const r=x=>Math.round(x*10)/10;
+  const zestOnly=t=>p.juiceTbsp && /\bzest\b/i.test(t) && !/juice/i.test(t) && !/\bjuice of\b/i.test(t);
+  const hasOther=texts.some(t=>!zestOnly(t));   // zest comes off a lemon you're already buying for juice
+  const need=texts.reduce((a,t)=>a+((hasOther&&zestOnly(t))?0:produceNeed(p,t)),0); const r=x=>Math.round(x*10)/10;
   if(p.garlic){ const cl=Math.ceil(need-1e-9); const heads=Math.max(1,Math.ceil(cl/12)); return heads+" head"+(heads>1?"s":"")+" garlic ("+cl+" clove"+(cl>1?"s":"")+" needed)"; }
   if(p.carrots){ const c=Math.ceil(need-1e-9); return c<=8 ? "1 bag (1 lb) carrots ("+c+" needed)" : Math.ceil(c/8)+" bags (1 lb) carrots ("+c+" needed)"; }
   if(p.herb){ const b=Math.max(1,Math.ceil(need/1.5-1e-9)); return b+" "+(b>1?p.many:p.one)+(need>=0.5?" (about "+r(need)+" cups chopped)":""); }
@@ -12118,13 +12127,31 @@ function produceBuyText(p, texts){
   if(p.oneBunch){ return "1 "+p.one; }
   const c=Math.max(1,Math.ceil(need-1e-9)); return c+" "+(c>1?p.many:p.one)+(texts.length>1&&Math.abs(need-c)>0.01?" (about "+r(need)+" needed)":"");
 }
+function expandPlusLines(list){
+  const out=[]; const AMT=/^(?:optional:\s*)?(?:[\d½¼¾⅓⅔⅛]|a pinch|a few|pinch)/i;
+  list.forEach((ing, ii) => {
+    if (typeof ing !== "string" || ing.startsWith("---") || !/ \+ /.test(ing)) { out.push({ ing, ii }); return; }
+    // split on " + " outside parentheses
+    const parts=[]; let depth=0, cur="";
+    for (let k=0;k<ing.length;k++){ const c=ing[k]; if(c==="(") depth++; if(c===")") depth=Math.max(0,depth-1);
+      if(depth===0 && ing.slice(k,k+3)===" + "){ parts.push(cur); cur=""; k+=2; continue; } cur+=c; }
+    parts.push(cur);
+    if (parts.length>1 && parts.slice(1).every(x=>AMT.test(x.trim()))) {
+      const opt=/^\s*optional\s*:/i.test(ing);
+      // a trailing "— note" or ", to finish" on the last part belongs to the whole line; keep it on the last part only
+      const fruit=(parts[0].match(/\b(lemon|lime|orange)\b/i)||[])[1];
+      parts.forEach(x=>{ let t=x.trim(); if(fruit && /^[\d½¼¾⅓⅔⅛\s\/]*(?:tsp|tbsp)?\s*(?:zest|juice)\b/i.test(t) && !/\b(lemon|lime|orange)\b/i.test(t.split("(")[0])) t=t.replace(/\b(zest|juice)\b/i, fruit.toLowerCase()+" $1"); out.push({ ing:(opt&&!/^\s*optional/i.test(t)?"Optional: ":"")+t, ii }); });
+    } else out.push({ ing, ii });
+  });
+  return out;
+}
 function buildSmartGroceryList() {
   const planned = [...getPlannedRecipes(), ...plannedSides()];
   const raw = [];
   planned.forEach(r => {
     let curSection = "";
     const ch = parseChoices(r);
-    (r.ingredients || []).forEach((ing, ii) => {
+    expandPlusLines(r.ingredients || []).forEach(({ ing, ii }) => {
       const text = (typeof ing === "string" ? ing : (ing && ing.text) || "").trim();
       if (text.startsWith("---")) { curSection = text; return; }
       const own = ch.owner[ii]; let choice = null;
@@ -12134,7 +12161,7 @@ function buildSmartGroceryList() {
       // skip "to taste"/"for serving" style non-purchases
       if (/\b(to taste|as needed|for serving|for the table|on the table|season at the end)\b/i.test(text) && !/^\s*\d/.test(text)) return;
       // not purchases: alternatives, labels, "extra X on top", notes
-      if (/^(or|and)\s/i.test(text) || /\bVERSION:|^[A-Z][A-Z\s/&'-]{3,}:\s/.test(text) || /^(extra|the|a few|more)\s/i.test(text) || /\s·\s/.test(text) || /\b(to finish|on top|for max enjoyment|if you went there|if they insist)\b/i.test(text) || /^(squeeze|pinch|dash|splash|drizzle) of\b/i.test(text)) return;
+      if (/^(or|and)\s/i.test(text) || /\bVERSION:|^[A-Z][A-Z\s/&'-]{3,}:\s/.test(text) || /^(extra|the|a few|more)\s/i.test(text) || /\s·\s/.test(text) || /\b(for max enjoyment|if you went there|if they insist)\b/i.test(text) || /^(squeeze|pinch|dash|splash|drizzle) of\b/i.test(text)) return;
       if (/optional/i.test(curSection) && /upgrade|optional/i.test(curSection)) return; // "ADULT UPGRADE (optional)" sections
       // not purchases: homemade sauces from the Sauces tab, serving notes, headers-as-lines, water
       if (/^🫙|\bfrom (the )?sauces tab\b|^serve (with|over|on)\b|^(additions?|garnish(es)?|toppings?|to serve)\s*[:(]|\bfrom your batch\b|\bfrom the freezer\b/i.test(text)) return;
@@ -13773,6 +13800,7 @@ function getIngredientKey(text) {
     [/bone-in.*thigh|thigh.*bone-in/, "bone-in skin-on chicken thighs"],
     [/chicken thigh/, "boneless skinless chicken thighs"],
     [/fairlife.*milk|milk.*fairlife/, "Fairlife 2% milk"],
+    [/^(?!.*\b(crisps?|rind|dressing|alfredo)\b).*\bparmesan\b|parmigiano/, "Parmesan"],
     [/\brao'?s\b(?!.*\b(vodka|arrabbiata|alfredo|tomato basil soup)\b)/, "Rao's marinara"],
     [/^(?!.*\b(tzatziki|ranch|dressing|dip)\b)(?=.*(fage.*yogurt|greek yogurt)).*\b2%/, "Fage 2% Greek yogurt"],
     [/^(?!.*\b(tzatziki|ranch|dressing|dip)\b)(?=.*(fage.*yogurt|greek yogurt)).*\b0%/, "Fage 0% Greek yogurt"],
@@ -16880,7 +16908,7 @@ function showImportStatus(msg) {
 
 // Bump RECIPE_REV whenever built-in recipes are edited in code. On next load, saved copies of
 // built-in recipes take the new content once (ratings, notes, plans are stored separately and untouched).
-const RECIPE_REV = "2026-10-25c";
+const RECIPE_REV = "2026-10-25d";
 function refreshBuiltInRecipes() {
   try {
     if (state.recipeRev === RECIPE_REV) return false;
