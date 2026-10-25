@@ -9283,7 +9283,12 @@ let saveTimer = null;
 let currentTab = "plan";
 let swapsSubTab = "swaps";
 let planView = "list"; // 'list' | 'calendar'
-let scaleFactors = {}; // recipeId -> multiplier
+// recipeId -> multiplier. Backed by state.recipeScale so it's remembered, synced with MK, and the grocery list follows it.
+const scaleFactors = new Proxy({}, {
+  get: (_, k) => { try { return ((typeof state !== "undefined" && state && state.recipeScale) || {})[k]; } catch (e) { return undefined; } },
+  set: (_, k, v) => { try { state.recipeScale = Object.assign({}, state.recipeScale || {}); const n = Number(v); if (!n || n === 1) delete state.recipeScale[k]; else state.recipeScale[k] = n; if (typeof scheduleSave === "function") scheduleSave(); } catch (e) {} return true; },
+  has: (_, k) => { try { return !!(state && state.recipeScale && k in state.recipeScale); } catch (e) { return false; } },
+});
 
 // Family sync is built in — every device connects on first load. Settings can override.
 const DEFAULT_SUPABASE_URL = "https://opnpfaepzhtoozjdzgjv.supabase.co";
@@ -9356,7 +9361,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026102414;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026102415;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -11991,7 +11996,7 @@ function toggleGroceryLunchbox(){ state.groceryLunchbox=!state.groceryLunchbox; 
 function groceryCandidates(){
   const all=[...(state.dinners||[]),...(state.breakfasts||[]),...(state.lunches||[]),...(state.desserts||[])]; const out=[]; const seen=new Set();
   const sc=groceryScope(); const add=(e,wk,key)=>{ if(!e) return; const day=String(key).split("_")[0];
-    if(e.recipeId&&!seen.has(e.recipeId)){ const r=all.find(x=>x.id===e.recipeId); if(r){ seen.add(r.id); out.push({id:r.id,name:r.name,emoji:r.emoji||"🍽",when:(wk==="next"?"next ":"")+day}); } }
+    if(e.recipeId&&!seen.has(e.recipeId)){ const r=all.find(x=>x.id===e.recipeId); if(r){ seen.add(r.id); const sc=scaleFactors[r.id]||1; out.push({id:r.id,name:r.name,emoji:r.emoji||"🍽",when:(wk==="next"?"next ":"")+day+(sc!==1?" · "+(sc===0.5?"½":sc===1.5?"1½":sc)+"×":"")}); } }
     if(e.side&&SIDES_BY_ID[e.side]&&!seen.has("side:"+e.side)){ seen.add("side:"+e.side); const sd=SIDES_BY_ID[e.side]; out.push({id:"side:"+sd.id,name:sd.name,emoji:sd.emoji||"🥦",when:"side",side:true}); } };
   if(sc!=="next") Object.entries(state.weekPlan||{}).forEach(([k,e])=>{ if(groceryDayOk(k,"this")) add(e,"this",k); });
   if(sc!=="rest") Object.entries(state.nextWeekPlan||{}).forEach(([k,e])=>add(e,"next",k));
@@ -12047,8 +12052,17 @@ function parseQty(t){
   return { n, u, rest: t.slice(m[0].length) };
 }
 function fmtQty(n){ const w=Math.floor(n), f=n-w; const map=[[.125,"⅛"],[.25,"¼"],[1/3,"⅓"],[.5,"½"],[2/3,"⅔"],[.75,"¾"]]; let best=null; map.forEach(([v,c])=>{ if(Math.abs(f-v)<.04) best=c; }); if(f<.04) return String(w); if(best) return (w?w:"")+best; return String(Math.round(n*100)/100); }
+const VOL_TSP = { tsp:1, tbsp:3, cup:48 }, WT_OZ = { oz:1, lb:16 };
 function combineQuantities(texts){
   const ps=texts.map(parseQty);
+  if (ps.every(p=>p && p.u) && ps.some(p=>p.u!==ps[0].u)) {
+    const fam = ps.every(p=>VOL_TSP[p.u]) ? VOL_TSP : ps.every(p=>WT_OZ[p.u]) ? WT_OZ : null;
+    if (fam) {
+      const base = ps.reduce((a,p)=>a+p.n*fam[p.u],0); const rest = ps[0].rest;
+      if (fam===VOL_TSP) { if (base>=12) { const c=Math.round(base/48*8)/8; return fmtQty(c)+" cup"+(c>1?"s":"")+" "+rest; } if (base>=3) return fmtQty(Math.round(base/3*2)/2)+" tbsp "+rest; return fmtQty(Math.round(base*4)/4)+" tsp "+rest; }
+      if (base>=16) { const l=Math.round(base/16*4)/4; return fmtQty(l)+" lb "+rest; } return fmtQty(Math.ceil(base))+" oz "+rest;
+    }
+  }
   if (ps.every(p=>p) && ps.every(p=>p.u===ps[0].u)) {
     let total=ps.reduce((a,p)=>a+p.n,0); const u=ps[0].u; if(!u||/^(large|medium|small|whole|head|clove|can|jar|bag|pack|package)$/.test(u)) total=Math.ceil(total-1e-9); const plural=(u&&total>1&&!/^(oz|tbsp|tsp|large|medium|small|whole)$/.test(u))?(u==="bunch"?"bunches":u+"s"):u;
     return fmtQty(total)+(u?" "+plural:"")+" "+ps[0].rest;
@@ -12152,8 +12166,10 @@ function buildSmartGroceryList() {
     let curSection = "";
     const ch = parseChoices(r);
     expandPlusLines(r.ingredients || []).forEach(({ ing, ii }) => {
-      const text = (typeof ing === "string" ? ing : (ing && ing.text) || "").trim();
+      let text = (typeof ing === "string" ? ing : (ing && ing.text) || "").trim();
       if (text.startsWith("---")) { curSection = text; return; }
+      const rScale = (r.id && scaleFactors[r.id]) || 1;
+      if (rScale !== 1 && typeof scaleAmountsInText === "function") text = scaleAmountsInText(text, rScale);
       const own = ch.owner[ii]; let choice = null;
       if (own) { if (choicePick(r.id, own.g) !== own.opt) return;            // the path you didn't pick isn't bought
         const o = ch.groups[own.g][own.opt]; choice = { rid: r.id, rname: r.name, g: own.g, label: o.label, letter: o.letter }; }
@@ -12167,7 +12183,8 @@ function buildSmartGroceryList() {
       if (/^🫙|\bfrom (the )?sauces tab\b|^serve (with|over|on)\b|^(additions?|garnish(es)?|toppings?|to serve)\s*[:(]|\bfrom your batch\b|\bfrom the freezer\b/i.test(text)) return;
       if (/^(water|ice|hot water|cold water|warm water|boiling water)\b/i.test(text) || /^[\d\s½¼¾⅓⅔⅛.\/–-]+(cups?|tbsp|tsp|ml)?\s*(warm |hot |cold |boiling |lukewarm |ice[- ])?water\b/i.test(text) || /:\s*$/.test(text)) return;
       if (/^(leftover|cooked leftover|reserved|saved)\b/i.test(text) || /^[\d\s½¼¾⅓⅔⅛.,\-–~]+(oz|ounces?|lbs?|pounds?|cups?|g)?\s+(of\s+)?leftover\b/i.test(text)) return;   // made earlier in the week, not bought   // water; "Optional additions:" style headers
-      const optLine = /^optional\b/i.test(text) || /\b(upgrades?|garnish(es)?|condiment ideas|for the table|optional)\b/i.test(curSection) || /\(optional\)|\boptional\b|\bif you like\b|\badded after\b|\bbroken over\b|\bright before serving\b/i.test(text);
+      const madeElsewhere = /\((?:breakfast|lunch|dinner|sauces) tab\)|\bhomemade\b(?!.*\bsauce\b)|\bper the (?:breakfast|lunch|dinner)\b|\bfrom (?:the )?(?:breakfast|lunch) tab\b/i.test(text);
+      const optLine = madeElsewhere || /^optional\b/i.test(text) || /\b(upgrades?|garnish(es)?|condiment ideas|for the table|optional)\b/i.test(curSection) || /\(optional\)|\boptional\b|\bif you like\b|\badded after\b|\bbroken over\b|\bright before serving\b/i.test(text);
       if (/^(kosher salt|salt|black pepper|pepper|salt (and|&) (black )?pepper|water|ice)\b/i.test(text) && !/^\s*\d/.test(text)) return;
       raw.push({ text, source: r.name, opt: optLine, choice });
     });
