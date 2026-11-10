@@ -2529,7 +2529,7 @@ const DEFAULT_DINNERS = [
       "1 small zucchini, peeled and grated on a box grater (about 1.5 cups) — white version: squeeze it dry in a towel",
       "2 carrots, grated on a box grater (about 1.5 cups)",
       "--- 🟣 SAUCE (Bowl 4) ---",
-      "½ tsp kosher salt + ¼ tsp black pepper (Diamond Crystal; half if Morton)",
+      "½ tsp Diamond Crystal kosher salt (¼ tsp if Morton) + ¼ tsp black pepper",
       "--- ⓐ Red sauce: marinara + tomatoes (choose one: the sauce) ---",
       "1 jar Frik & Frak or Rao's marinara sauce",
       "1 can (14oz) diced tomatoes, drained",
@@ -2809,7 +2809,7 @@ const DEFAULT_DINNERS = [
       "1 tsp Burlap & Barrel Herbes de Provence, Penzeys Sunny Paris, Spiceology Greek Freak, OR Dan-O's Sea-Soning (all excellent on salmon)",
       "1 tsp Dan-O's Original",
       "½ tsp Burlap & Barrel Smoked Chipotle Chili Flakes (adults — add at table)",
-      "1 tsp kosher salt + ¼ tsp black pepper (Diamond Crystal; ½ tsp salt if Morton — ¾ tsp if your blend is Greek Freak, which is salted)",
+      "1 tsp Diamond Crystal kosher salt (½ tsp if Morton; ¾ tsp if your blend is Greek Freak, which is salted) + ¼ tsp black pepper",
       "2 lemons — one half-sliced for roasting, half for finishing; the second for the sauces",
       "--- THE VEG ---",
       "2 cups cherry tomatoes, left whole",
@@ -2985,7 +2985,7 @@ const DEFAULT_DINNERS = [
       "1½ tsp cumin",
       "1 tsp smoked paprika",
       "¼ tsp Dan-O's Original",
-      "¼ tsp kosher salt + ¼ tsp black pepper to finish (Diamond Crystal; a pinch if Morton) — plus more to taste",
+      "¼ tsp Diamond Crystal kosher salt (a pinch if Morton), plus more to taste + ¼ tsp black pepper to finish",
       "1 lime (acid finish)",
       "--- TOPPINGS ---",
       "¾ cup Fage 5% whole-milk Greek yogurt (sour cream swap) — sub: any plain Greek yogurt (Chobani, Kroger Simple Truth)",
@@ -4409,7 +4409,7 @@ const DEFAULT_DINNERS = [
       "½ tsp garlic powder",
       "1 tsp dried dill or parsley",
       "1 tbsp chopped green onions",
-      "¼ tsp kosher salt + ⅛ tsp black pepper (half the salt if Morton)",
+      "¼ tsp Diamond Crystal kosher salt (⅛ tsp if Morton) + ⅛ tsp black pepper",
       "--- ⓑ Homemade Nothing Hidden Ranch (Sauces tab) (choose one: the drizzle) ---",
       "6 tbsp Fage 5% whole-milk Greek yogurt",
       "2 tbsp light mayo (Duke's Light or Hellmann's Light)",
@@ -8514,7 +8514,7 @@ const DEFAULT_DINNERS = [
       "1 tsp adobo sauce from the chipotle can (smoke and tang, very little heat)",
       "--- 🍗 THE CHICKEN ---",
       "1½ lb boneless skinless chicken breasts (3 breasts; thighs work too and stay juicier)",
-      "½ tsp Diamond Crystal kosher salt + ¼ tsp black pepper (¼ tsp salt if Morton)",
+      "½ tsp Diamond Crystal kosher salt (¼ tsp if Morton) + ¼ tsp black pepper",
       "¼ cup chicken or vegetable broth",
       "--- 🧀 THE CREAMY FINISH ---",
       "4 oz cream cheese, softened (half an 8 oz block)",
@@ -9531,7 +9531,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111027;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111028;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -17452,7 +17452,7 @@ function showImportStatus(msg) {
 
 // Bump RECIPE_REV whenever built-in recipes are edited in code. On next load, saved copies of
 // built-in recipes take the new content once (ratings, notes, plans are stored separately and untouched).
-const RECIPE_REV = "2026-11-10c";
+const RECIPE_REV = "2026-11-10d";
 function refreshBuiltInRecipes() {
   try {
     if (state.recipeRev === RECIPE_REV) return false;
