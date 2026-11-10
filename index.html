@@ -9534,7 +9534,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111031;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111032;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9852,8 +9852,7 @@ function shopPickState(phrase, text, opt){
   else if (SPICE_RE.test(k)) { def = false; reason = "spice — check the cabinet"; }
   else if (opt) { def = false; reason = "optional / topping"; }
   else if (!/^\s*(optional\s*[:—-]\s*)?[\d½¼¾⅓⅔⅛]|^\s*(optional\s*[:—-]\s*)?(a|an|one|two|three|four|half|juice|zest)\b/i.test(text||"")) { def = false; reason = "no amount in the recipe — tick if you need it"; }
-  const on = (k in picks) ? !!picks[k] : def;
-  return { on, def, reason };
+  return { on: true, def, reason };
 }
 function shopPreviewItems(){
   const grouped = collectShoppingItems(false);
@@ -9901,7 +9900,7 @@ function preferredProductRaw(phrase){
 function prefHtml(pp){ const r = prefRanks(pp); if (!r.length) return ""; return r.map((x, i) => (i ? `<span style="color:var(--dim)"> › </span>` : "") + `<span style="color:${i ? "#94a3b8" : "#a7f3d0"}">${i ? (i + 1) + ". " : ""}${esc(x)}</span>`).join(""); }
 function setProductPref(k, current){
   const v = prompt("What to buy for \"" + k + "\", best choice first. Separate backups with  >  (e.g. Siete mild > Frontera > Old El Paso mild). Leave blank for no preference.", prefRanks(current).join(" > "));
-  if (v === null) return; state.productPrefs = Object.assign({}, state.productPrefs || {}); state.productPrefs[k] = prefRanks(v).join(" > "); scheduleSave(); renderShopPreview();
+  if (v === null) return; state.productPrefs = Object.assign({}, state.productPrefs || {}); state.productPrefs[k] = prefRanks(v).join(" > "); scheduleSave(); try { renderGrocery(); } catch (e) {} try { if (document.getElementById("shop-preview") && document.getElementById("shop-preview").style.display !== "none") renderShopPreview(); } catch (e) {}
 }
 function renderShopPreview(){
   const m=document.getElementById("shop-preview"); if(!m) return;
@@ -12700,7 +12699,7 @@ function renderGrocery() {
     });
   });
 
-  const usualShown = [];
+  const usualShown = []; let haveCount = 0;
   const cats = sectionOrder.filter(s => sectionMap[s] && sectionMap[s].length).map(section => {
     const itemHtml = sectionMap[section].map(({item, cat, i, itemText}) => {
       const key = groceryKey(cat, itemText);
@@ -12708,16 +12707,25 @@ function renderGrocery() {
       const usual = usuallyHave(itemText); const outNow = usual && state.grocery[key] === false;
       if (usual && !(key in state.grocery)) usualShown.push(itemText);
       const have = !!(groceryHave(key, itemText) || inPantryCond); const checked = have ? "" : "checked";   // tick = buy it; untick = already have
+      if (have) haveCount++;
+      const skipWhy = (!usual && !(key in state.grocery) && have) ? defaultSkipReason(itemText) : "";
+      const skipTag = skipWhy ? ' <span title="Starts unticked — tap if you need to buy it" style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:999px;background:rgba(255,255,255,0.06);color:var(--dim);vertical-align:middle">' + esc(skipWhy) + '</span>' : "";
+      const ppRaw = have ? "" : preferredProduct(itemText); const kShop = shopKey(productPhrase(itemText)).replace(/'/g,"\\'");
+      const prefArg = JSON.stringify(ppRaw).replace(/"/g,"&quot;").replace(/'/g,"\\'");
+      const brandLine = (!have && ppRaw) ? `<div style="font-size:12px;padding:3px 0 0 26px" onclick="event.stopPropagation()">→ ${prefHtml(ppRaw)}</div>` : "";
+      const brandBtn = have ? "" : `<button onclick="event.stopPropagation();setProductPref('${kShop}',${prefArg})" title="${ppRaw ? "Change the brand to buy" : "Set the brand to buy (first choice, then backups)"}" style="padding:2px 8px;border-radius:6px;border:1px solid ${ppRaw ? "rgba(16,185,129,0.4)" : "rgba(255,255,255,0.15)"};background:transparent;color:${ppRaw ? "#6ee7b7" : "var(--dim)"};font-size:11px;cursor:pointer;flex-shrink:0">🏷</button>`;
       const usualTag = usual ? (outNow ? ' <span title="You usually have this — marked out for this week" style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(248,113,113,0.12);color:#fca5a5;vertical-align:middle">out this week</span>' : ' <span title="Unticked because you had it two weeks running. Tap the item if you\'re out." style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(16,185,129,0.12);color:#6ee7b7;vertical-align:middle">🏠 usually have</span>') : "";
       const sourceText = ((item && item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + (item.sources.length > 1 ? ' +' + (item.sources.length - 1) + ' more' : '') + '</span>' : "") + (inPantryCond ? ' <span class="grocery-source" style="color:var(--green);border:1px solid rgba(16,185,129,0.3)">in pantry</span>' : "");
       const note = (state.groceryNotes && state.groceryNotes[key]) ? state.groceryNotes[key] : "";
       return `<div class="grocery-item ${have ? "have" : ""}" data-text="${esc(itemText)}" data-usual="${usual ? 1 : 0}" onclick="toggleGrocery('${esc(key)}',this)" style="flex-direction:column;align-items:flex-start">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
           <div class="grocery-check ${checked}">${checked ? "✓" : ""}</div>
-          <span style="flex:1">${esc(itemText)}${usualTag}${sourceText}${storeHint(itemText) ? ' <span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(245,158,11,0.12);color:#fbbf24;vertical-align:middle">' + esc(storeHint(itemText)) + '</span>' : ""}</span>
+          <span style="flex:1">${esc(itemText)}${usualTag}${skipTag}${sourceText}${storeHint(itemText) ? ' <span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(245,158,11,0.12);color:#fbbf24;vertical-align:middle">' + esc(storeHint(itemText)) + '</span>' : ""}</span>
           ${have ? "" : `<a href="https://www.instacart.com/store/${instacartSlug()}/s?k=${encodeURIComponent(productPhrase(itemText))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Search this at ${esc(state.store)} on Instacart" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:var(--green);font-size:11px;text-decoration:none;flex-shrink:0">🔎</a>`}
-          <button onclick="event.stopPropagation();openGroceryNote('${esc(key)}','${esc(note)}')" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:11px;cursor:pointer;flex-shrink:0">${note ? "✏️" : "+"}</button>
+          ${brandBtn}
+          <button onclick="event.stopPropagation();openGroceryNote('${esc(key)}','${esc(note)}')" title="Add a note" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:11px;cursor:pointer;flex-shrink:0">${note ? "✏️" : "+"}</button>
         </div>
+        ${brandLine}
         ${(item && item.detail) ? `<div style="font-size:12px;color:var(--dim);padding:3px 0 0 24px;line-height:1.4">${esc(item.detail)}</div>` : ""}
         ${note ? `<div style="font-size:12px;color:var(--amber);padding:3px 0 0 24px;font-style:italic">📝 ${esc(note)}</div>` : ""}
       </div>`;
@@ -12735,7 +12743,7 @@ function renderGrocery() {
       <div>
         <div style="font-size:20px;font-weight:700">🛒 ${groceryScopeLabel()}</div>
         <div style="color:var(--dim);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span>${Math.max(0, displayCats.reduce((a,c)=>a+c.items.length,0) - checkedCount)} to buy · ${displayCats.reduce((a,c)=>a+c.items.length,0)} items</span>
+          <span>${Math.max(0, displayCats.reduce((a,c)=>a+c.items.length,0) - haveCount)} to buy · ${displayCats.reduce((a,c)=>a+c.items.length,0)} items</span>
           <select onchange="state.store=this.value;scheduleSave();renderGrocery()" style="width:auto;flex:0 0 auto;padding:3px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--text);font-size:12px;font-weight:700">
             ${["Kroger","Publix","Whole Foods","Costco"].map(st => `<option ${state.store===st?"selected":""}>${st}</option>`).join("")}
           </select>
@@ -12752,10 +12760,11 @@ function renderGrocery() {
       </div>
     </div>
     <div class="shop-actions" style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap">
-      <button onclick="openShopPreview()" style="flex:2;min-width:200px;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:800;font-size:15px;cursor:pointer">🛒 Review & send to ${esc(state.store)}</button>
-      <button onclick="shareListToMK()" style="flex:1;min-width:120px;padding:13px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:var(--text);font-weight:700;font-size:14px;cursor:pointer">📤 Share to MK</button>
+      <button onclick="sendListToClaude()" style="flex:2;min-width:200px;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:800;font-size:15px;cursor:pointer">🛒 Send ticked items to Claude → ${esc(state.store)} cart</button>
+      <button onclick="copyListForClaude()" title="Just copy the list" style="flex:0 0 auto;padding:14px 14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:var(--text);font-weight:700;font-size:14px;cursor:pointer">📋</button>
+      <button onclick="shareListToMK()" style="flex:1;min-width:120px;padding:14px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:var(--text);font-weight:700;font-size:14px;cursor:pointer">📤 Share to MK</button>
     </div>
-    <div style="font-size:12px;color:var(--dim);margin:0 0 10px;line-height:1.45">Ticked = buy it. Untick anything you already have. <b style="color:var(--muted)">Review & send</b> shows just what's left and gives you the two ways to get it into Instacart. <a href="#" onclick="event.preventDefault();openInstacart()" style="color:var(--dim)">Just open ${esc(state.store)} on Instacart ↗</a></div>
+    <div style="font-size:12px;color:var(--dim);margin:0 0 10px;line-height:1.45">Ticked = buy it; untick what you already have (staples, spices and optional toppings start unticked). <b style="color:var(--muted)">Send</b> opens Claude with the list filled in — hit send there and Claude fills your ${esc(state.store)} cart with your brand picks. 📋 just copies the list.</div>
     <div id="copy-claude-status" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:4px 0;margin-bottom:8px"></div>
     ${aisleEditorHtml()}
 
@@ -12821,7 +12830,17 @@ function usuallyHave(text){
   if (outs.length >= 2 && lastOut > lastHave) return false;
   return true;
 }
-function groceryHave(key, text){ if (state.grocery && key in state.grocery) return !!state.grocery[key]; return usuallyHave(text); }
+// Why an item starts unticked (have / skip) when you haven't touched it: "" means it starts ticked (buy)
+function defaultSkipReason(text){
+  const t = String(text || ""); const phrase = productPhrase(t); const k = shopKey(phrase);
+  if (typeof condimentOwned === "function" && condimentOwned(t)) return "you have it";
+  if (typeof STAPLES_RE !== "undefined" && STAPLES_RE.test(k) && !/\b(fit flour|almond flour|oat flour|fresh|bunch|lb|chicken|beef|pork|salmon|shrimp|turkey|cheese|milk|yogurt|cream)\b/i.test(k)) return "staple";
+  if (typeof SPICE_RE !== "undefined" && SPICE_RE.test(k)) return "spice — check the cabinet";
+  if (/^\s*optional\b/i.test(t)) return "optional";
+  if (!/^\s*(optional\s*[:—-]\s*)?[\d½¼¾⅓⅔⅛]|^\s*(optional\s*[:—-]\s*)?(a|an|one|two|three|four|half|juice|zest)\b/i.test(t)) return "no amount given";
+  return "";
+}
+function groceryHave(key, text){ if (state.grocery && key in state.grocery) return !!state.grocery[key]; if (usuallyHave(text)) return true; return !!defaultSkipReason(text); }
 function haveRecord(text, had){
   const pk = havePk(text); if (!pk || !HAVE_SECTIONS.includes(categorizeGroceryItem(text))) return;
   const all = Object.assign({}, state.haveStats || {}); const st = Object.assign({ w: [], o: [] }, all[pk] || {}); const wk = haveWeek();
@@ -12841,10 +12860,11 @@ function forgetUsual(pk){ const all = Object.assign({}, state.haveStats || {}); 
 function toggleGrocery(key, el) {
   const text = (el && el.dataset && el.dataset.text) || "";
   const usual = !!(el && el.dataset && el.dataset.usual === "1");
-  const cur = (key in (state.grocery || {})) ? !!state.grocery[key] : usual;
   state.grocery = state.grocery || {};
+  const cur = groceryHave(key, text);              // true = have it (unticked)
   const next = !cur;
-  if (usual && next) delete state.grocery[key]; else state.grocery[key] = next;     // back to "usually have" = no explicit value
+  const defaultHave = usual || !!defaultSkipReason(text);
+  if (next === defaultHave) delete state.grocery[key]; else state.grocery[key] = next;   // back to the default = no explicit value
   if (text) haveRecord(text, usual ? (next ? true : false) : (next ? true : null));
   scheduleSave();
   renderGrocery();
