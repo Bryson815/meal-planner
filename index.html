@@ -8529,8 +8529,11 @@ const DEFAULT_DINNERS = [
       "1 bunch fresh cilantro, chopped (some goes in the sauce below)",
       "1 lime, cut into wedges",
       "Optional: sliced jalapeños, adults",
-      "--- 🫙 LIME DRIZZLE ---",
-      "½ cup Fage 5% Greek yogurt (or sour cream — thinned with lime, nobody can tell)",
+      "--- ⓐ Lime drizzle with Fage 5% — same taste, fewer calories (choose one: the drizzle) ---",
+      "½ cup Fage 5% Greek yogurt",
+      "--- ⓑ Lime drizzle with sour cream — Arash's original (choose one: the drizzle) ---",
+      "½ cup sour cream",
+      "--- 🫙 LIME DRIZZLE (both) ---",
       "1 tbsp fresh lime juice",
       "1–2 tbsp cold water",
       "Pinch of Diamond Crystal kosher salt",
@@ -8553,7 +8556,7 @@ const DEFAULT_DINNERS = [
       "Shred the chicken right in the slow cooker with two forks. Add the softened cream cheese and stir until it has completely melted into the sauce.",
       "Stir in the 1 cup shredded Mexican cheese. Cover and give it another 15–20 min on LOW to melt.",
       "Meanwhile cook the rice in generously salted water per the package (Kaizen: 5–6 min; jasmine or basmati: about 15 min).",
-      "🫙 LIME DRIZZLE: whisk the ½ cup Fage 5%, 1 tbsp lime juice and a pinch of salt until smooth, then add cold water 1 tbsp at a time until it drizzles. A squeeze bottle makes this easy.",
+      "🫙 LIME DRIZZLE: whisk the ½ cup Fage 5% or sour cream (whichever you picked), 1 tbsp lime juice and a pinch of salt until smooth, then add cold water 1 tbsp at a time until it drizzles. A squeeze bottle makes this easy.",
       "🌶️ Optional spicy cilantro sauce (adults): blend the cilantro, garlic, jalapeño, lime juice, 2 tbsp Fage 5%, olive oil, chili-lime seasoning and a pinch of salt until smooth. Add cold water until it pours, then taste for salt, lime and heat.",
       "Finish the chicken with the juice of ½ lime. Taste and add salt if it needs it. You want it thick, creamy and scoopable so it sits on the rice instead of running through it.",
       "── SERVE (girls' bowls first) ──",
@@ -9531,7 +9534,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111028;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111029;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -17452,7 +17455,7 @@ function showImportStatus(msg) {
 
 // Bump RECIPE_REV whenever built-in recipes are edited in code. On next load, saved copies of
 // built-in recipes take the new content once (ratings, notes, plans are stored separately and untouched).
-const RECIPE_REV = "2026-11-10d";
+const RECIPE_REV = "2026-11-10e";
 function refreshBuiltInRecipes() {
   try {
     if (state.recipeRev === RECIPE_REV) return false;
