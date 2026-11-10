@@ -9523,13 +9523,13 @@ function _legacyApplySwaps(ingredients) {
 // overwrite the family plan with defaults); (2) every upload is a 3-way merge against what
 // this device last synced, so MK's edit and Andrew's edit to different things both survive.
 const STORAGE_KEY = "lemmonMealPlan_v2";
-const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek","groceryExcluded","groceryLunchbox","groceryScope","recipeScale","haveStats","planProposal","cartRequest","productPrefs","leftovers","aisleOrder"];
+const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek","groceryExcluded","groceryLunchbox","groceryScope","recipeScale","haveStats","planProposal","cartRequest","productPrefs","leftovers","aisleOrder","groceryExtra"];
 const DEVICE_KEYS = ["vaultSort","readAloud","voiceAutoStart","voiceTipSeen","voiceLoose","vaultAudience","vaultQuick","vaultUseUp"];
 let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111021;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111022;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -10392,6 +10392,9 @@ function viewRecipe(section, id) {
   const enjoyMode = !!(window.recipeEnjoyMode && window.recipeEnjoyMode[item.id]) && !!(item.originalIngredients && item.originalIngredients.length);
   const shownIngredients = enjoyMode ? item.originalIngredients : (item.ingredients || []);
   function scaleIngr(ing) { return scaleAmountsInText(ing, scale); }
+  const onList = (typeof isGroceryExtra === "function") && isGroceryExtra(item.id);
+  const shopBtnHtml = `<button onclick="toggleGroceryExtra('${item.id}',()=>viewRecipe('${section}','${item.id}'))" style="width:100%;margin-bottom:10px;padding:11px;border-radius:12px;border:1.5px solid ${onList?"rgba(16,185,129,0.6)":"rgba(129,140,248,0.5)"};background:${onList?"rgba(16,185,129,0.12)":"rgba(129,140,248,0.08)"};color:${onList?"#6ee7b7":"#c7d2fe"};font-weight:700;font-size:14px;cursor:pointer">${onList?"✓ On the shopping list — tap to remove":"🛒 Shop this recipe — add its ingredients to the list"}</button>
+  ${onList?`<div style="font-size:12px;color:var(--dim);margin:-4px 0 10px;text-align:center">Open the Shop tab to review and send it to Instacart (${groceryExtras().length} added recipe${groceryExtras().length===1?"":"s"}${(()=>{const n=groceryPlanEntries().filter(e=>!e.extra&&e.recipeId).length;return n?" + "+n+" planned":"";})()}).</div>`:""}`;
   const scaleHtml = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 12px">
     <span style="font-size:13px;color:var(--dim);margin-right:4px">Servings:</span>
     ${[0.5,1,1.5,2,3].map(f => `<button onclick="scaleFactors['${item.id}']=${f};viewRecipe('${section}','${item.id}')" style="padding:5px 10px;border-radius:8px;border:1px solid ${scale===f?'var(--green)':'rgba(255,255,255,0.12)'};background:${scale===f?'rgba(16,185,129,0.15)':'transparent'};color:${scale===f?'var(--green)':'var(--muted)'};font-size:13px;font-weight:${scale===f?'700':'400'};cursor:pointer">${f===0.5?'½':f===1.5?'1½':f}x</button>`).join("")}
@@ -10453,6 +10456,7 @@ function viewRecipe(section, id) {
       <button onclick="askAboutRecipe('${item.id}')" style="flex:1;padding:14px;border-radius:14px;border:1px solid rgba(16,185,129,0.4);background:transparent;color:var(--green);font-weight:700;font-size:15px">👨‍🍳 Ask</button>
       <button onclick="closeModalForce();startCooking('${section}','${item.id}')" style="flex:2;padding:14px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--green),#059669);color:#07090f;font-weight:800;font-size:16px">Start Cooking →</button>
     </div>
+    ${shopBtnHtml}
     <div class="scale-row">
       <span style="font-size:12px;color:var(--muted);font-weight:600">Servings:</span>
       <button class="scale-btn" onclick="changeScale('${item.id}','${section}',-1)">−</button>
@@ -11177,7 +11181,7 @@ function rolloverWeeks(){
   state.weekPlanMonday = cur;
   // Shopping done over the weekend was for the week that just started — keep those ticks, notes and left-off recipes.
   // Only wipe them when we skipped ahead (no plan carried over).
-  if (nextMon !== cur) { state.grocery = {}; state.groceryNotes = {}; state.groceryExcluded = {}; }
+  if (nextMon !== cur) { state.grocery = {}; state.groceryNotes = {}; state.groceryExcluded = {}; state.groceryExtra = []; }
   state.groceryScope = null; state.prepDone = {};
   scheduleSave();
   return true;
@@ -12245,6 +12249,7 @@ function renderVault() {
           </div>
           <div class="vc-actions" style="display:flex;flex-direction:column;gap:4px;flex-shrink:0" onclick="event.stopPropagation()">
             <button onclick="quickAssignToWeek('${r.id}')" title="Add to this week" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(16,185,129,0.4);background:transparent;color:var(--green);font-size:12px;font-weight:600;cursor:pointer">+<span class="vc-txt"> Week</span></button>
+            <button onclick="toggleGroceryExtra('${r.id}',renderVault)" title="${isGroceryExtra(r.id)?"On the shopping list — tap to remove":"Add its ingredients to the shopping list"}" style="padding:5px 10px;border-radius:8px;border:1px solid ${isGroceryExtra(r.id)?"rgba(16,185,129,0.6)":"rgba(129,140,248,0.4)"};background:${isGroceryExtra(r.id)?"rgba(16,185,129,0.12)":"transparent"};color:${isGroceryExtra(r.id)?"#6ee7b7":"#a5b4fc"};font-size:12px;font-weight:600;cursor:pointer">${isGroceryExtra(r.id)?"✓":"🛒"}<span class="vc-txt"> Shop</span></button>
             <button onclick="toggleFavorite('${r.id}')" title="Favorite" style="padding:5px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:${isFav?"var(--amber)":"var(--dim)"};font-size:12px;cursor:pointer">${isFav?"★":"☆"}<span class="vc-txt"> Fav</span></button>
           </div>
         </div>
@@ -12366,10 +12371,23 @@ function groceryScope(){
 }
 function setGroceryScope(v){ state.groceryScope={v, d:localISODate()}; scheduleSave(); renderGrocery(); }
 function groceryDayOk(key, week){ if(week==="next") return true; const day=String(key).split("_")[0]; const i=PLAN_DAYS.indexOf(day); return i<0 || i>=planTodayIdx(); }
+// ── "Shop this recipe": recipes added to the shopping list straight from the recipe, no plan day needed (synced, cleared with the list) ──
+function groceryExtras(){ return Array.isArray(state.groceryExtra) ? state.groceryExtra.filter(id => byIdAll(id)) : []; }
+function isGroceryExtra(id){ return groceryExtras().includes(id); }
+function toggleGroceryExtra(id, rerender){
+  const cur = groceryExtras(); state.groceryExtra = cur.includes(id) ? cur.filter(x => x !== id) : cur.concat(id);
+  if (!cur.includes(id) && state.groceryExcluded && state.groceryExcluded[id]) { state.groceryExcluded = Object.assign({}, state.groceryExcluded); delete state.groceryExcluded[id]; }
+  scheduleSave(); try { renderGrocery(); } catch (e) {}
+  if (rerender) rerender();
+  const n = groceryExtras().length; const added = state.groceryExtra.includes(id);
+  try { const t = document.createElement("div"); t.textContent = added ? "🛒 Added to the shopping list" + (n > 1 ? " (" + n + " extra recipes)" : "") : "Removed from the shopping list";
+    t.style.cssText = "position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111827;border:1px solid rgba(16,185,129,0.5);color:#d1fae5;padding:10px 16px;border-radius:12px;font-size:14px;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.4)"; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); } catch (e) {}
+}
 function groceryPlanEntries(){
   const sc=groceryScope(); const out=[];
   if(sc!=="next") Object.entries(state.weekPlan||{}).forEach(([k,e])=>{ if(groceryDayOk(k,"this")) out.push(e); });
   if(sc!=="rest") Object.values(state.nextWeekPlan||{}).forEach(e=>out.push(e));
+  groceryExtras().forEach(id => out.push({ recipeId: id, extra: true }));
   return out;
 }
 // Recipes the family chose not to shop for this time (cleared when the week rolls over)
@@ -12384,13 +12402,15 @@ function groceryCandidates(){
     if(e.side&&SIDES_BY_ID[e.side]&&!seen.has("side:"+e.side)){ seen.add("side:"+e.side); const sd=SIDES_BY_ID[e.side]; out.push({id:"side:"+sd.id,name:sd.name,emoji:sd.emoji||"🥦",when:"side",side:true}); } };
   if(sc!=="next") Object.entries(state.weekPlan||{}).forEach(([k,e])=>{ if(groceryDayOk(k,"this")) add(e,"this",k); });
   if(sc!=="rest") Object.entries(state.nextWeekPlan||{}).forEach(([k,e])=>add(e,"next",k));
+  groceryExtras().forEach(id => { if(seen.has(id)) return; const r=all.find(x=>x.id===id); if(!r) return; seen.add(id); const sf=scaleFactors[id]||1; out.push({id,name:r.name,emoji:r.emoji||"🍽",when:"added"+(sf!==1?" · "+(sf===0.5?"½":sf===1.5?"1½":sf)+"×":""),extra:true}); });
   return out;
 }
 function groceryPickerHtml(){
   const c=groceryCandidates(); const lbOn=!!state.groceryLunchbox;
   const lbCount=(typeof lbGroceryItems==="function")?lbGroceryItems(null).length:0;
   const on=c.filter(x=>!groceryExcluded(x.id)).length;
-  const chip=(x)=>{ const off=groceryExcluded(x.id); return `<button onclick="toggleGroceryRecipe('${x.id}')" title="${off?"Add back to the list":"Leave off the list"}" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid ${off?"rgba(255,255,255,0.12)":"rgba(16,185,129,0.45)"};background:${off?"transparent":"rgba(16,185,129,0.1)"};color:${off?"var(--dim)":"var(--text)"};font-size:13px;cursor:pointer;${off?"text-decoration:line-through;":""}"><span>${off?"○":"✓"}</span>${x.emoji} ${esc(x.name)}<span style="color:var(--dim);font-size:11px">${esc(x.when)}</span></button>`; };
+  const chip=(x)=>{ if(x.extra) return `<button onclick="toggleGroceryExtra('${x.id}')" title="Remove from the list" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid rgba(129,140,248,0.5);background:rgba(129,140,248,0.1);color:var(--text);font-size:13px;cursor:pointer"><span>🛒</span>${x.emoji} ${esc(x.name)}<span style="color:var(--dim);font-size:11px">${esc(x.when)}</span><span style="color:var(--dim);margin-left:2px">✕</span></button>`;
+    const off=groceryExcluded(x.id); return `<button onclick="toggleGroceryRecipe('${x.id}')" title="${off?"Add back to the list":"Leave off the list"}" style="display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid ${off?"rgba(255,255,255,0.12)":"rgba(16,185,129,0.45)"};background:${off?"transparent":"rgba(16,185,129,0.1)"};color:${off?"var(--dim)":"var(--text)"};font-size:13px;cursor:pointer;${off?"text-decoration:line-through;":""}"><span>${off?"○":"✓"}</span>${x.emoji} ${esc(x.name)}<span style="color:var(--dim);font-size:11px">${esc(x.when)}</span></button>`; };
   const open = (window._grocPickOpen!==undefined) ? window._grocPickOpen : true;
   return `<details ${open?"open":""} ontoggle="window._grocPickOpen=this.open" style="margin:6px 0 14px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08)">
     <summary style="cursor:pointer;font-size:13px;font-weight:700;color:var(--muted)">Shopping for ${on} of ${c.length} recipe${c.length===1?"":"s"}${lbOn?" + kids' lunchboxes":""} <span style="font-weight:400;color:var(--dim)">· tap to leave one off</span></summary>
