@@ -455,6 +455,8 @@ input::placeholder,textarea::placeholder{color:var(--dim);}
   color:#07090f;
   font-size:11px;
 }
+.grocery-item.have{opacity:0.55}
+.grocery-item.have > div > span:first-of-type{text-decoration:line-through;text-decoration-color:rgba(255,255,255,0.35)}
 
 /* ── COOK MODE ───────────────────────────────────────── */
 .cook-step{
@@ -9529,7 +9531,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111025;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111026;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -12691,15 +12693,15 @@ function renderGrocery() {
       const inPantryCond = condimentOwned(itemText);
       const usual = usuallyHave(itemText); const outNow = usual && state.grocery[key] === false;
       if (usual && !(key in state.grocery)) usualShown.push(itemText);
-      const checked = (groceryHave(key, itemText) || inPantryCond) ? "checked" : "";
-      const usualTag = usual ? (outNow ? ' <span title="You usually have this — marked out for this week" style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(248,113,113,0.12);color:#fca5a5;vertical-align:middle">out this week</span>' : ' <span title="Checked as already-have two weeks running. Tap the item if you\'re out." style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(16,185,129,0.12);color:#6ee7b7;vertical-align:middle">🏠 usually have</span>') : "";
+      const have = !!(groceryHave(key, itemText) || inPantryCond); const checked = have ? "" : "checked";   // tick = buy it; untick = already have
+      const usualTag = usual ? (outNow ? ' <span title="You usually have this — marked out for this week" style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(248,113,113,0.12);color:#fca5a5;vertical-align:middle">out this week</span>' : ' <span title="Unticked because you had it two weeks running. Tap the item if you\'re out." style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(16,185,129,0.12);color:#6ee7b7;vertical-align:middle">🏠 usually have</span>') : "";
       const sourceText = ((item && item.sources && item.sources.length) ? ' <span class="grocery-source">' + esc(item.sources[0]) + (item.sources.length > 1 ? ' +' + (item.sources.length - 1) + ' more' : '') + '</span>' : "") + (inPantryCond ? ' <span class="grocery-source" style="color:var(--green);border:1px solid rgba(16,185,129,0.3)">in pantry</span>' : "");
       const note = (state.groceryNotes && state.groceryNotes[key]) ? state.groceryNotes[key] : "";
-      return `<div class="grocery-item ${checked}" data-text="${esc(itemText)}" data-usual="${usual ? 1 : 0}" onclick="toggleGrocery('${esc(key)}',this)" style="flex-direction:column;align-items:flex-start">
+      return `<div class="grocery-item ${have ? "have" : ""}" data-text="${esc(itemText)}" data-usual="${usual ? 1 : 0}" onclick="toggleGrocery('${esc(key)}',this)" style="flex-direction:column;align-items:flex-start">
         <div style="display:flex;align-items:center;gap:8px;width:100%">
           <div class="grocery-check ${checked}">${checked ? "✓" : ""}</div>
           <span style="flex:1">${esc(itemText)}${usualTag}${sourceText}${storeHint(itemText) ? ' <span style="font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:rgba(245,158,11,0.12);color:#fbbf24;vertical-align:middle">' + esc(storeHint(itemText)) + '</span>' : ""}</span>
-          ${checked ? "" : `<a href="https://www.instacart.com/store/${instacartSlug()}/s?k=${encodeURIComponent(productPhrase(itemText))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Search this at ${esc(state.store)} on Instacart" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:var(--green);font-size:11px;text-decoration:none;flex-shrink:0">🔎</a>`}
+          ${have ? "" : `<a href="https://www.instacart.com/store/${instacartSlug()}/s?k=${encodeURIComponent(productPhrase(itemText))}" target="_blank" rel="noopener" onclick="event.stopPropagation()" title="Search this at ${esc(state.store)} on Instacart" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(16,185,129,0.3);background:rgba(16,185,129,0.08);color:var(--green);font-size:11px;text-decoration:none;flex-shrink:0">🔎</a>`}
           <button onclick="event.stopPropagation();openGroceryNote('${esc(key)}','${esc(note)}')" style="padding:2px 8px;border-radius:6px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:11px;cursor:pointer;flex-shrink:0">${note ? "✏️" : "+"}</button>
         </div>
         ${(item && item.detail) ? `<div style="font-size:12px;color:var(--dim);padding:3px 0 0 24px;line-height:1.4">${esc(item.detail)}</div>` : ""}
@@ -12717,7 +12719,7 @@ function renderGrocery() {
       <div>
         <div style="font-size:20px;font-weight:700">🛒 ${groceryScopeLabel()}</div>
         <div style="color:var(--dim);font-size:13px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span>${checkedCount} checked · ${displayCats.reduce((a,c)=>a+c.items.length,0)} items</span>
+          <span>${Math.max(0, displayCats.reduce((a,c)=>a+c.items.length,0) - checkedCount)} to buy · ${displayCats.reduce((a,c)=>a+c.items.length,0)} items</span>
           <select onchange="state.store=this.value;scheduleSave();renderGrocery()" style="width:auto;flex:0 0 auto;padding:3px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.06);color:var(--text);font-size:12px;font-weight:700">
             ${["Kroger","Publix","Whole Foods","Costco"].map(st => `<option ${state.store===st?"selected":""}>${st}</option>`).join("")}
           </select>
@@ -12730,14 +12732,14 @@ function renderGrocery() {
       <div style="display:flex;gap:6px">
         <button onclick="checkStaples()" title="Check off common pantry staples you probably already have" style="padding:7px 12px;border-radius:10px;border:1.5px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);color:var(--green);font-size:12px;font-weight:700;cursor:pointer">✓ I have the staples</button>
         <button onclick="window._aisleEdit=!window._aisleEdit;renderGrocery()" title="Put the sections in the order you walk your store" style="padding:7px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.18);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">🏬 Store order</button>
-        <button onclick="clearGrocery()" style="padding:7px 12px;border-radius:10px;border:1.5px solid var(--dim);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">Clear</button>
+        <button onclick="clearGrocery()" title="Tick everything again" style="padding:7px 12px;border-radius:10px;border:1.5px solid var(--dim);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">Reset</button>
       </div>
     </div>
     <div class="shop-actions" style="display:flex;gap:8px;margin-bottom:6px;flex-wrap:wrap">
       <button onclick="openShopPreview()" style="flex:2;min-width:200px;padding:13px;border-radius:12px;border:none;background:linear-gradient(135deg,#10b981,#059669);color:#0a0f1a;font-weight:800;font-size:15px;cursor:pointer">🛒 Review & send to ${esc(state.store)}</button>
       <button onclick="shareListToMK()" style="flex:1;min-width:120px;padding:13px;border-radius:12px;border:1.5px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.05);color:var(--text);font-weight:700;font-size:14px;cursor:pointer">📤 Share to MK</button>
     </div>
-    <div style="font-size:12px;color:var(--dim);margin:0 0 10px;line-height:1.45">Tick what you already have below. <b style="color:var(--muted)">Review & send</b> shows what's left to buy and gives you the three ways to get it into Instacart. <a href="#" onclick="event.preventDefault();openInstacart()" style="color:var(--dim)">Just open ${esc(state.store)} on Instacart ↗</a></div>
+    <div style="font-size:12px;color:var(--dim);margin:0 0 10px;line-height:1.45">Ticked = buy it. Untick anything you already have. <b style="color:var(--muted)">Review & send</b> shows just what's left and gives you the three ways to get it into Instacart. <a href="#" onclick="event.preventDefault();openInstacart()" style="color:var(--dim)">Just open ${esc(state.store)} on Instacart ↗</a></div>
     <div id="copy-claude-status" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:4px 0;margin-bottom:8px"></div>
     ${cartRequestHtml()}
     ${aisleEditorHtml()}
