@@ -9534,7 +9534,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111030;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111031;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -9813,7 +9813,8 @@ function buildClaudeListText() {
     const qty = (v.text.match(/^([\d½¼¾⅓⅔⅛.\/\s-]+)\s*(lbs?|oz|cups?|cans?|jars?|bags?|packs?|packages?|pouches?|bunch(?:es)?|heads?)\b/i) || [])[0];
     const lead = !qty && (v.text.match(/^(\d+)\s+(?!(?:tbsp|tsp|cups?)\b)/i) || [])[1];
     const pp = preferredProduct(v.phrase);
-    lines.push("- " + v.phrase + (pp ? " — buy: " + pp : "") + (qty ? " (~" + qty.trim() + ")" : lead && +lead > 1 ? " ×" + lead : (v.count > 1 ? " ×" + v.count : "")) + (v.opt ? " (optional)" : ""));
+    const pr = prefRanks(pp);
+    lines.push("- " + v.phrase + (pr.length ? " — buy: " + pr[0] + (pr.length > 1 ? " (if not available: " + pr.slice(1).join(", then ") + ")" : "") : "") + (qty ? " (~" + qty.trim() + ")" : lead && +lead > 1 ? " ×" + lead : (v.count > 1 ? " ×" + v.count : "")) + (v.opt ? " (optional)" : ""));
   });
   lines.push("");
   if (state.alexaOnlyItems && state.alexaOnlyItems.length) { lines.push("## Extra items (Alexa)"); state.alexaOnlyItems.forEach(i => lines.push("- " + i)); lines.push(""); }
@@ -9887,16 +9888,20 @@ const DEFAULT_PRODUCT_PREFS = [
   [/\b2%.*greek yogurt|fage 2/, "Fage Total 2% plain Greek yogurt"],
   [/\bkosher salt\b/, "Diamond Crystal kosher salt"],
 ];
-function preferredProduct(phrase){
+// A preference is a ranked list, first choice first: "Siete mild > Frontera > Old El Paso mild". The shopper takes the first one the store has.
+function prefRanks(v){ return String(v || "").split(/\s*>\s*|\s*;\s*/).map(x => x.trim()).filter(Boolean); }
+function preferredProduct(phrase){ return prefRanks(preferredProductRaw(phrase)).join(" > "); }
+function preferredProductRaw(phrase){
   const k = shopKey(phrase); const mine = (state.productPrefs || {})[k];
   if (mine !== undefined) return mine || "";                         // "" = explicitly no preference
   const low = String(phrase || "").toLowerCase(); const hit = DEFAULT_PRODUCT_PREFS.find(([re]) => re.test(low)); if (!hit) return "";
   if (low.startsWith(hit[1].toLowerCase().split(/\s+/)[0])) return "";      // the recipe already names that brand — its wording is more specific
   return hit[1];
 }
+function prefHtml(pp){ const r = prefRanks(pp); if (!r.length) return ""; return r.map((x, i) => (i ? `<span style="color:var(--dim)"> › </span>` : "") + `<span style="color:${i ? "#94a3b8" : "#a7f3d0"}">${i ? (i + 1) + ". " : ""}${esc(x)}</span>`).join(""); }
 function setProductPref(k, current){
-  const v = prompt("Exact product to buy for \"" + k + "\" (brand, size). Leave blank for no preference.", current || "");
-  if (v === null) return; state.productPrefs = Object.assign({}, state.productPrefs || {}); state.productPrefs[k] = v.trim(); scheduleSave(); renderShopPreview();
+  const v = prompt("What to buy for \"" + k + "\", best choice first. Separate backups with  >  (e.g. Siete mild > Frontera > Old El Paso mild). Leave blank for no preference.", prefRanks(current).join(" > "));
+  if (v === null) return; state.productPrefs = Object.assign({}, state.productPrefs || {}); state.productPrefs[k] = prefRanks(v).join(" > "); scheduleSave(); renderShopPreview();
 }
 function renderShopPreview(){
   const m=document.getElementById("shop-preview"); if(!m) return;
@@ -9913,7 +9918,7 @@ function renderShopPreviewInner(m){
       <input type="checkbox" ${it.on?"checked":""} onchange="shopPickToggle('${k}', this.checked)" style="width:20px;height:20px;margin-top:1px;accent-color:#10b981;flex-shrink:0">
       <div style="flex:1;min-width:0"><div style="font-size:14px;font-weight:600;color:var(--text)">${esc(it.phrase)}${it.count>1?` <span style="color:var(--dim);font-weight:500">×${it.count}</span>`:""}${qty?` <span style="color:var(--dim);font-weight:500">(~${esc(qty.trim())})</span>`:""}</div>
       ${(()=>{ const pp=preferredProduct(it.phrase); const btn=(lbl)=>`<a href="#" onclick="event.preventDefault();event.stopPropagation();setProductPref('${k}',${JSON.stringify(pp).replace(/"/g,"&quot;").replace(/'/g,"\\'")})" style="color:var(--dim);text-decoration:underline;text-decoration-color:rgba(255,255,255,0.2)">${lbl}</a>`;
-        return (pp?`<div style="font-size:12px;margin-top:3px;color:#a7f3d0">→ ${esc(pp)} · ${btn("change")}</div>`:"")+`<div style="font-size:11px;color:var(--dim);margin-top:2px">${esc(it.sources.slice(0,2).join(" · "))}${it.reason?` · <span style="color:${it.on?"#fbbf24":"#94a3b8"}">${esc(it.reason)}</span>`:""}${pp?"":" · "+btn("set brand")}</div>`; })()}</div></label>`;
+        return (pp?`<div style="font-size:12px;margin-top:3px">→ ${prefHtml(pp)} · ${btn("change")}</div>`:"")+`<div style="font-size:11px;color:var(--dim);margin-top:2px">${esc(it.sources.slice(0,2).join(" · "))}${it.reason?` · <span style="color:${it.on?"#fbbf24":"#94a3b8"}">${esc(it.reason)}</span>`:""}${pp?"":" · "+btn("set brand")}</div>`; })()}</div></label>`;
   };
   let html = "", cur = "";
   // 🔀 Choose-one groups for planned recipes: pick the path, check/uncheck the whole group or single items
@@ -9938,18 +9943,17 @@ function renderShopPreviewInner(m){
       <div style="font-size:13px;color:var(--dim);margin-top:4px">${onN} of ${items.length} to buy. Ticked = buy it. Staples, spices and optional toppings start unticked — tick anything you're actually out of. Your picks hold for this week.</div>
     </div>
     <div id="sp-scroll" style="overflow-y:auto;padding:4px 18px 12px;flex:1">${items.length?html:'<div style="padding:30px;text-align:center;color:var(--dim)">Nothing on the list.</div>'}</div>
-    <div style="padding:10px 18px 0;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;color:var(--dim);line-height:1.5"><b style="color:var(--muted)">Two ways to send it:</b> <b style="color:#c7d2fe">Copy for Claude</b> copies the list — paste it into a Claude chat and it fills the cart while you watch, picking your brands and sizes. <b style="color:#c7d2fe">Have Claude fill my cart</b> saves the list and Claude's scheduled check fills the cart on its own at its next run.</div>
+    <div style="padding:10px 18px 0;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;color:var(--dim);line-height:1.5"><b style="color:#c7d2fe">Copy & open Claude</b> copies the list and opens Claude with it pasted in — hit send and Claude fills your ${esc(state.store)} cart using your brand picks (first choice, then backups). <b style="color:#c7d2fe">Copy for Claude</b> just copies, if you'd rather paste it yourself.</div>
     <div style="padding:10px 18px 18px;display:flex;gap:8px;flex-wrap:wrap">
       <button onclick="shopPickReset()" style="padding:11px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:var(--dim);font-size:13px;cursor:pointer">Reset picks</button>
       <button onclick="copyListForClaude()" ${onN?"":"disabled"} style="flex:1;min-width:150px;padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-weight:800;font-size:14px;cursor:pointer">🛒 Copy ${onN} for Claude</button>
-      <button onclick="requestCartFill()" ${onN?"":"disabled"} title="Saves this exact list; Claude's scheduled check adds it to your ${esc(state.store)} cart" style="flex-basis:100%;padding:11px;border-radius:12px;border:1.5px solid rgba(129,140,248,0.5);background:rgba(129,140,248,0.08);color:#c7d2fe;font-weight:700;font-size:14px;cursor:pointer">🤖 Have Claude fill my ${esc(state.store)} cart (no pasting)</button>
+      <button onclick="sendListToClaude()" ${onN?"":"disabled"} title="Copies the list and opens Claude with it ready to send" style="flex-basis:100%;padding:11px;border-radius:12px;border:1.5px solid rgba(129,140,248,0.5);background:rgba(129,140,248,0.08);color:#c7d2fe;font-weight:700;font-size:14px;cursor:pointer">↗ Copy & open Claude</button>
     </div>
-    <div style="padding:0 18px">${cartRequestHtml()}</div>
     <div id="copy-claude-status-pv" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:0 0 12px"></div>
   </div>`;
 }
 async function openInstacartList(btn) {
-  const items = shopPreviewItems().filter(i => i.on).map(i => ({ name: preferredProduct(i.phrase) || i.phrase, display: i.text.replace(/\s*\([^)]*\)\s*/g, " ").trim().slice(0, 150), quantity: 1 }));
+  const items = shopPreviewItems().filter(i => i.on).map(i => ({ name: prefRanks(preferredProduct(i.phrase))[0] || i.phrase, display: i.text.replace(/\s*\([^)]*\)\s*/g, " ").trim().slice(0, 150), quantity: 1 }));
   if (!items.length) { alert("Nothing unchecked on the list."); return; }
   const orig = btn ? btn.textContent : "";
   if (btn) { btn.disabled = true; btn.textContent = "⏳ Building Instacart list…"; }
@@ -9965,6 +9969,14 @@ async function openInstacartList(btn) {
     }
   } catch (e) { alert("Couldn't reach the Instacart relay: " + e.message); }
   if (btn) { btn.textContent = orig; btn.disabled = false; }
+}
+function sendListToClaude() {
+  const { text, count } = buildClaudeListText();
+  if (!count) { flashCopyStatus("Nothing to buy — everything is unticked."); return; }
+  try { navigator.clipboard.writeText(text); } catch (e) {}
+  const url = "https://claude.ai/new?q=" + encodeURIComponent(text);
+  flashCopyStatus("✅ Copied " + count + " items and opening Claude — if the message isn't filled in, just paste.");
+  setTimeout(() => { window.open(url, "_blank"); }, 150);
 }
 function copyListForClaude() {
   const { text, count } = buildClaudeListText();
@@ -12745,7 +12757,6 @@ function renderGrocery() {
     </div>
     <div style="font-size:12px;color:var(--dim);margin:0 0 10px;line-height:1.45">Ticked = buy it. Untick anything you already have. <b style="color:var(--muted)">Review & send</b> shows just what's left and gives you the two ways to get it into Instacart. <a href="#" onclick="event.preventDefault();openInstacart()" style="color:var(--dim)">Just open ${esc(state.store)} on Instacart ↗</a></div>
     <div id="copy-claude-status" style="display:none;font-size:13px;color:var(--green);text-align:center;padding:4px 0;margin-bottom:8px"></div>
-    ${cartRequestHtml()}
     ${aisleEditorHtml()}
 
     <div style="display:flex;gap:6px;margin-bottom:10px">
