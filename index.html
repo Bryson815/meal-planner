@@ -9531,7 +9531,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111026;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111027;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -12714,6 +12714,8 @@ function renderGrocery() {
   const liveKeys = new Set(); Object.values(sectionMap).forEach(arr => (arr || []).forEach(x => liveKeys.add(groceryKey(x.cat, x.itemText))));
   const checkedCount = Object.entries(state.grocery).filter(([k, v]) => v && liveKeys.has(k)).length + usualShown.length;
   if (usualShown.length) setTimeout(() => haveRefresh(usualShown), 0);
+  setTimeout(() => { try { const btn = document.getElementById("staples-btn"); if (!btn) return; const st = staplesOnList(); const allHave = st.length && st.every(x => x.have);
+    btn.textContent = allHave ? "✓ Staples unticked · tap to put back" : "I have the staples"; btn.style.background = allHave ? "rgba(16,185,129,0.22)" : "transparent"; btn.style.color = allHave ? "#6ee7b7" : "var(--green)"; } catch (e) {} }, 0);
   el.innerHTML = `
     <div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0 8px;flex-wrap:wrap;gap:8px">
       <div>
@@ -12730,7 +12732,7 @@ function renderGrocery() {
         </div>
       </div>
       <div style="display:flex;gap:6px">
-        <button onclick="checkStaples()" title="Check off common pantry staples you probably already have" style="padding:7px 12px;border-radius:10px;border:1.5px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);color:var(--green);font-size:12px;font-weight:700;cursor:pointer">✓ I have the staples</button>
+        <button id="staples-btn" onclick="checkStaples()" title="Untick the common pantry staples (salt, oil, spices…) in one tap; tap again to put them back" style="padding:7px 12px;border-radius:10px;border:1.5px solid rgba(16,185,129,0.4);background:rgba(16,185,129,0.08);color:var(--green);font-size:12px;font-weight:700;cursor:pointer">✓ I have the staples</button>
         <button onclick="window._aisleEdit=!window._aisleEdit;renderGrocery()" title="Put the sections in the order you walk your store" style="padding:7px 12px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.18);background:transparent;color:var(--muted);font-size:12px;cursor:pointer">🏬 Store order</button>
         <button onclick="clearGrocery()" title="Tick everything again" style="padding:7px 12px;border-radius:10px;border:1.5px solid var(--dim);background:transparent;color:var(--dim);font-size:12px;cursor:pointer">Reset</button>
       </div>
@@ -12772,19 +12774,23 @@ function renderGrocery() {
 
 const STAPLES_RE = /^(?:(?:good|extra[- ]virgin|unsalted|salted|kosher|sea|flaky|fine|coarse|ground|dried|light|dark|pure|real|plain|white|granulated|low[- ]sodium|reduced[- ]sodium|diamond crystal|morton|burlap & barrel|penzeys|mccormick)\s+)*(kosher salt|sea salt|flaky salt|salt|black pepper|pepper|peppercorns?|olive oil|avocado oil|vegetable oil|canola oil|cooking spray|butter|all-purpose flour|flour|sugar|brown sugar|honey|garlic powder|onion powder|smoked paprika|paprika|cumin|chili powder|italian seasoning|oregano|red pepper flakes|cayenne|cinnamon|nutmeg|vanilla(?: extract)?|baking soda|baking powder|cornstarch|soy sauce|worcestershire(?: sauce)?|dijon(?: mustard)?|mustard|yellow mustard|ketchup|mayo|mayonnaise|hot sauce|cholula(?: hot sauce)?|frank's(?: redhot)?|(?:red wine |white wine |rice |apple cider |balsamic )?vinegar|chicken broth|beef broth|stock|salt and (?:black )?pepper|pinch (?:of )?(?:salt|nutmeg|cinnamon))\b(?:\s*(?:\(.*\))?)?$/i;
 // a staple only when the line IS the staple — "red bell pepper", "flour tortillas", "peanut butter", "sugar snap peas" are groceries
-function checkStaples() {
-  const items = document.querySelectorAll("#page-grocery .grocery-item");
-  let n = 0;
-  items.forEach(el => {
-    const txt = (el.querySelector("span") || {}).textContent || "";
+function staplesOnList(){
+  return [...document.querySelectorAll("#page-grocery .grocery-item")].map(el => {
+    const txt = el.dataset.text || (el.querySelector("span") || {}).textContent || "";
     const key = (el.getAttribute("onclick") || "").match(/toggleGrocery\('([^']+)'/);
-    if (!key) return;
-    if (STAPLES_RE.test(productPhrase(txt).toLowerCase()) && !groceryHave(key[1], el.dataset.text || txt)) { state.grocery[key[1]] = true; if (el.dataset.text) haveRecord(el.dataset.text, true); n++; }
-  });
+    return key && STAPLES_RE.test(productPhrase(txt).toLowerCase()) ? { key: key[1], txt, have: groceryHave(key[1], txt), usual: el.dataset.usual === "1" } : null;
+  }).filter(Boolean);
+}
+function checkStaples() {
+  // Toggle: first tap unticks every pantry staple on the list (= you have them); tapping again when they're all unticked ticks them back.
+  const items = staplesOnList(); const toHave = items.filter(x => !x.have);
+  let msg;
+  if (!items.length) msg = "No pantry staples on this list";
+  else if (toHave.length) { toHave.forEach(x => { state.grocery[x.key] = true; haveRecord(x.txt, true); }); msg = "✓ Unticked " + toHave.length + " pantry staple" + (toHave.length > 1 ? "s" : "") + " — tick any you're actually out of"; }
+  else { items.forEach(x => { if (x.usual) state.grocery[x.key] = false; else delete state.grocery[x.key]; haveRecord(x.txt, x.usual ? false : null); }); msg = "Ticked " + items.length + " staple" + (items.length > 1 ? "s" : "") + " back onto the list"; }
   scheduleSave();
   renderGrocery();
-  const st = document.getElementById("copy-claude-status");
-  if (st) { st.style.display = "block"; st.textContent = n ? "✓ Checked off " + n + " pantry staple" + (n>1?"s":"") + " — uncheck anything you're actually out of" : "No unchecked staples found"; setTimeout(() => { if (st) st.style.display = "none"; }, 4000); }
+  try { const t = document.createElement("div"); t.textContent = msg; t.style.cssText = "position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#111827;border:1px solid rgba(16,185,129,0.5);color:#d1fae5;padding:10px 16px;border-radius:12px;font-size:14px;z-index:99999;box-shadow:0 8px 24px rgba(0,0,0,0.4);max-width:90vw;text-align:center"; document.body.appendChild(t); setTimeout(() => t.remove(), 3000); } catch (e) {}
 }
 
 // ── "We always have this" ── pantry / condiment / spice items checked as already-have in 2+ different weeks start checked.
