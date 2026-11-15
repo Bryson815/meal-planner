@@ -9534,13 +9534,13 @@ function _legacyApplySwaps(ingredients) {
 // overwrite the family plan with defaults); (2) every upload is a 3-way merge against what
 // this device last synced, so MK's edit and Andrew's edit to different things both survive.
 const STORAGE_KEY = "lemmonMealPlan_v2";
-const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek","groceryExcluded","groceryLunchbox","groceryScope","recipeScale","haveStats","planProposal","cartRequest","productPrefs","leftovers","aisleOrder","groceryExtra"];
+const SHARED_KEYS = ["breakfasts","lunches","dinners","desserts","swaps","spiceBlends","userEmail","wifeEmail","wifePhone","store","grocery","useStaticGrocery","pantry","alexaOnlyItems","alexaSyncTime","ratings","activeRecipes","sauces","weekPlan","nextWeekPlan","cookHistory","groceryNotes","prepDone","lunchbox","planDefaults","uiPrefs","useUp","recipeRev","shopPicks","shopPicksWeek","needsGrocery","groceryBothWeeks","weekPlanMonday","choicePicks","prepAheadDone","savedWeeks","lastWeek","groceryExcluded","groceryLunchbox","groceryScope","recipeScale","haveStats","planProposal","cartRequest","productPrefs","leftovers","aisleOrder","groceryExtra","workShifts"];
 const DEVICE_KEYS = ["vaultSort","readAloud","voiceAutoStart","voiceTipSeen","voiceLoose","vaultAudience","vaultQuick","vaultUseUp"];
 let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111533;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111534;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -11198,6 +11198,12 @@ window.kidComfort = kidComfort; window.householdLevel = householdLevel;
 // ── Week rollover: "This week" is always the real Monday–Sunday we're in ──
 function mondayISO(d){ d = d ? new Date(d) : new Date(); const k = (d.getDay() + 6) % 7; d.setDate(d.getDate() - k); return localISODate(d); }
 function addDaysISO(iso, n){ const [y,m,dd] = iso.split("-").map(Number); const d = new Date(y, m-1, dd); d.setDate(d.getDate() + n); return localISODate(d); }
+function shiftPillHtml(day, which){
+  const iso = addDaysISO(mondayISO(), PLAN_DAYS.indexOf(day) + (which === "next" ? 7 : 0));
+  const sh = (state.workShifts || {})[iso]; if (!sh || !sh.label) return "";
+  const st = { off: ["#34d399","rgba(16,185,129,0.14)","🏖"], late: ["#f87171","rgba(239,68,68,0.14)","🌙"], remote: ["#93c5fd","rgba(59,130,246,0.14)","🏠"], day: ["#fcd34d","rgba(245,158,11,0.14)","🏥"] }[sh.kind] || ["#cbd5e1","rgba(255,255,255,0.08)","📅"];
+  return `<div style="margin-top:5px;display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;color:${st[0]};background:${st[1]}" title="From Andrew's QGenda calendar">${st[2]} ${esc(sh.label)}${sh.kind==="late" ? ' · no cook' : ''}</div>`;
+}
 function weekDateLabel(day, which){ const mon = mondayISO(); const iso = addDaysISO(mon, PLAN_DAYS.indexOf(day) + (which === "next" ? 7 : 0)); const [y,m,d] = iso.split("-").map(Number); return new Date(y, m-1, d).toLocaleDateString([], { month: "short", day: "numeric" }); }
 function rolloverWeeks(){
   const cur = mondayISO();
@@ -11975,6 +11981,7 @@ function renderPlan() {
         <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.05);position:relative;">
           <div style="font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--green);margin-bottom:3px;opacity:0.8">${{Monday:"WEEKDAY",Tuesday:"WEEKDAY",Wednesday:"MID-WEEK",Thursday:"WEEKDAY",Friday:"FRIDAY",Saturday:"WEEKEND",Sunday:"SUNDAY · BATCH DAY"}[day] || "WEEKDAY"}</div>
           <div style="font-size:15px;font-weight:800;letter-spacing:-0.3px;color:var(--text)">${day} <span style="font-size:12px;font-weight:600;color:var(--dim)">${weekDateLabel(day, planWeekView)}</span>${(planWeekView==="this" && PLAN_DAYS.indexOf(day) === (new Date().getDay()+6)%7) ? ' <span style="font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;background:rgba(16,185,129,0.15);color:#34d399;vertical-align:2px">TODAY</span>' : ""}</div>
+          ${shiftPillHtml(day, planWeekView)}
         </div>
         <div style="padding:8px 10px">
           ${slotsHtml}
