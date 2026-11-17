@@ -9555,7 +9555,7 @@ let cloudReady = false;      // true only after a successful cloud read
 let syncBase = null;         // {key: JSON string} as of the last successful sync
 let syncing = false, resyncQueued = false;
 const _j = v => JSON.stringify(v === undefined ? null : v);
-const APP_BUILD = 2026111700;   // bump on every deploy; an older open tab reloads itself instead of writing
+const APP_BUILD = 2026111701;   // bump on every deploy; an older open tab reloads itself instead of writing
 function staleCheck(plan){
   if (plan && typeof plan.appBuild === "number" && plan.appBuild > APP_BUILD) {
     let n = 0; try { n = +sessionStorage.getItem("staleReload") || 0; } catch (e) {}
@@ -15408,11 +15408,13 @@ function handleAtlantaSearch(query) {
 // ── Claude relay: the API key lives server-side in a Supabase Edge Function; browsers never hold it ──
 const CLAUDE_RELAY_URL = "https://opnpfaepzhtoozjdzgjv.supabase.co/functions/v1/claude-chat";
 async function callClaude(payload) {
+  if (!familyKey()) throw new Error("Enter the family passcode first (tap the lock at the top of the app).");
   const response = await fetch(CLAUDE_RELAY_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-app": "lemmon-meal-planner" },
+    headers: { "Content-Type": "application/json", "x-app": "lemmon-meal-planner", "x-family-key": familyKey() },
     body: JSON.stringify(payload)
   });
+  if (response.status === 401) throw new Error("The family passcode on this device didn't work. Re-enter it in Settings.");
   if (!response.ok) {
     const err = await response.json().catch(() => ({}));
     throw new Error((err.error && (err.error.message || err.error)) || ("API error " + response.status));
